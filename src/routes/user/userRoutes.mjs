@@ -170,6 +170,7 @@ const filterUsers = async  (req,res) =>  {
 userRoutes.put('/edit-user', async (req, res) => {
     try {
         const { id, username, email,mobileNumber, organizationId, password,roleId } = req.body;
+     
         setCommonHeaders(res);
 
         if (!organizationsUsersMap.has(id)) {
@@ -183,8 +184,8 @@ userRoutes.put('/edit-user', async (req, res) => {
         user.username = username || user.username;
         user.email = email || user.email;
         user.organizationId = organizationId || user.organizationId;
-        user.mobileNumber = mobileNumber;
-        user.roleId = roleId;
+        user.mobileNumber = mobileNumber || user.mobileNumber;
+        user.roleId = roleId || user.roleId;
 
         // Update password only if a new password is provided and it's different from the existing one
         //console.log('password : ',password);
