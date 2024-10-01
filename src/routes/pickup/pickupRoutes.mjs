@@ -119,7 +119,7 @@ pickupRoutes.delete('/:id', function (req, res) {
     }    
     );
     if(!flowFound)
-      userHasDeleteRights(req,configurationPickupMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+      userHasDeleteRights(req,configurationPickupMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
       //configurationPickupMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(new ResponseMessage(uuidv4(),`Unable to delete id ${req.params.id}`,'Failed'));
     else 
       res.status(400).send(new ResponseMessage(uuidv4(),`Pickup :  ${configurationPickupMap.get(req.params.id).connectionName} used in flow :  ${flowName}`,'Failed')) ;

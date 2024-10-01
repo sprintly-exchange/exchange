@@ -209,7 +209,7 @@ organizationRoutes.delete('/id/:id', (req, res) => {
     console.log('organizationsMap.get(id).isDefaultUiDisplayFalse',organizationsMap.get(id).isDefaultUiDisplayFalse);
     if(organizationsMap.get(id).isDefaultUiDisplayFalse !== true){
       //organizationsMap.delete(id);
-      userHasDeleteRights(req,organizationsMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+      userHasDeleteRights(req,organizationsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
       res.status(200).send(new ResponseMessage(uuidv4(),'Organization deleted successfully','Success'));
     } else {
       res.status(404).send(new ResponseMessage(uuidv4(),`${organizationsMap.get(id).name} cannot be deleted.`,'Failed'));

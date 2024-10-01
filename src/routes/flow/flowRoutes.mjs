@@ -143,7 +143,7 @@ flowRoutes.delete('/:id', function (req, res) {
     console.log(`Current flows: ${configurationFlowMap.size}`);
     
     //configurationFlowMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send('{}'); 
-    userHasDeleteRights(req,configurationFlowMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+    userHasDeleteRights(req,configurationFlowMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
 
     console.log(`Current flows after deletion: ${configurationFlowMap.size}`);
 });

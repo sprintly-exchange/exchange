@@ -113,7 +113,7 @@ async function getProcessing(req,res){
     }    
     );
     if(!flowFound)
-        userHasDeleteRights(req,configurationProcessingMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+        userHasDeleteRights(req,configurationProcessingMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
         //configurationProcessingMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(new ResponseMessage(uuidv4(),`Unable to delete id ${req.params.id}`,'Failed'));
     else 
       res.status(400).send(new ResponseMessage(uuidv4(),`Processing :  ${configurationProcessingMap.get(req.params.id).processingName} used in flow :  ${flowName}`,'Failed')) ;

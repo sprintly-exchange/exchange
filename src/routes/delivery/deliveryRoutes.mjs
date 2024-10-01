@@ -181,7 +181,7 @@ deliveryRoutes.delete('/:id', function (req, res) {
     console.log('flowFound:', flowFound);
 
     if (!flowFound) {
-        userHasDeleteRights(req,configurationDeliveryMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+        userHasDeleteRights(req,configurationDeliveryMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
         //configurationDeliveryMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(`{"Status":"Unable to delete ID ${req.params.id}"}`);
     } else {
         res.status(400).send(new ResponseMessage(uuidv4(),`Delivery :  ${configurationDeliveryMap.get(req.params.id).connectionName} used in flow :  ${flowName}`,'Failed')) ;
