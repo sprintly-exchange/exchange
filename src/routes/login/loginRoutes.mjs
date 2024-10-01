@@ -66,9 +66,13 @@ loginRoutes.post('/login', async (req, res) => {
       }
 
       // If user with the given username is not found
-      if (!foundUser) {
-          return res.status(400).send('Invalid credentials');
-      }
+      if (foundUser) {
+        // Update the lastLoggedInTime of the found user
+        foundUser.lastLoggedInTime = new Date(); // Or set to your desired time
+        console.log(`Updated lastLogged for user: ${foundUser.username}`);
+    } else {
+        console.log('User not found.');
+    }
 
       // Check if password matches
       const isMatch = await bcrypt.compare(password, foundUser.password);

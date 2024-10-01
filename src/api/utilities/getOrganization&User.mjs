@@ -1,7 +1,7 @@
 import jwt, { decode } from 'jsonwebtoken';
 import axios from 'axios';
 import jwkToPem from 'jwk-to-pem';
-import { getOrgId, getRoleId, getUserId, organizationExists, userExists } from './serverCommon.mjs';
+import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userExists } from './serverCommon.mjs';
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 import appEnumerations from './severInitFunctions.mjs';
@@ -67,6 +67,7 @@ export const getAuthDetails = async (authorizationHeader) => {
             memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
             roleId : getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
             registrationDate: new Date().toISOString(),
+            lastLoggedInTime: new Date(),
           };
           organizationsUsersMap.set(user.id,user);
           userId = user.id;
@@ -74,6 +75,8 @@ export const getAuthDetails = async (authorizationHeader) => {
           global.googleUserCreationStatus[email] = false;
         } else {
           userId = getUserId(email);
+          const currUserSet = getUserById(userId);
+          currUserSet.lastLoggedInTime =  new Date();
         }
 
         //console.log('Google based user/organization ID',{userId, organizationId});
