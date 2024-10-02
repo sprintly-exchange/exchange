@@ -3,6 +3,7 @@ import { TransactionProcessorFS } from "./transaction-processor-FS.mjs";;
 import { TransactionProcessorFTP } from "./transaction-processor-FTP.mjs";
 import { TransactionProcessorSFTP } from "./transaction-processor-SFTP.mjs";
 import { TransactionProcessorKAFKA } from "./transaction-processor-KAFKA.mjs";
+import xmldom from "xmldom";
 
 import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
