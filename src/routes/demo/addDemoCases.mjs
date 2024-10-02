@@ -235,7 +235,7 @@ export function addDemoCases(organizationId){
             flow_process_order_respones.organizationId = organizationId;
             flow_process_order_respones.activationStatus = false; 
       //Set flows flow_process_invoices
-            flow_process_invoices = new Flow("Process invoices",Pickup_Invoices.id,Deliver_Invoices.id,Processing_code_default.id);
+            flow_process_invoices = new Flow("Process invoices",Pickup_Invoices.id,Deliver_Invoices.id,Invoice_JSON_to_XML_Mapper_Example_Code.id);
             flow_process_invoices.organizationId = organizationId;
             flow_process_invoices.activationStatus = false;  
   
