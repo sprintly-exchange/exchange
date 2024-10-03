@@ -121,6 +121,8 @@ export class TransactionProcessManager{
       async configurationProcessing() {
             this.transactionProcessManagerStage = this._STAGE_CONFIG_PROCESSING;
             this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
+           
+
             //console.log(this.configProcessing);
             if(this.configProcessing && this.configProcessing.code){
                   // Decode the base64 encoded code to a string
@@ -149,6 +151,7 @@ export class TransactionProcessManager{
                         console.error('Generated object does not have a valid method to execute.');
                   }
                   } catch (error) {
+                  this.transaction.configurationProcessingError=error.toString();
                   console.error('Error executing processing transformation:', error);
                   // Handle error accordingly, maybe return a default value or rethrow
                   return false;
