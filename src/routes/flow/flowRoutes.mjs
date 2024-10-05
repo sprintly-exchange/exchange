@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { filterResultsBasedOnUserRoleAndUserId, getOrganizatonNameById, setCommonHeaders, userHasDeleteRights } from '../../api/utilities/serverCommon.mjs';
+import { filterResultsBasedOnUserRoleAndUserId, getOrganizatonNameById, setCommonHeaders, userHasDeleteRights, mapEntrySearchByValue } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
@@ -40,6 +40,14 @@ const flowRoutes = Router();
  */
 flowRoutes.post('/', function (req, res) {   
     console.debug(`Flow received : ${JSON.stringify(req.body)}`);
+        
+    //Check If a record already exists with name
+    if(mapEntrySearchByValue(configurationFlowMap,'flowName',req.body.flowName)){
+        res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
+        return;
+    }   
+
+      
     req.body.id === undefined ? req.body.id = uuidv4() : '';
     configurationFlowMap.set(req.body.id, req.body);
     setCommonHeaders(res);

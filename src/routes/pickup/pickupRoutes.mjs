@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userHasDeleteRights,filterResultsBasedOnUserRoleAndUserId, setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
+import { userHasDeleteRights,filterResultsBasedOnUserRoleAndUserId, setCommonHeaders, mapEntrySearchByValue } from '../../api/utilities/serverCommon.mjs';
 import {v4 as uuidv4} from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
@@ -26,7 +26,13 @@ pickupRoutes.post('/', function (req, res) {
     setCommonHeaders(res);
     if(req.body === '[]') 
       res.status(400).send('No data');
-    //console.debug(`Pickup received : ${JSON.stringify(req.body)}`);
+    
+    //Check If a record already exists with name
+    if(mapEntrySearchByValue(configurationPickupMap,'connectionName',req.body.connectionName)){
+      res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
+      return;
+    }   
+
     req.body.id === undefined ? req.body.id = uuidv4() :'';
     configurationPickupMap.set(req.body.id,req.body);
     res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 

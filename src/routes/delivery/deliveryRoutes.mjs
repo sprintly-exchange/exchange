@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders, userHasDeleteRights } from '../../api/utilities/serverCommon.mjs';
+import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders, userHasDeleteRights , mapEntrySearchByValue} from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
@@ -45,6 +45,13 @@ deliveryRoutes.post('/', function (req, res) {
         res.status(400).send('No data'); 
         return;
     }
+
+    //Check If a record already exists with name
+    if(mapEntrySearchByValue(configurationDeliveryMap,'connectionName',req.body.connectionName)){
+        res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
+        return;
+    }   
+
     req.body.id === undefined ? req.body.id = uuidv4() : '';
     configurationDeliveryMap.set(req.body.id, req.body);
     res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 

@@ -13,6 +13,19 @@ export function setCommonHeaders(res){
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 };
 
+export function mapEntrySearchByValue(map, searchKey, searchValue) {
+    // Iterate through the map entries
+    for (let [key, value] of map.entries()) {
+      // Check if the value is an object and has a property that matches searchKey and searchValue
+      if (value && value[searchKey] === searchValue) {
+        return true;
+      }
+    }
+    
+    // Return false if no matching entry is found
+    return false;
+  }
+  
 //get role id when given a role
 export function getRoleId(role){
     let roleId = undefined;
