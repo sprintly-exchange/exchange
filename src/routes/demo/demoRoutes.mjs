@@ -1,4 +1,5 @@
 // routes/demo.mjs
+
 import { Router } from 'express';
 import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { addDemoCases, removeDemoCases } from './addDemoCases.mjs';
@@ -6,45 +7,64 @@ import { getAuthDetails } from "../../api/utilities/getOrganization&User.mjs";
 
 const demoRoutes = Router();
 
-//function for enabling disabling the demo mode
-const toogleDemoMode = async (req) => {
-      const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-       if(!global.demoModeEnabled[organizationId]) {
-            addDemoCases(organizationId);
-            global.demoModeEnabled[organizationId] = true;
-            console.log('Demo mode status enabled : ', global.demoModeEnabled[organizationId]);
-            return true;
-       } else {
-            removeDemoCases(configurationPickupMap,configurationDeliveryMap,configurationFlowMap,organizationId);
-            global.demoModeEnabled[organizationId] = false; 
-            console.log('Demo mode status enabled : ', global.demoModeEnabled[organizationId]); 
-            return true;
-       }
+// Function for enabling/disabling the demo mode
+const toggleDemoMode = async (req) => {
+    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
 
-     
-       
+    // Get the current demo mode status
+    const demoMode = global.demoModeEnabledMap.get(organizationId);
+    
+    // If no demo mode entry exists for the organization, return false
+    if (!demoMode) {
+         // If demo mode is currently disabled, enable it
+         addDemoCases(organizationId);
+         global.demoModeEnabledMap.set(organizationId, { 'status': true });
+         console.log('Demo mode status enabled for organization:', organizationId);
+         return true;
+    }
+
+    const status = demoMode.status;
+
+    // Toggle demo mode: disable if enabled, enable if disabled
+    if (status) {
+        // If demo mode is currently enabled, disable it
+        removeDemoCases(configurationPickupMap, configurationDeliveryMap, configurationFlowMap, organizationId);
+        global.demoModeEnabledMap.set(organizationId, { 'status': false });
+        console.log('Demo mode status disabled for organization:', organizationId);
+        return false;
+    } else {
+      // If demo mode is currently disabled, enable it
+      addDemoCases(organizationId);
+      global.demoModeEnabledMap.set(organizationId, { 'status': true });
+      console.log('Demo mode status enabled for organization:', organizationId);
+      return true;
+    }
+
+    return true;  // Return true if the toggle was successful
 };
 
-
-//enable for testing purpose during development
-//(toogleDemoMode(true));
-
-demoRoutes.get('/toggle', function (req, res) {   
-      toggle(req,res);
+// Route to toggle demo mode
+demoRoutes.get('/toggle', async function (req, res) {   
+    await toggle(req, res);
 });
 
-  async function toggle(req,res){
-      const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-      const demoStatus = {
-            status: global.demoModeEnabled[organizationId],
-      };
-      console.debug(`Toggle demo mode request.`);
-      setCommonHeaders(res);
-      toogleDemoMode(req)?res.status(200).send(JSON.stringify(demoStatus)):res.status(400).send(JSON.stringify(demoStatus)); ; 
-      console.debug(`Demo mode status: ${global.demoModeEnabled[organizationId]}`);
-  };
+async function toggle(req, res) {
+    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
+    console.debug('Toggle demo mode request.');
+    setCommonHeaders(res);
 
-//api to get status of demo mode
+    // Await the toggleDemoMode function since it's async
+    const toggleResult = await toggleDemoMode(req);
+
+    // If toggle was successful, return the updated demo mode status
+    if (toggleResult) {
+        res.status(200).send(global.demoModeEnabledMap.get(organizationId));  // Successful toggle
+    } else {
+        res.status(400).send('');  // Bad request
+    }
+}
+
+// API to get the current status of the demo mode
 /**
 * @swagger
 * /api/toggledemomode/status:
@@ -54,19 +74,19 @@ demoRoutes.get('/toggle', function (req, res) {
 *       200:
 *         description: Successful response
 */
-demoRoutes.get('/status', function (req, res) {  
-      status(req,res);
+demoRoutes.get('/status', async function (req, res) {  
+    await status(req, res);  // Ensure async status function is awaited
 });
 
-async function status(req,res){
-      const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-      const demoStatus = {
-            status: demoModeEnabled[organizationId],
-      }; 
-      console.debug(`Demo mode status requested.`);
-      setCommonHeaders(res);
-      res.status(200).send(JSON.stringify(demoStatus));   
-       console.debug(`Demo mode status: ${demoModeEnabled[organizationId]}`);
+async function status(req, res) {
+    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
+    const demoStatus = {
+        status: global.demoModeEnabledMap.get(organizationId) ? global.demoModeEnabledMap.get(organizationId).status : false,
+    }; 
+    console.debug('Demo mode status requested.');
+    setCommonHeaders(res);
+    res.status(200).json(demoStatus);  // Express automatically converts object to JSON
+    console.debug(`Demo mode status: ${demoStatus.status}`);
 }
 
 export default demoRoutes;

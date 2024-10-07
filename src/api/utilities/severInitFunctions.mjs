@@ -139,7 +139,7 @@ export const initFunction = async () => {
         global.configurationFlowMap = new Map(); // map to store the flow configruations objects
         global.transactonsStatisticsMap = new Map(); // Map to store runtime trasactions objects
         global.forntEndConfigurationMap = new Map(); // Map to store runtime trasactions objects
-        global.demoModeEnabled={};
+        global.demoModeEnabledMap=new Map();
         global.configruationProcessor = new ConfigurationProcessor();
         // Map to store runtime transaction objects
         global.organizationsMap = new Map();
