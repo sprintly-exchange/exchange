@@ -154,7 +154,15 @@ export const initFunction = async () => {
 
         //fix used to stop user creation duplicate issue for google uses
         global.googleUserCreationStatus={};
-    
+
+        //to store server configruation values
+        global.serverConfigurationMap= new Map();
+        global.serverConfigurationMap.set('processRulesTimeInterval',1000);
+        global.serverConfigurationMap.set('processPickupProcessingQueueTimeInterval',1000);
+        global.serverConfigurationMap.set('processDeliveryProcessingQueueTimeInterval',1000);
+        global.serverConfigurationMap.set('processConfigurationProcessingQueueTimeInterval',1000);
+        global.serverConfigurationMap.set('removeOldTransactionsTimeInterval',30000);
+        global.serverConfigurationMap.set('removeOldTransactionsArchiveDays',1);
         //Configruation save funtionality
         global.storageConfiguration = new ConfigurationFileStorage('FS',process.env.CONFIG_STORAGE_DIR,);
         global.storage = new FileStorage('FS');

@@ -3,6 +3,7 @@ import { getItemByUserId, setCommonHeaders } from '../../api/utilities/serverCom
 import {v4 as uuidv4} from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
+import { setProcessConfigurationProcessingQueueInterval, setProcessDeliveryProcessingQueueInterval, setProcessPickupProcessingQueueInterval, setProcessRulesInterval, setRemoveOldTransactionsInterval } from '../../../server.mjs';
 
 const configurationRoutes = Router();
 
@@ -106,5 +107,53 @@ async function getUserConfig(req,res) {
         return res.status(204).send('');
     }
 }
+
+configurationRoutes.get('/system/settings', function (req, res) {   
+    console.debug(`System settings configuration requested`);
+    getSystemSettings(req,res);
+});
+
+async function getSystemSettings(req,res) {
+    const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
+    setCommonHeaders(res); 
+    // Assuming global.serverConfigurationMap is a Map
+    const events = Object.fromEntries(global.serverConfigurationMap);
+    // Convert to JSON string
+    const eventsJson = JSON.stringify(events);
+    return res.status(200).send(eventsJson);
+    
+}
+
+configurationRoutes.put('/system/settings', function (req, res) {   
+    console.debug(`System settings configuration requested`);
+    updateSystemSettings(req,res);
+});
+
+async function updateSystemSettings(req, res) {
+    try {
+        // Assuming req.body contains the new settings
+        const newSettings = req.body;
+
+        // Loop through each key in newSettings and update the global map
+        for (const [key, value] of Object.entries(newSettings)) {
+            if (global.serverConfigurationMap.has(key)) {
+                global.serverConfigurationMap.set(key, Number(value));
+                setProcessRulesInterval();
+                setProcessPickupProcessingQueueInterval
+                setProcessConfigurationProcessingQueueInterval();
+                setProcessDeliveryProcessingQueueInterval();
+                setRemoveOldTransactionsInterval();
+            } else {
+                console.log(`Key ${key} not found in global serverConfigurationMap.`);
+            }
+        }
+
+        res.status(200).json({ message: 'System settings updated successfully' });
+    } catch (error) {
+        console.error('Error updating system settings:', error);
+        res.status(500).json(new ResponseMessage(uuidv4,'Internal server error','Failed'));
+    }
+}
+
 
 export default configurationRoutes;

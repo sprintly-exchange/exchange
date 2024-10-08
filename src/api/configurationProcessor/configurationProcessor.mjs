@@ -15,6 +15,7 @@ export class ConfigurationProcessor {
         configurationProcessingMap: this.mapToJson(global.configurationProcessingMap),
         configurationFlowMap: this.mapToJson(global.configurationFlowMap),
         demoModeEnabledMap: this.mapToJson(global.demoModeEnabledMap),
+        serverConfigurationMap: this.mapToJson(global.serverConfigurationMap),
       };
     
       await global.storageConfiguration.saveStaticFile('Configurations.json', JSON.stringify(dataConfigurations));
@@ -43,6 +44,7 @@ export class ConfigurationProcessor {
           global.configurationProcessingMap = this.jsonToMap(dataConfigurations.configurationProcessingMap);
           global.configurationFlowMap = this.jsonToMap(dataConfigurations.configurationFlowMap);
           global.demoModeEnabledMap = this.jsonToMap(dataConfigurations.demoModeEnabledMap);
+          global.serverConfigurationMap = this.jsonToMap(userConfigurations.serverConfigurationMap);
       } catch (error) {
           console.log(error);
           console.log('dataConfigurations not found for loading.');
