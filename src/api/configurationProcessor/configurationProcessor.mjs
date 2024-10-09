@@ -44,7 +44,7 @@ export class ConfigurationProcessor {
           global.configurationProcessingMap = this.jsonToMap(dataConfigurations.configurationProcessingMap);
           global.configurationFlowMap = this.jsonToMap(dataConfigurations.configurationFlowMap);
           global.demoModeEnabledMap = this.jsonToMap(dataConfigurations.demoModeEnabledMap);
-          global.serverConfigurationMap = this.jsonToMap(userConfigurations.serverConfigurationMap);
+          global.serverConfigurationMap = this.jsonToMap(dataConfigurations.serverConfigurationMap);
       } catch (error) {
           console.log(error);
           console.log('dataConfigurations not found for loading.');

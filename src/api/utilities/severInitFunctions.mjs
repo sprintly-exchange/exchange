@@ -21,8 +21,13 @@ const appEnumerations = Object.freeze({
   TRANSACTION_STATUS_PROCESSING_PICKUP: 'PROCESSING_PICKUP',
   TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS: 'PROCESSING_CONFIGURATIONS',
   TRANSACTION_STATUS_SUCCESS: 'SUCCESS',
+  PROCESS_RULES_TIME_INTERVAL : 'PROCESS_RULES_TIME_INTERVAL',
+  PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL: 'PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL',
+  PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL: 'PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL',
+  PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL: 'PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL',
+  REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL: 'REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL',
+  REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS: 'REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS',
 });
-
 
 
 const defaultRoleAdmin = {
@@ -129,6 +134,33 @@ const defaultUser = {
         console.log(error);
       } 
   };
+
+  export const ensureSystemSettings = async () => {
+    // Set or update the configuration values based on whether the key exists
+    if (!global.serverConfigurationMap.has(appEnumerations.PROCESS_RULES_TIME_INTERVAL)) {
+      global.serverConfigurationMap.set(appEnumerations.PROCESS_RULES_TIME_INTERVAL, 1000);
+    } 
+
+    if (!global.serverConfigurationMap.has(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) {
+        global.serverConfigurationMap.set(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    }
+
+    if (!global.serverConfigurationMap.has(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)) {
+        global.serverConfigurationMap.set(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    }
+
+    if (!global.serverConfigurationMap.has(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) {
+        global.serverConfigurationMap.set(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    }
+
+    if (!global.serverConfigurationMap.has(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)) {
+        global.serverConfigurationMap.set(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL, 30000);
+    }
+
+    if (!global.serverConfigurationMap.has(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)) {
+        global.serverConfigurationMap.set(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS, 1);
+    }
+  };
   
 
 export const initFunction = async () => {
@@ -155,16 +187,13 @@ export const initFunction = async () => {
         //fix used to stop user creation duplicate issue for google uses
         global.googleUserCreationStatus={};
 
-        //to store server configruation values
+        //system settings
         global.serverConfigurationMap= new Map();
-        global.serverConfigurationMap.set('processRulesTimeInterval',1000);
-        global.serverConfigurationMap.set('processPickupProcessingQueueTimeInterval',1000);
-        global.serverConfigurationMap.set('processDeliveryProcessingQueueTimeInterval',1000);
-        global.serverConfigurationMap.set('processConfigurationProcessingQueueTimeInterval',1000);
-        global.serverConfigurationMap.set('removeOldTransactionsTimeInterval',30000);
-        global.serverConfigurationMap.set('removeOldTransactionsArchiveDays',1);
-        //Configruation save funtionality
+
+
+     //Configruation save funtionality
         global.storageConfiguration = new ConfigurationFileStorage('FS',process.env.CONFIG_STORAGE_DIR,);
+        console.log('global.storageConfiguration',global.storageConfiguration);
         global.storage = new FileStorage('FS');
         global.storage._storageLocation= process.env.FILE_STORAGE_DIR;
 
@@ -172,6 +201,7 @@ export const initFunction = async () => {
         await configruationProcessor.loadConfigurations();
         await ensureDefaultOrganization();
         await ensureDefaultRoles();
+        await ensureSystemSettings();
 
         //Setting config saving interval
         const saveInterval = 10000; // 10 seconds
