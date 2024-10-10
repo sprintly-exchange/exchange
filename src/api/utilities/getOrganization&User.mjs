@@ -61,7 +61,7 @@ export const getAuthDetails = async (authorizationHeader) => {
             id: `${uuidv4()}`,
             username : email,
             email : email,
-            mobileNumnber: '',
+            mobileNumber : '',
             password :  `${await bcrypt.hash('changeme', 10)}`,
             organizationId: organizationId,
             memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],

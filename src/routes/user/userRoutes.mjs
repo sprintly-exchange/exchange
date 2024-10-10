@@ -187,6 +187,7 @@ userRoutes.put('/edit-user', async (req, res) => {
         user.mobileNumber = mobileNumber || user.mobileNumber;
         user.roleId = roleId || user.roleId;
 
+
         // Update password only if a new password is provided and it's different from the existing one
         //console.log('password : ',password);
         //console.log('user.password : ',user.password)
