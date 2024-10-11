@@ -9,16 +9,42 @@ export class ConfigurationProcessor {
 
       await global.storageConfiguration.saveStaticFile('User_Configurations.json', JSON.stringify(userConfigurations));
 
-      const dataConfigurations = {
+      //configurationPickupMap config
+      const configurationPickupMap = {
         configurationPickupMap: this.mapToJson(global.configurationPickupMap),
-        configurationDeliveryMap: this.mapToJson(global.configurationDeliveryMap),
+      };
+      await global.storageConfiguration.saveStaticFile('configurationPickupMap.json', JSON.stringify(configurationPickupMap));
+
+      //configurationProcessingMap config
+      const configurationProcessingMap = {
         configurationProcessingMap: this.mapToJson(global.configurationProcessingMap),
+      };
+      await global.storageConfiguration.saveStaticFile('configurationProcessingMap.json', JSON.stringify(configurationProcessingMap));
+      
+       //configurationDeliveryMap config
+       const configurationDeliveryMap = {
+        configurationDeliveryMap: this.mapToJson(global.configurationDeliveryMap),
+      };
+      await global.storageConfiguration.saveStaticFile('configurationDeliveryMap.json', JSON.stringify(configurationDeliveryMap));
+      
+      //configurationFlowMap config
+      const configurationFlowMap = {
         configurationFlowMap: this.mapToJson(global.configurationFlowMap),
+      };
+      await global.storageConfiguration.saveStaticFile('configurationFlowMap.json', JSON.stringify(configurationFlowMap));
+      
+      //demoModeEnabledMap config
+      const demoModeEnabledMap = {
         demoModeEnabledMap: this.mapToJson(global.demoModeEnabledMap),
+      };
+      await global.storageConfiguration.saveStaticFile('demoModeEnabledMap.json', JSON.stringify(demoModeEnabledMap));
+
+      //demoModeEnabledMap config
+      const serverConfigurationMap = {
         serverConfigurationMap: this.mapToJson(global.serverConfigurationMap),
       };
-    
-      await global.storageConfiguration.saveStaticFile('Configurations.json', JSON.stringify(dataConfigurations));
+      await global.storageConfiguration.saveStaticFile('serverConfigurationMap.json', JSON.stringify(serverConfigurationMap));
+
 
       const dataTransactions = {
           transactonsStatisticsMap: this.mapToJson(global.transactonsStatisticsMap),
@@ -38,13 +64,24 @@ export class ConfigurationProcessor {
         }
 
       try {
-          const dataConfigurations = JSON.parse(await global.storageConfiguration.loadStaticFile('Configurations.json'));
-          global.configurationPickupMap = this.jsonToMap(dataConfigurations.configurationPickupMap);
-          global.configurationDeliveryMap = this.jsonToMap(dataConfigurations.configurationDeliveryMap);
-          global.configurationProcessingMap = this.jsonToMap(dataConfigurations.configurationProcessingMap);
-          global.configurationFlowMap = this.jsonToMap(dataConfigurations.configurationFlowMap);
-          global.demoModeEnabledMap = this.jsonToMap(dataConfigurations.demoModeEnabledMap);
-          global.serverConfigurationMap = this.jsonToMap(dataConfigurations.serverConfigurationMap);
+          const configurationPickupMap = JSON.parse(await global.storageConfiguration.loadStaticFile('configurationPickupMap.json'));
+          global.configurationPickupMap = this.jsonToMap(configurationPickupMap.configurationPickupMap);
+
+          const configurationDeliveryMap = JSON.parse(await global.storageConfiguration.loadStaticFile('configurationDeliveryMap.json'));
+          global.configurationDeliveryMap = this.jsonToMap(configurationDeliveryMap.configurationDeliveryMap);
+
+          const configurationProcessingMap = JSON.parse(await global.storageConfiguration.loadStaticFile('configurationProcessingMap.json'));
+          global.configurationProcessingMap = this.jsonToMap(configurationProcessingMap.configurationProcessingMap);
+
+          const configurationFlowMap = JSON.parse(await global.storageConfiguration.loadStaticFile('configurationFlowMap.json'));
+          global.configurationFlowMap = this.jsonToMap(configurationFlowMap.configurationFlowMap);
+
+          const demoModeEnabledMap = JSON.parse(await global.storageConfiguration.loadStaticFile('demoModeEnabledMap.json'));
+          global.demoModeEnabledMap = this.jsonToMap(demoModeEnabledMap.demoModeEnabledMap);
+
+          const serverConfigurationMap = JSON.parse(await global.storageConfiguration.loadStaticFile('serverConfigurationMap.json'));
+          global.serverConfigurationMap = this.jsonToMap(serverConfigurationMap.serverConfigurationMap);
+
       } catch (error) {
           console.log(error);
           console.log('dataConfigurations not found for loading.');
