@@ -3,6 +3,7 @@ import { TransactionProcessorFS } from "./transaction-processor-FS.mjs";;
 import { TransactionProcessorFTP } from "./transaction-processor-FTP.mjs";
 import { TransactionProcessorSFTP } from "./transaction-processor-SFTP.mjs";
 import { TransactionProcessorKAFKA } from "./transaction-processor-KAFKA.mjs";
+import { TransactionProcessorMQTT } from "./transaction-processor-MQTT.mjs";
 import xmldom from "xmldom";
 
 import { Transaction } from '../models/Transaction.mjs';
@@ -20,6 +21,7 @@ export class TransactionProcessManager{
       transactionProcessorHTTP;
       transactionProcessorFS;
       trasactionProcessorKAFKA;
+      transactionProcessorMQTT;
       
       messageStore;
       transaction;
@@ -36,6 +38,7 @@ export class TransactionProcessManager{
             this.transactionProcessorFS = new TransactionProcessorFS();
             this.transactionProcessorFTP = new TransactionProcessorFTP();
             this.trasactionProcessorKAFKA = new TransactionProcessorKAFKA();
+            this.transactionProcessorMQTT = new TransactionProcessorMQTT();
             
 
             this.configPickup = configPickup;
@@ -108,6 +111,13 @@ export class TransactionProcessManager{
                   case 'KAFKA': {
                         //flow name is required as this is handled in seperate way
                         await this.trasactionProcessorKAFKA.transactionProcessorPickup(this);
+                        //new transaction is created and added from kafka processor for each message from kafka server
+                        // no need to log a transaction in this level simialr to HTTP
+                        break;
+                  }
+                  case 'MQTT': {
+                        //flow name is required as this is handled in seperate way
+                        await this.TransactionProcessorMQTT.transactionProcessorPickup(this);
                         //new transaction is created and added from kafka processor for each message from kafka server
                         // no need to log a transaction in this level simialr to HTTP
                         break;
@@ -190,6 +200,12 @@ export class TransactionProcessManager{
                   case 'KAFKA': {
                         //flow name is required as this is handled in seperate way
                         await this.trasactionProcessorKAFKA.transactionProcessorDelivery(this);
+                        // no need to log a transaction in this level simialr to HTTP
+                        break;
+                  }
+                  case 'MQTT': {
+                        //flow name is required as this is handled in seperate way
+                        await this.transactionProcessorMQTT.transactionProcessorDelivery(this);
                         // no need to log a transaction in this level simialr to HTTP
                         break;
                   }
