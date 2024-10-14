@@ -12,6 +12,7 @@ export const getAuthDetails = async (authorizationHeader) => {
       !authorizationHeader.startsWith('Bearer ')
     ) {
       throw new Error('Access Denied: No Token Provided!');
+      return  {undefined, undefined};
     }
   
     const token = authorizationHeader.split(' ')[1];
@@ -22,9 +23,20 @@ export const getAuthDetails = async (authorizationHeader) => {
       const { userId, organizationId } = decoded;
       //if found retun the userId and organizationId
       return { userId, organizationId };
-    }catch(error) {
-      console.log('Checking for google user authentication.')
-      return await checkGoogleAuth(token);
+    }catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // Handle the expired token case
+        console.log('Token expired:', error.expiredAt);
+        throw new Error('Access Denied: Token has expired, please reauthenticate!');
+        // Alternatively, implement token refresh logic here if applicable
+        // Example:
+        // const newToken = await refreshToken(token);
+        // return await getAuthDetails(`Bearer ${newToken}`);
+      } else {
+        // For other types of errors (like invalid token), fall back to Google authentication
+        console.log('Checking for Google user authentication.');
+        return await checkGoogleAuth(token);
+      }
     }
    };
 
