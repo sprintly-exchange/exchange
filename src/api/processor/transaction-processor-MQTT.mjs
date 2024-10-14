@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { promises as fs } from 'fs';
 import os from 'os';
 import mqtt from 'mqtt';
-import appEnumerations from '../utilities/serverInitFunctions.mjs';
+import appEnumerations from '../utilities/severInitFunctions.mjs';
 
 export class TransactionProcessorMQTT {
     client;
