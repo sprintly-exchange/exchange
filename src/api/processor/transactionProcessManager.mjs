@@ -117,7 +117,7 @@ export class TransactionProcessManager{
                   }
                   case 'MQTT': {
                         //flow name is required as this is handled in seperate way
-                        await this.TransactionProcessorMQTT.transactionProcessorPickup(this);
+                        await this.transactionProcessorMQTT.transactionProcessorPickup(this);
                         //new transaction is created and added from kafka processor for each message from kafka server
                         // no need to log a transaction in this level simialr to HTTP
                         break;

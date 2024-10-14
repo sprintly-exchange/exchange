@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import os from 'os';
 import mqtt from 'mqtt';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
+import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
 
 export class TransactionProcessorMQTT {
     client;
