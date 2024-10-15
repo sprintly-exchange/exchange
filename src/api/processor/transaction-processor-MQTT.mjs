@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { promises as fs } from 'fs';
+import { copyFileSync, promises as fs } from 'fs';
 import os from 'os';
 import mqtt from 'mqtt';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
@@ -30,14 +30,20 @@ export class TransactionProcessorMQTT {
 
     // Connect to the MQTT broker
     async connect(config) {
-        this.client = mqtt.connect(config.brokerUrl, {
-            clientId: config.clientId,
-            clean: true,
-            connectTimeout: 4000,
-            username: config.username,
+        const  options = {
+            host: config.host,
+            port: Number(config.port),
+            protocol: config.protocol.toLowerCase(),
+            username: config.userName,
             password: config.password,
-            reconnectPeriod: 1000,
-        });
+            clientId: config.clientId,
+        };
+        
+        Object.assign(config,options);
+
+        // initialize the MQTT client
+        this.client = mqtt.connect(config);
+
 
         return new Promise((resolve, reject) => {
             this.client.on('connect', () => {
@@ -94,7 +100,21 @@ export class TransactionProcessorMQTT {
     // Method to handle message pickup from MQTT
     async transactionProcessorPickup(transactionProcessManagerInput) {
         try {
+            console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
             const config = transactionProcessManagerInput.configPickup;
+            const  options = {
+                host: config.host,
+                port: Number(config.port),
+                protocol: config.protocol.toLowerCase(),
+                username: config.userName,
+                password: config.password,
+                clientId: config.clientId,
+            };
+            
+            Object.assign(config,options);
+           
+            // initialize the MQTT client
+            this.client = mqtt.connect(config);
             const connected = await this.retryOperation(() => this.connect(config));
 
             if (connected) {
@@ -151,10 +171,9 @@ export class TransactionProcessorMQTT {
         try {
             const config = transactionProcessManagerInput.configDelivery;
             const connected = await this.retryOperation(() => this.connect(config));
-
+            
             if (connected) {
                 await this.publish(config.topic, transactionProcessManagerInput.transaction.currentMessage);
-                
                 // Additional delivery logic can go here...
                 transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
                 transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;

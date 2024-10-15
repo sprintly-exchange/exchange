@@ -140,7 +140,7 @@ async function updateSystemSettings(req, res) {
             if (global.serverConfigurationMap.has(key)) {
                 global.serverConfigurationMap.set(key, Number(value));
                 key === appEnumerations.PROCESS_RULES_TIME_INTERVAL ? setProcessRulesInterval() : '';
-                key === appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessPickupProcessingQueueInterval: '';
+                key === appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessPickupProcessingQueueInterval(): '';
                 key === appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessConfigurationProcessingQueueInterval(): '';
                 key === appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessDeliveryProcessingQueueInterval(): '';
                 key === appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL || key === appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS ? setRemoveOldTransactionsInterval(): '';

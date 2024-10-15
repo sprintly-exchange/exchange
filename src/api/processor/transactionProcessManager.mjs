@@ -85,6 +85,7 @@ export class TransactionProcessManager{
       async processPickup(){
             this.transactionProcessManagerStage = this._STAGE_PICKUP;
             this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP;
+            console.log('Processing pickup : ', this.transaction.id);
             switch(this.configPickup.protocol){
                   //Pickup from file connector from localhost
                   case 'FS': {
@@ -115,8 +116,9 @@ export class TransactionProcessManager{
                         // no need to log a transaction in this level simialr to HTTP
                         break;
                   }
-                  case 'MQTT': {
+                  case ('MQTTS' || 'MQTT'): {
                         //flow name is required as this is handled in seperate way
+                        //console.log('********** MQTT PICKUP');
                         await this.transactionProcessorMQTT.transactionProcessorPickup(this);
                         //new transaction is created and added from kafka processor for each message from kafka server
                         // no need to log a transaction in this level simialr to HTTP
@@ -131,7 +133,7 @@ export class TransactionProcessManager{
       async configurationProcessing() {
             this.transactionProcessManagerStage = this._STAGE_CONFIG_PROCESSING;
             this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
-           
+            console.log('Processing configuration : ', this.transaction.id);
 
             //console.log(this.configProcessing);
             if(this.configProcessing && this.configProcessing.code){
@@ -178,6 +180,7 @@ export class TransactionProcessManager{
       async processDelivery(){
             this.transactionProcessManagerStage = this._STAGE_DELIVERY;
             this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY;
+            console.log('Processing delivery : ', this.transaction.id);
             switch(this.configDelivery.protocol){
                   //Delviery to localhost through file connector
                   case 'FS': {
@@ -187,24 +190,28 @@ export class TransactionProcessManager{
                   }
                   //Delivery to HTTP POST
                   case 'HTTP': {
+                        console.log('********** HTTP DELIVERY');
                         await this.transactionProcessorHTTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
                   } 
                   case 'FTP': {
                         //flow name is required as this is handled in seperate way
+                        console.log('********** FTP DELIVERY');
                         await this.transactionProcessorFTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
                   }                  
                   case 'KAFKA': {
                         //flow name is required as this is handled in seperate way
+                        console.log('********** KAFKA DELIVERY');
                         await this.trasactionProcessorKAFKA.transactionProcessorDelivery(this);
                         // no need to log a transaction in this level simialr to HTTP
                         break;
                   }
-                  case 'MQTT': {
+                  case ('MQTTS' || 'MQTT'): {
                         //flow name is required as this is handled in seperate way
+                        console.log('********** MQTT/MQTTS DELIVERY');
                         await this.transactionProcessorMQTT.transactionProcessorDelivery(this);
                         // no need to log a transaction in this level simialr to HTTP
                         break;
