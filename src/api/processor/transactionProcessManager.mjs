@@ -164,6 +164,7 @@ export class TransactionProcessManager{
                   }
                   } catch (error) {
                   this.transaction.configurationProcessingError=error.toString();
+                  this.commonTransactionUtils.addTransaction(this.transaction);
                   console.error('Error executing processing transformation:', error);
                   // Handle error accordingly, maybe return a default value or rethrow
                   return false;

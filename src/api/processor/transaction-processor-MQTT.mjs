@@ -4,6 +4,7 @@ import os from 'os';
 import mqtt from 'mqtt';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
 import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
+import { TransactionProcessManager } from './transactionProcessManager.mjs';
 
 export class TransactionProcessorMQTT {
     client;
@@ -30,17 +31,6 @@ export class TransactionProcessorMQTT {
 
     // Connect to the MQTT broker
     async connect(config) {
-        const  options = {
-            host: config.host,
-            port: Number(config.port),
-            protocol: config.protocol.toLowerCase(),
-            username: config.userName,
-            password: config.password,
-            clientId: config.clientId,
-        };
-        
-        Object.assign(config,options);
-
         // initialize the MQTT client
         this.client = mqtt.connect(config);
 
@@ -101,31 +91,34 @@ export class TransactionProcessorMQTT {
     async transactionProcessorPickup(transactionProcessManagerInput) {
         try {
             console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
-            const config = transactionProcessManagerInput.configPickup;
+            //get a copy fro config pickup
+            const config_copy = Object.create(transactionProcessManagerInput.configPickup);
+            //overide the object attributes
             const  options = {
-                host: config.host,
-                port: Number(config.port),
-                protocol: config.protocol.toLowerCase(),
-                username: config.userName,
-                password: config.password,
-                clientId: config.clientId,
+                host: config_copy.host,
+                port: Number(config_copy.port),//ensure the port is a number
+                protocol: config_copy.protocol.toLowerCase(), // UI containts capital letters, the object require simple letters
+                username: config_copy.userName,
+                password: config_copy.password,
+                clientId: config_copy.clientId,
             };
             
-            Object.assign(config,options);
+            //copy adjustments to orignnal copy
+            Object.assign(config_copy,options);
            
             // initialize the MQTT client
-            this.client = mqtt.connect(config);
-            const connected = await this.retryOperation(() => this.connect(config));
+            this.client = mqtt.connect(config_copy);
+            const connected = await this.retryOperation(() => this.connect(config_copy));
 
             if (connected) {
                 console.log('Connected to MQTT for pickup.');
 
-                const messageList = await this.retryOperation(() => this.subscribeAndReceive(config.topic));
+                const messageList = await this.retryOperation(() => this.subscribeAndReceive(config_copy.topic));
                 console.log('Received messages from MQTT:', messageList);
 
                 const childTransaction = {};
                 Object.assign(childTransaction, transactionProcessManagerInput.transaction);
-                childTransaction.pickupPath = `mqtt://${config.brokerUrl}/${config.topic}`;
+                childTransaction.pickupPath = `mqtt://${config_copy.host}:${config_copy.port}/${config_copy.topic}`;
                 childTransaction.id = uuidv4();
                 childTransaction.currentMessage = messageList.content;
 
@@ -169,8 +162,22 @@ export class TransactionProcessorMQTT {
     // Method to handle message delivery to MQTT
     async transactionProcessorDelivery(transactionProcessManagerInput) {
         try {
-            const config = transactionProcessManagerInput.configDelivery;
-            const connected = await this.retryOperation(() => this.connect(config));
+            console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
+            //get a copy fro config pickup
+            const config_copy = Object.create(transactionProcessManagerInput.configPickup);
+            //overide the object attributes
+            const  options = {
+                host: config_copy.host,
+                port: Number(config_copy.port),//ensure the port is a number
+                protocol: config_copy.protocol.toLowerCase(), // UI containts capital letters, the object require simple letters
+                username: config_copy.userName,
+                password: config_copy.password,
+                clientId: config_copy.clientId,
+            };
+            
+            //copy adjustments to orignnal copy
+            Object.assign(config_copy,options);
+            const connected = await this.retryOperation(() => this.connect(config_copy));
             
             if (connected) {
                 await this.publish(config.topic, transactionProcessManagerInput.transaction.currentMessage);

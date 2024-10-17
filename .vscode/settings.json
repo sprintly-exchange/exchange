@@ -1,10 +1,12 @@
 {
     "vsmqtt.brokerProfiles": [
         {
-            "name": "192.168.68.144",
-            "host": "192.168.68.144",
-            "port": 1883,
-            "clientId": "vsmqtt_client_cfb1"
+            "name": "6db1724abc734dcabf6cdb04444ae7eb.s1.eu.hivemq.cloud",
+            "host": "6db1724abc734dcabf6cdb04444ae7eb.s1.eu.hivemq.cloud",
+            "port": 8883,
+            "clientId": "vsmqtt_client_d594",
+            "username": "Sprintlyexchange",
+            "password": "Sprintlyexchange1"
         }
     ]
 }
