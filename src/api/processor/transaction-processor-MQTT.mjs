@@ -4,14 +4,25 @@ import os from 'os';
 import mqtt from 'mqtt';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
 import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
-import { TransactionProcessManager } from './transactionProcessManager.mjs';
-
-export class TransactionProcessorMQTT {
-    client;
+import { TransactionProcessManager } from './transactionProcessManager.mjs';export class TransactionProcessorMQTT {
+    static client;
     commonTransactionUtils;
 
     constructor() {
         this.commonTransactionUtils = new CommonTransactionUtils();
+    }
+
+    // Singleton pattern to ensure a single persistent MQTT connection
+    static getClient(config) {
+        if (!TransactionProcessorMQTT.client || !TransactionProcessorMQTT.client.connected) {
+            const options = {
+                ...config,
+                keepalive: 60, // MQTT keepalive interval in seconds
+                reconnectPeriod: 5000, // Automatically reconnect after 5 seconds if disconnected
+            };
+            TransactionProcessorMQTT.client = mqtt.connect(options);
+        }
+        return TransactionProcessorMQTT.client;
     }
 
     async retryOperation(operation, maxRetries = 3, delay = 1000) {
@@ -31,43 +42,59 @@ export class TransactionProcessorMQTT {
 
     // Connect to the MQTT broker
     async connect(config) {
-        // initialize the MQTT client
-        this.client = mqtt.connect(config);
-
+        const client = TransactionProcessorMQTT.getClient(config);
 
         return new Promise((resolve, reject) => {
-            this.client.on('connect', () => {
+            client.on('connect', () => {
                 console.log('Connected to MQTT broker');
                 resolve(true);
             });
 
-            this.client.on('error', (error) => {
+            client.on('error', (error) => {
                 console.error('Connection error:', error);
                 reject(false);
             });
         });
     }
 
-    // Subscribe and receive messages from a topic
-    async subscribeAndReceive(topic) {
+    // Subscribe and receive messages from a topic (handling multiple messages)
+    subscribeAndReceive(topic, config) {
+        // Get or create the MQTT client instance
+        const client = TransactionProcessorMQTT.getClient(config);
+
         return new Promise((resolve, reject) => {
-            this.client.subscribe(topic, (error) => {
+            const messages = [];  // Collect multiple messages
+
+            client.subscribe(topic, (error) => {
                 if (error) {
                     return reject(error);
                 }
 
                 console.log(`Subscribed to topic: ${topic}`);
-                this.client.on('message', (topic, message) => {
-                    resolve({ topic, content: message.toString() });
+                
+                // Handle multiple messages
+                client.on('message', (topic, message) => {
+                    console.log(`Received message from topic ${topic}: ${message.toString()}`);
+                    messages.push({ topic, content: message.toString() });
+
+                    // Optionally resolve immediately for the first message, or continue collecting.
                 });
             });
+
+            // Optionally resolve after a certain time or condition (e.g., after receiving n messages)
+            setTimeout(() => {
+                resolve(messages); // Resolve with all collected messages
+            }, 5000);  // Adjust the timeout as needed
         });
     }
 
+
+
     // Publish a message to a topic
     async publish(topic, message) {
+        const client = TransactionProcessorMQTT.getClient();
         return new Promise((resolve, reject) => {
-            this.client.publish(topic, message, {}, (error) => {
+            client.publish(topic, message, {}, (error) => {
                 if (error) {
                     return reject(error);
                 }
@@ -77,70 +104,72 @@ export class TransactionProcessorMQTT {
         });
     }
 
-    // Disconnect from the MQTT broker
+    // Disconnect from the MQTT broker (only if necessary)
     async disconnect() {
-        return new Promise((resolve) => {
-            this.client.end(true, () => {
-                console.log('Disconnected from MQTT broker');
-                resolve();
+        if (TransactionProcessorMQTT.client) {
+            return new Promise((resolve) => {
+                TransactionProcessorMQTT.client.end(true, () => {
+                    console.log('Disconnected from MQTT broker');
+                    resolve();
+                });
             });
-        });
+        }
     }
 
     // Method to handle message pickup from MQTT
     async transactionProcessorPickup(transactionProcessManagerInput) {
         try {
-            console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
-            //get a copy fro config pickup
-            const config_copy = Object.create(transactionProcessManagerInput.configPickup);
-            //overide the object attributes
-            const  options = {
+            console.log('XXXXXXXXXXXX : MQTT PICKUP');
+            const config_copy = { ...transactionProcessManagerInput.configPickup };
+
+            // Override the object attributes
+            const options = {
                 host: config_copy.host,
-                port: Number(config_copy.port),//ensure the port is a number
-                protocol: config_copy.protocol.toLowerCase(), // UI containts capital letters, the object require simple letters
+                port: Number(config_copy.port), // Ensure the port is a number
+                protocol: config_copy.protocol.toLowerCase(), // UI contains capital letters, the object requires lowercase
                 username: config_copy.userName,
                 password: config_copy.password,
-                clientId: config_copy.clientId,
             };
-            
-            //copy adjustments to orignnal copy
-            Object.assign(config_copy,options);
-           
-            // initialize the MQTT client
-            this.client = mqtt.connect(config_copy);
-            const connected = await this.retryOperation(() => this.connect(config_copy));
 
+            // Copy adjustments to the original config copy
+            Object.assign(config_copy, options);
+
+            const connected = await this.retryOperation(() => this.connect(config_copy));
+            console.log('XXXXXXXXXXXX : MQTT PICKUP');
             if (connected) {
                 console.log('Connected to MQTT for pickup.');
+                console.log('XXXXXXXXXXXX : MQTT PICKUP');
 
-                const messageList = await this.retryOperation(() => this.subscribeAndReceive(config_copy.topic));
+                const messageList = await this.retryOperation(() => this.subscribeAndReceive(config_copy.topic, config_copy));
                 console.log('Received messages from MQTT:', messageList);
 
-                const childTransaction = {};
-                Object.assign(childTransaction, transactionProcessManagerInput.transaction);
-                childTransaction.pickupPath = `mqtt://${config_copy.host}:${config_copy.port}/${config_copy.topic}`;
-                childTransaction.id = uuidv4();
-                childTransaction.currentMessage = messageList.content;
+                for (const message of messageList) {  // Process each message individually
+                    const childTransaction = {
+                        ...transactionProcessManagerInput.transaction,
+                        pickupPath: `mqtt://${config_copy.host}:${config_copy.port}/${config_copy.topic}`,
+                        id: uuidv4(),
+                        currentMessage: message.content,  // Individual message content
+                        messageName: `MQTT_Message_${uuidv4()}`,
+                        processingTime: new Date().toISOString(),
+                        pickupTime: new Date().toISOString(),
+                        pickupStatus: appEnumerations.TRANSACTION_STATUS_COMPLETED,
+                    };
 
-                // Set transaction metadata
-                childTransaction.messageName = `MQTT_Message_${uuidv4()}`;
-                childTransaction.processingTime = new Date().toISOString();
-                childTransaction.pickupTime = new Date().toISOString();
-                childTransaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
+                    // Store the message and handle post-pickup actions
+                    await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
+                    this.commonTransactionUtils.addTransaction(childTransaction, transactonsStatisticsMap);
 
-                // Store the message and handle post-pickup actions
-                await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
-                this.commonTransactionUtils.addTransaction(childTransaction, transactonsStatisticsMap);
+                    const transactionProcessManager = new TransactionProcessManager(
+                        transactionProcessManagerInput.configPickup,
+                        transactionProcessManagerInput.configDelivery,
+                        transactionProcessManagerInput.configProcessing,
+                        transactionProcessManagerInput.configurationFlow
+                    );
 
-                const transactionProcessManager = new TransactionProcessManager(
-                    transactionProcessManagerInput.configPickup,
-                    transactionProcessManagerInput.configDelivery,
-                    transactionProcessManagerInput.configProcessing,
-                    transactionProcessManagerInput.configurationFlow
-                );
-
-                await transactionProcessManager.setTransaction(childTransaction);
-                await configurationProcessingQueue.enqueue(transactionProcessManager);
+                    await transactionProcessManager.setTransaction(childTransaction);
+                    this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+                    await configurationProcessingQueue.enqueue(transactionProcessManager);
+                }
             } else {
                 transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
@@ -151,20 +180,18 @@ export class TransactionProcessorMQTT {
             transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
             return false;
-        } finally {
-            await this.disconnect(); // Ensure the MQTT connection is closed
         }
 
-        // Returning false to stop adding this to the delivery queue from parent classes.
-        return false;
-    }
+    // Returning false to stop adding this to the delivery queue from parent classes.
+    return false;
+}   
+
 
     // Method to handle message delivery to MQTT
     async transactionProcessorDelivery(transactionProcessManagerInput) {
         try {
-            console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
-            //get a copy fro config pickup
-            const config_copy = Object.create(transactionProcessManagerInput.configPickup);
+            console.log('XXXXXXXXXXXX : MQTT PUBLISH');
+            const config_copy = { ...transactionProcessManagerInput.configPickup };
             //overide the object attributes
             const  options = {
                 host: config_copy.host,
@@ -178,13 +205,12 @@ export class TransactionProcessorMQTT {
             //copy adjustments to orignnal copy
             Object.assign(config_copy,options);
             const connected = await this.retryOperation(() => this.connect(config_copy));
-            
+
             if (connected) {
-                await this.publish(config.topic, transactionProcessManagerInput.transaction.currentMessage);
-                // Additional delivery logic can go here...
+                await this.publish(config_copy.topic, transactionProcessManagerInput.transaction.currentMessage);
                 transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
                 transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
-                
+
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
             }
         } catch (error) {
@@ -193,8 +219,6 @@ export class TransactionProcessorMQTT {
             transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
             return false;
-        } finally {
-            await this.disconnect(); // Ensure the MQTT connection is closed
         }
 
         // Returning false to stop adding this to the delivery queue from parent classes.
@@ -203,25 +227,20 @@ export class TransactionProcessorMQTT {
 
     async storeMessage(transaction, messageStore, leg) {
         switch (leg) {
-            case 'PIM': {
+            case 'PIM':
                 [transaction.pickupInboundMessagePath, transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
                 break;
-            }
-            case 'POM': {
+            case 'POM':
                 [transaction.pickupOutboundMessagePath, transaction.pickupOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
                 break;
-            }
-            case 'DIM': {
+            case 'DIM':
                 [transaction.deliveryInboundMessagePath, transaction.deliveryInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
                 break;
-            }
-            case 'DOM': {
+            case 'DOM':
                 [transaction.deliveryOutboundMessagePath, transaction.deliveryOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
                 break;
-            }
-            default: {
-                // Handle default case if necessary
-            }
+            default:
+                break;
         }
 
         return true;
