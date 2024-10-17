@@ -40,9 +40,11 @@ export class TransactionProcessorFTP {
             if (connected) {
                 const fileList = await this.retryOperation(() => ftpProcessor.listFiles());
                 console.log('fileList', fileList);
+                let count = 0;
 
                 for (const file of fileList) {
                     if (file.isFile) {
+                        count++;
                         const childTransaction = {};
                         Object.assign(childTransaction, transactionProcessManagerInput.transaction);
                         childTransaction.pickupPath = (await ftpProcessor.getFtpUrlWithoutPassword()).toString();
@@ -67,6 +69,11 @@ export class TransactionProcessorFTP {
                         );
                         await transactionProcessManager.setTransaction(childTransaction);
                         await configurationProcessingQueue.enqueue(transactionProcessManager);
+                    }
+
+                    if(count >= global.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)){
+                        console.warn(`${appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION} limit exedded : `,global.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION))
+                        break;
                     }
                 }
             } else {

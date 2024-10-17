@@ -81,6 +81,12 @@ export class ConfigurationProcessor {
 
           const serverConfigurationMap = JSON.parse(await global.storageConfiguration.loadStaticFile('serverConfigurationMap.json'));
           global.serverConfigurationMap = this.jsonToMap(serverConfigurationMap.serverConfigurationMap);
+          // Iterate over the Map and print all key-value pairs
+          //Loaded server configuration settings
+          console.log('Loaded server configruation settings.');
+          global.serverConfigurationMap.forEach((value, key) => {
+          console.log(`Key: ${key}, Value: ${value}`);
+});
 
       } catch (error) {
           console.log(error);
