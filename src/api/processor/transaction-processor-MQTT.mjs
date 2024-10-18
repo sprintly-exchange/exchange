@@ -138,12 +138,12 @@ import { TransactionProcessManager } from './transactionProcessManager.mjs';expo
             console.log('XXXXXXXXXXXX : MQTT PICKUP');
             if (connected) {
                 console.log('Connected to MQTT for pickup.');
-                console.log('XXXXXXXXXXXX : MQTT PICKUP');
 
                 const messageList = await this.retryOperation(() => this.subscribeAndReceive(config_copy.topic, config_copy));
                 console.log('Received messages from MQTT:', messageList);
 
                 for (const message of messageList) {  // Process each message individually
+                    console.log('Processing Message:', message.content);
                     const childTransaction = {
                         ...transactionProcessManagerInput.transaction,
                         pickupPath: `mqtt://${config_copy.host}:${config_copy.port}/${config_copy.topic}`,
@@ -155,9 +155,18 @@ import { TransactionProcessManager } from './transactionProcessManager.mjs';expo
                         pickupStatus: appEnumerations.TRANSACTION_STATUS_COMPLETED,
                     };
 
+                    childTransaction.processingTime = new Date().toISOString();
+                    childTransaction.pickupTime = new Date().toISOString();
+                    childTransaction.id = uuidv4();
+                    childTransaction.currentMessage =  message.content;
+                    
+
                     // Store the message and handle post-pickup actions
                     await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
+                    childTransaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_SUCCESS;
+                    console.log('childTransaction',childTransaction);
                     this.commonTransactionUtils.addTransaction(childTransaction, transactonsStatisticsMap);
+
 
                     const transactionProcessManager = new TransactionProcessManager(
                         transactionProcessManagerInput.configPickup,
@@ -170,9 +179,8 @@ import { TransactionProcessManager } from './transactionProcessManager.mjs';expo
                     this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
                     await configurationProcessingQueue.enqueue(transactionProcessManager);
                 }
-            } else {
-                transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
-                this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+
+                this.disconnect();
             }
         } catch (error) {
             console.log('Error processing from MQTT:', error);
