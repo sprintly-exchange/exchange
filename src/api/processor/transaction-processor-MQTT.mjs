@@ -16,16 +16,39 @@ export class TransactionProcessorMQTT {
 
     // Singleton pattern to ensure a single persistent MQTT connection
     static getClient(config) {
+        // If there's no client or if it's disconnected, create a new one
         if (!TransactionProcessorMQTT.client || !TransactionProcessorMQTT.client.connected) {
+            const config_copy = { ...config };
             const options = {
-                ...config,
-                keepalive: 60, // MQTT keepalive interval in seconds
-                reconnectPeriod: 5000, // Automatically reconnect after 5 seconds if disconnected
+                host: config_copy.host,
+                port: Number(config_copy.port),
+                protocol: config_copy.protocol.toLowerCase(),
+                username: config_copy.userName,
+                password: config_copy.password,
             };
-            TransactionProcessorMQTT.client = mqtt.connect(options);
+            
+            Object.assign(config_copy, options);
+
+            // Create the client
+            console.log('config_copy',config_copy);
+            TransactionProcessorMQTT.client = mqtt.connect(config_copy);
+
+            // Handle connection errors
+            TransactionProcessorMQTT.client.on('error', (error) => {
+                console.error('MQTT Connection Error:', error);
+            });
+
+            // Handle client disconnection
+            TransactionProcessorMQTT.client.on('close', () => {
+                console.log('MQTT client disconnected.');
+                TransactionProcessorMQTT.client = null; // Clear the client on disconnect
+            });
         }
+
+        // Return the connected client
         return TransactionProcessorMQTT.client;
     }
+
 
     // Retry logic with exponential backoff
     async retryOperation(operation, maxRetries = 3, delay = 1000) {
@@ -62,6 +85,7 @@ export class TransactionProcessorMQTT {
 
     // Subscribe and receive messages from a topic (handling multiple messages)
     subscribeAndReceive(topic, config) {
+        console.log(config);
         const client = TransactionProcessorMQTT.getClient(config);
 
         return new Promise((resolve, reject) => {
@@ -87,18 +111,45 @@ export class TransactionProcessorMQTT {
     }
 
     // Publish a message to a topic
-    async publish(topic, message) {
-        const client = TransactionProcessorMQTT.getClient();
+    async publish(topic, message, config) {
+        const client = TransactionProcessorMQTT.getClient(config);
+
         return new Promise((resolve, reject) => {
-            client.publish(topic, message, {}, (error) => {
-                if (error) {
-                    return reject(error);
-                }
-                console.log(`Message published to ${topic}: ${message}`);
-                resolve(true);
-            });
+            // Wait for the client to connect before publishing
+            if (client.connected) {
+                const payload = typeof message === 'string' ? message : JSON.stringify(message);
+
+                client.publish(topic, payload, {}, (error) => {
+                    if (error) {
+                        console.error('Failed to publish message:', error);
+                        return reject(error);
+                    }
+                    console.log(`Message published to ${topic}: ${payload}`);
+                    resolve(true);
+                });
+            } else {
+                // If client isn't connected, wait for the 'connect' event
+                client.on('connect', () => {
+                    const payload = typeof message === 'string' ? message : JSON.stringify(message);
+
+                    client.publish(topic, payload, {}, (error) => {
+                        if (error) {
+                            console.error('Failed to publish message:', error);
+                            return reject(error);
+                        }
+                        console.log(`Message published to ${topic}: ${payload}`);
+                        resolve(true);
+                    });
+                });
+
+                client.on('error', (error) => {
+                    console.error('Error while waiting for connection:', error);
+                    reject(error);
+                });
+            }
         });
     }
+
 
     // Disconnect from the MQTT broker (if necessary)
     async disconnect() {
@@ -116,16 +167,8 @@ export class TransactionProcessorMQTT {
     // Message pickup handler
     async transactionProcessorPickup(transactionProcessManagerInput) {
         try {
+            // Copy and prepare configuration for MQTT connection
             const config_copy = { ...transactionProcessManagerInput.configPickup };
-            const options = {
-                host: config_copy.host,
-                port: Number(config_copy.port),
-                protocol: config_copy.protocol.toLowerCase(),
-                username: config_copy.userName,
-                password: config_copy.password,
-            };
-
-            Object.assign(config_copy, options);
             const connected = await this.retryOperation(() => this.connect(config_copy));
 
             if (connected) {
@@ -144,7 +187,7 @@ export class TransactionProcessorMQTT {
 
                     childTransaction.processingTime = new Date().toISOString();
                     childTransaction.pickupTime = new Date().toISOString();
-                    childTransaction.currentMessage =await message.content;
+                    childTransaction.currentMessage = await message.content;
                     console.log("processing pickup message", childTransaction.currentMessage);
                     
 
@@ -178,43 +221,62 @@ export class TransactionProcessorMQTT {
 
     // Message delivery handler
     async transactionProcessorDelivery(transactionProcessManagerInput) {
-        try { 
-            console.log('OOOOOOOOOOOOOXXX transactionProcessManagerInput' );
+        try {
+            // Copy and prepare configuration for MQTT connection
             const config_copy = { ...transactionProcessManagerInput.configDelivery };
-            const options = {
-                host: config_copy.host,
-                port: Number(config_copy.port),
-                protocol: config_copy.protocol.toLowerCase(),
-                username: config_copy.userName,
-                password: config_copy.password,
-                clientId: config_copy.clientId,
-            };
-
-            
-
-            Object.assign(config_copy, options);
+        
+            // Attempt to connect to the MQTT broker
             const connected = await this.retryOperation(() => this.connect(config_copy));
-    
 
             if (connected) {
-            
-                await this.publish(config_copy.topic, transactionProcessManagerInput.transaction.currentMessage);
+                console.log(`Successfully connected to MQTT broker at ${config_copy.host}:${config_copy.port}`);
+
+                // Ensure the topic and message are valid before publishing
+                const topic = config_copy.topic;
+                const message = transactionProcessManagerInput.transaction.currentMessage;
+
+                if (!topic || !message) {
+                    throw new Error('Invalid topic or message. Topic or message cannot be null.');
+                }
+
+                console.log(`Preparing to publish message ${message} to topic: ${topic}`);
+
+                // Publish the message
+                await this.publish(topic, message, config_copy);
+                console.log(`Message successfully published to topic: ${topic}`);
+
+                // Update transaction status upon successful delivery
                 transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
                 transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
 
+                // Log the transaction in the system
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
-                    await this.disconnect();
+
+                // Cleanly disconnect from the MQTT broker
+                await this.disconnect();
+                console.log('Disconnected from MQTT broker after successful message delivery.');
+
+            } else {
+                throw new Error('Failed to connect to MQTT broker.');
             }
         } catch (error) {
-            console.log('XXXXXXXXXX  Error sending message to MQTT:', error);
+            // Error handling: log the error and update the transaction status
+            console.error('Error during MQTT message delivery:', error.message);
+
+            // Update transaction process with error information
             transactionProcessManagerInput.transaction.deliveryError = error.message;
             transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+
+            // Log the failed transaction in the system
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
-            return false;
+
+            return false; // Return false to indicate delivery failure
         }
 
+        // Returning false to stop further queue processing
         return false;
     }
+
 
     // Store message with the appropriate leg
     async storeMessage(transaction, messageStore, leg) {
