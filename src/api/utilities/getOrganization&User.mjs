@@ -1,5 +1,6 @@
 import pkg from 'jsonwebtoken';
-const {jwt, decode, TokenExpiredError, verify } = pkg;
+
+import jwt, { decode } from 'jsonwebtoken';
 import axios from 'axios';
 import jwkToPem from 'jwk-to-pem';
 import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userExists } from './serverCommon.mjs';
@@ -7,6 +8,7 @@ import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 import appEnumerations from './severInitFunctions.mjs';
 
+const {TokenExpiredError} = pkg;
 
 export const getAuthDetails = async (authorizationHeader) => {
     if (
