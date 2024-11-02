@@ -36,6 +36,7 @@ export class TransactionProcessorFTP {
         try {
             transactionProcessManagerInput.transaction.pickupPath = (await ftpProcessor.getFtpUrlWithoutPassword()).toString();
 
+
             const connected = await this.retryOperation(() => ftpProcessor.connect());
             if (connected) {
                 const fileList = await this.retryOperation(() => ftpProcessor.listFiles());
@@ -49,6 +50,12 @@ export class TransactionProcessorFTP {
                         Object.assign(childTransaction, transactionProcessManagerInput.transaction);
                         childTransaction.pickupPath = (await ftpProcessor.getFtpUrlWithoutPassword()).toString();
                         childTransaction.id = uuidv4();
+
+                        // test case for mutiple tansactions, enable for test case validation with ftp case
+                        //transactionProcessManagerInput.transaction.status ='MYSTATUS';
+                        //transactionProcessManagerInput.transaction.flowName = ' MyFlow';
+                        //this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+                        //childTransaction.parentId = transactionProcessManagerInput.transaction.id;
 
                         childTransaction.currentMessage = await this.retryOperation(() => ftpProcessor.downloadFile(`${file.name}`, os.tmpdir()));
                         await this.retryOperation(() => ftpProcessor.deleteFile(`${file.name}`));
