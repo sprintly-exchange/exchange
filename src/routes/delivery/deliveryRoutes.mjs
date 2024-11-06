@@ -113,13 +113,34 @@ deliveryRoutes.put('/', function (req, res) {
 deliveryRoutes.get('/', function (req, res) {   
     console.debug(`All deliveries requested`);
     getDeliveries(req, res);
-});
-
-async function getDeliveries(req,res){
+  });
+  
+  async function getDeliveries(req, res) {
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRoleAndUserId(configurationDeliveryMap,req);
-    return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
-};
+  
+    // Filter deliveries based on user role and ID
+    const events = await filterResultsBasedOnUserRoleAndUserId(configurationDeliveryMap, req);
+  
+    // Get all deliveries used in flows
+    const usedDeliveries = new Map();
+    configurationFlowMap.forEach(flow => {
+      if (flow.deliveryId) {
+        usedDeliveries.set(flow.deliveryId, flow.flowName);
+      }
+    });
+  
+    // Add isUsed and flowName to each delivery in events
+    const updatedEvents = events.map(delivery => ({
+      ...delivery,
+      isUsed: usedDeliveries.has(delivery.id),
+      flowName: usedDeliveries.get(delivery.id) || null
+    }));
+  
+    return updatedEvents.length > 0
+      ? res.status(200).send(updatedEvents)
+      : res.status(204).send('');
+  }
+  
 
 /**
  * @swagger

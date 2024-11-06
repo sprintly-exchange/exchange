@@ -51,16 +51,37 @@ pickupRoutes.put('/', function (req, res) {
       res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 
   });
 
-pickupRoutes.get('/', function (req, res) {   
+  pickupRoutes.get('/', function (req, res) {   
     console.debug(`All pickups requested`);
-    getPickups(req,res);
-});
-
-async function getPickups(req,res){
-  setCommonHeaders(res);
-  const events = await filterResultsBasedOnUserRoleAndUserId(configurationPickupMap,req);
-  return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
-};
+    getPickups(req, res);
+  });
+  
+  async function getPickups(req, res) {
+    setCommonHeaders(res);
+  
+    // Filter pickups based on user role and ID
+    const events = await filterResultsBasedOnUserRoleAndUserId(configurationPickupMap, req);
+  
+    // Get all pickups used in flows
+    const usedPickups = new Map();
+    configurationFlowMap.forEach(flow => {
+      if (flow.pickupId) {
+        usedPickups.set(flow.pickupId, flow.flowName);
+      }
+    });
+  
+    // Add isUsed and flowName to each pickup in events
+    const updatedEvents = events.map(pickup => ({
+      ...pickup,
+      isUsed: usedPickups.has(pickup.id),
+      flowName: usedPickups.get(pickup.id) || null
+    }));
+  
+    return updatedEvents.length > 0
+      ? res.status(200).send(updatedEvents)
+      : res.status(204).send('');
+  }
+  
 
 /**
 * @swagger
