@@ -143,7 +143,9 @@ export function setProcessRulesInterval() {
 // Call to set the initial interval
 setProcessRulesInterval();
 
-// Function to process rules
+// Map to track active timeouts for each configurationFlowMapItem
+const timeoutMap = new Map();
+
 function processRules() {
   const date = new Date();
   const configurationPickupMapSet = [...new Set(configurationPickupMap.values())];
@@ -152,24 +154,51 @@ function processRules() {
 
   console.info(`Processing rules started ${date.toLocaleTimeString()}`);
 
-  configurationFlowMap.forEach((configurationFlowMapItem, key) => {
+  configurationFlowMap.forEach((configurationFlowMapItem) => {
     if (configurationFlowMapItem.activationStatus) {
       console.debug('Processing flow : ', configurationFlowMapItem.flowName);
-      
-      const configPickup = configurationPickupMapSet.filter((object) => object.id === configurationFlowMapItem.pickupId)[0]; // Extract current pickup method
-      const configDelivery = configurationDeliveryMapSet.filter((object) => object.id === configurationFlowMapItem.deliveryId)[0]; // Extract current delivery method
-      const configProcessing = configurationProcessingMapSet.filter((object) => object.id === configurationFlowMapItem.processingId)[0]; // Extract current processing method
+
+      const configPickup = configurationPickupMapSet.find((object) => object.id === configurationFlowMapItem.pickupId);
+      const configDelivery = configurationDeliveryMapSet.find((object) => object.id === configurationFlowMapItem.deliveryId);
+      const configProcessing = configurationProcessingMapSet.find((object) => object.id === configurationFlowMapItem.processingId);
 
       const transactionProcessManager = new TransactionProcessManager(configPickup, configDelivery, configProcessing, configurationFlowMapItem);
       
-      // Using queues, ideal for B2B integrations
-      pickupProcessingQueue.enqueue(transactionProcessManager);
+      // Determine retryInterval from configPickup or set a default of 60 seconds
+      const retryInterval = configPickup.retryInterval != null
+        ? configPickup.retryInterval * 1000
+        : 60 * 1000;
+
+      //console.debug('retryInterval - ', retryInterval);
+
+      // Retrieve any existing timeout info
+      const existingTimeout = timeoutMap.get(configurationFlowMapItem.flowName);
+
+      // Check if a timeout needs to be set or updated
+      if (!existingTimeout || existingTimeout.interval !== retryInterval) {
+        // Clear previous timeout if it's set and interval has changed
+        if (existingTimeout) {
+          clearTimeout(existingTimeout.id);
+          console.debug(`Cleared existing timeout for ${configurationFlowMapItem.flowName} due to interval change.`);
+        }
+
+        // Set a new timeout for this configurationFlowMapItem
+        const timeoutId = setTimeout(() => {
+          pickupProcessingQueue.enqueue(transactionProcessManager);
+          timeoutMap.delete(configurationFlowMapItem.flowName); // Clean up after enqueuing
+        }, retryInterval);
+
+        // Store the timeout ID and interval
+        timeoutMap.set(configurationFlowMapItem.flowName, { id: timeoutId, interval: retryInterval });
+      } else {
+        console.debug(`Timeout for ${configurationFlowMapItem.flowName} with interval ${retryInterval / 1000}s is already set. Skipping duplicate.`);
+      }
     }
   });
 
   console.info(`Processing rules ended ${date.toLocaleTimeString()}`);
-
 }
+
 
 // Whenever the configuration changes, call setProcessRulesInterval() again
 // For example, this can be triggered whenever the map is updated

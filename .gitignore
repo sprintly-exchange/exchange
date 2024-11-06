@@ -120,3 +120,7 @@ node_modules
 
 FS_Configurations.json
 FS_Transactions.json
+.idea/.gitignore
+.idea/exchange.iml
+.idea/modules.xml
+.idea/vcs.xml
