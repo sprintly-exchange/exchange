@@ -165,17 +165,17 @@ function processRules() {
       const transactionProcessManager = new TransactionProcessManager(configPickup, configDelivery, configProcessing, configurationFlowMapItem);
       
       // Determine retryInterval from configPickup or set a default of 60 seconds
-      const retryInterval = configPickup.retryInterval != null
-        ? configPickup.retryInterval * 1000
+      const retryInterval = Number(configPickup.retryInterval) > 0
+        ? Number(configPickup.retryInterval) * 1000
         : 60 * 1000;
 
       //console.debug('retryInterval - ', retryInterval);
 
       // Retrieve any existing timeout info
       const existingTimeout = timeoutMap.get(configurationFlowMapItem.flowName);
-
+      //console.debug('existingTimeout - ', existingTimeout);
       // Check if a timeout needs to be set or updated
-      if (!existingTimeout || existingTimeout.interval !== retryInterval) {
+      if (!existingTimeout || Number(existingTimeout.interval) !== retryInterval) {
         // Clear previous timeout if it's set and interval has changed
         if (existingTimeout) {
           clearTimeout(existingTimeout.id);

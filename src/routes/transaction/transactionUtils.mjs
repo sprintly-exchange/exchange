@@ -45,15 +45,16 @@ export function countFlowNamePerMinute(events) {
   export function transactionSummaryWithTimeInMinutes(events) {
     const counts = {};
   
+    // Step 1: Count existing events per minute and status
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
-      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHHMM"
+      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHH:MM"
       const status = entry.status;
   
       if (!counts[minute]) {
         counts[minute] = {};
       }
-
+  
       if (!counts[minute][status]) {
         counts[minute][status] = 0;
       }
@@ -61,22 +62,54 @@ export function countFlowNamePerMinute(events) {
       counts[minute][status]++;
     });
   
+    // Step 2: Find the earliest processing time in events (firstEntryTime)
+    const firstEntryTime = new Date(Math.min(...events.map(entry => new Date(entry.processingTime).getTime())));
+  
+    // Step 3: Get all unique statuses
+    const allStatuses = [...new Set(events.map(entry => entry.status))];
+  
+    // Step 4: Fill missing minutes with counts of 0 up to the current time
+    const currentTime = new Date();
+    let currentMinute = new Date(firstEntryTime);
+  
+    // Increment minute-by-minute from firstEntryTime to current time
+    while (currentMinute <= currentTime) {
+      const minuteKey = currentMinute.toISOString().substring(0, 16);
+  
+      // Ensure each status has a count of 0 if it doesn't exist for this minute
+      if (!counts[minuteKey]) {
+        counts[minuteKey] = {};
+      }
+  
+      allStatuses.forEach(status => {
+        if (!counts[minuteKey][status]) {
+          counts[minuteKey][status] = 0;
+        }
+      });
+  
+      // Move to the next minute
+      currentMinute.setMinutes(currentMinute.getMinutes() + 1);
+    }
+  
     return counts;
   }
+  
+  
 
 
   export function countFlowsPerMinute(events) {
     const counts = {};
-  
+    
+    // Step 1: Count existing events per minute
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
-      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHHMM"
+      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHH:MM"
       const flowName = entry.flowName;
   
       if (!counts[minute]) {
         counts[minute] = {};
       }
-
+  
       if (!counts[minute][flowName]) {
         counts[minute][flowName] = 0;
       }
@@ -84,8 +117,39 @@ export function countFlowNamePerMinute(events) {
       counts[minute][flowName]++;
     });
   
+    // Step 2: Find the earliest processing time in events (firstEntryTime)
+    const firstEntryTime = new Date(Math.min(...events.map(entry => new Date(entry.processingTime).getTime())));
+  
+    // Step 3: Get all unique flow names
+    const allFlows = [...new Set(events.map(entry => entry.flowName))];
+  
+    // Step 4: Fill missing minutes with counts of 0 up to the current time
+    const currentTime = new Date();
+    let currentMinute = new Date(firstEntryTime);
+  
+    // Increment minute-by-minute from firstEntryTime to current time
+    while (currentMinute <= currentTime) {
+      const minuteKey = currentMinute.toISOString().substring(0, 16);
+  
+      // Ensure each flow has a count of 0 if it doesn't exist for this minute
+      if (!counts[minuteKey]) {
+        counts[minuteKey] = {};
+      }
+  
+      allFlows.forEach(flowName => {
+        if (!counts[minuteKey][flowName]) {
+          counts[minuteKey][flowName] = 0;
+        }
+      });
+  
+      // Move to the next minute
+      currentMinute.setMinutes(currentMinute.getMinutes() + 1);
+    }
+  
     return counts;
   }
+  
+  
 
   export function countFlows(events) {
     const counts = {};
