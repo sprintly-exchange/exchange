@@ -9,7 +9,6 @@ import xmldom from "xmldom";
 import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
-import { TemplatePartner } from "../../custom-connections/templatePartner.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
 
 //processing transactions
@@ -222,18 +221,6 @@ export class TransactionProcessManager{
                         break;
                   default:
                         
-            }
-
-            switch(this.configDelivery.connectionId){
-                  case 'connectionIDPartnerTemplate' : {
-                        const templatePartener = new TemplatePartner();
-                        //to do...
-                        this.commonTransactionUtils.addTransaction(this.transaction);
-                        break;
-                  }
-                  default: {
-                        break;
-                  }
             }
       }
 
