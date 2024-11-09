@@ -90,6 +90,9 @@ async function getFlows(req,res){
         try{
             item.pickupName = configurationPickupMap.get(item.pickupId).connectionName;
             item.deliveryName = configurationDeliveryMap.get(item.deliveryId).connectionName;
+            item.processingName = configurationProcessingMap.has(item.processingId) 
+            ? configurationProcessingMap.get(item.processingId).processingName 
+            : item.processingName;
             item.organizationName = await getOrganizatonNameById(item.organizationId);           
         }catch(error){
             //
