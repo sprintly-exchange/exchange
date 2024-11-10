@@ -167,19 +167,14 @@ export function countFlowNamePerMinute(events) {
     return counts;
   }
 
-  export function searchTranscationsBetweenDatesByEpochTime(start,end,events) {
+  export function searchTranscationsBetweenDatesByEpochTime(start, end, events) {
     return events.filter((transaction) => {
       const transactionEpochTime = new Date(transaction.processingTime).getTime();
-      if((start <= transactionEpochTime) && (transactionEpochTime <= end)){
-        //console.debug('transaction.processingTime : ',transaction.processingTime);
-        //console.debug('transaction.processingTime-epoch : ',transactionEpochTime);
-        //console.debug('transaction search start time ',start);
-        //console.debug('transaction search end time:',end);
-        return transaction;
-      }
-      
-    })
+      // Check if transaction's time is within the start and end range
+      return start <= transactionEpochTime && transactionEpochTime <= end;
+    });
   }
+  
 
   export function searcTransationSearchByIds(messageId, senderId, receiverId, events) {
     return events.filter((transaction) => {
