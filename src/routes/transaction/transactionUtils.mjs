@@ -4,7 +4,7 @@ export function countFlowNamePerMinute(events) {
     const counts = {};
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
-      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHHMM"
+      const minute = date.toISOString().substring(0, 16)+ "Z"; ; // Format: "YYYY-MM-DDTHHMM"
   
       if (!counts[minute]) {
         counts[minute] = 0;
@@ -48,7 +48,7 @@ export function countFlowNamePerMinute(events) {
     // Step 1: Count existing events per minute and status
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
-      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHH:MM"
+      const minute = date.toISOString().substring(0, 16)+ "Z"; ; // Format: "YYYY-MM-DDTHH:MM"
       const status = entry.status;
   
       if (!counts[minute]) {
@@ -74,7 +74,7 @@ export function countFlowNamePerMinute(events) {
   
     // Increment minute-by-minute from firstEntryTime to current time
     while (currentMinute <= currentTime) {
-      const minuteKey = currentMinute.toISOString().substring(0, 16);
+      const minuteKey = currentMinute.toISOString().substring(0, 16)+ "Z"; ;
   
       // Ensure each status has a count of 0 if it doesn't exist for this minute
       if (!counts[minuteKey]) {
@@ -103,7 +103,7 @@ export function countFlowNamePerMinute(events) {
     // Step 1: Count existing events per minute
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
-      const minute = date.toISOString().substring(0, 16); // Format: "YYYY-MM-DDTHH:MM"
+      const minute = date.toISOString().substring(0, 16)+ "Z"; // Format: "YYYY-MM-DDTHH:MM"
       const flowName = entry.flowName;
   
       if (!counts[minute]) {
@@ -129,7 +129,7 @@ export function countFlowNamePerMinute(events) {
   
     // Increment minute-by-minute from firstEntryTime to current time
     while (currentMinute <= currentTime) {
-      const minuteKey = currentMinute.toISOString().substring(0, 16);
+      const minuteKey = currentMinute.toISOString().substring(0, 16)+ "Z";
   
       // Ensure each flow has a count of 0 if it doesn't exist for this minute
       if (!counts[minuteKey]) {
