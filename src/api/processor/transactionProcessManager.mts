@@ -28,7 +28,7 @@ export class TransactionProcessManager{
       configDelivery;
       configProcessing;
       flowName;
-      transactionProcessManagerStage;
+      transactionProcessManagerStage: TransactionProcessManager;
       commonTransactionUtils;
       configurationFlow;
 

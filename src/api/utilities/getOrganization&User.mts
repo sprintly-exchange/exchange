@@ -1,32 +1,41 @@
 import pkg from 'jsonwebtoken';
 
-import jwt, { decode } from 'jsonwebtoken';
+
+import jwt, { decode,JwtPayload } from 'jsonwebtoken';
 import axios from 'axios';
 import jwkToPem from 'jwk-to-pem';
 import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userExists } from './serverCommon.mjs';
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 import appEnumerations from './severInitFunctions.mjs';
-
+import GlobalConfiguration from '../../GlobalConfiguration';
 const {TokenExpiredError} = pkg;
 
-export const getAuthDetails = async (authorizationHeader) => {
+export const getAuthDetails = async (authorizationHeader:string) => {
     if (
       typeof authorizationHeader !== 'string' ||
       !authorizationHeader.startsWith('Bearer ')
     ) {
       throw new Error('Access Denied: No Token Provided!');
-      return  {undefined, undefined};
+      return  {};
     }
   
     const token = authorizationHeader.split(' ')[1];
     try {
       //Check API server provided JWT token
       const secret = process.env.JWT_SECRET;
+      if (!secret) {
+          throw new Error("JWT_SECRET environment variable is not set");
+      }
       const decoded = jwt.verify(token, secret);
-      const { userId, organizationId } = decoded;
+
+      if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded && 'organizationId' in decoded) {
+          const { userId, organizationId } = decoded as JwtPayload;
+          console.log(`User ID: ${userId}, Organization ID: ${organizationId}`);
+          return { userId, organizationId };
+      }
       //if found retun the userId and organizationId
-      return { userId, organizationId };
+      
     }catch (error) {
       if (error instanceof TokenExpiredError) {
         // Handle the expired token case
@@ -44,7 +53,7 @@ export const getAuthDetails = async (authorizationHeader) => {
     }
    };
 
-   const checkGoogleAuth = async (token) => {
+   const checkGoogleAuth = async (token:any) => {
     //attempt to move forward, check for google token to enable the other features to google authenticated user
     
     //Check organization existance based on email
@@ -63,7 +72,7 @@ export const getAuthDetails = async (authorizationHeader) => {
             organizationId: orgId,
             registrationDate: new Date().toISOString(),
           };
-          organizationsMap.set(org.id,org);
+          GlobalConfiguration.organizationsMap.set(org.id,org);
           organizationId = org.id;
           console.log('rganization added : ',new Date().toISOString(), org);
         } else {
@@ -71,8 +80,8 @@ export const getAuthDetails = async (authorizationHeader) => {
         }
 
         //Check user existance based on email
-        if(!userExists(email) && global.googleUserCreationStatus[email] !== true){
-          global.googleUserCreationStatus[email] = true;
+        if(!userExists(email) && GlobalConfiguration.googleUserCreationStatus[email] !== true){
+          GlobalConfiguration.googleUserCreationStatus[email] = true;
           const user = {
             id: `${uuidv4()}`,
             username : email,
@@ -85,10 +94,10 @@ export const getAuthDetails = async (authorizationHeader) => {
             registrationDate: new Date().toISOString(),
             lastLoggedInTime: new Date(),
           };
-          organizationsUsersMap.set(user.id,user);
+          GlobalConfiguration.organizationsUsersMap.set(user.id,user);
           userId = user.id;
           console.log('User added : ',new Date().toISOString(), user);
-          global.googleUserCreationStatus[email] = false;
+          GlobalConfiguration.googleUserCreationStatus[email] = false;
         } else {
           userId = getUserId(email);
           const currUserSet = getUserById(userId);
@@ -101,7 +110,7 @@ export const getAuthDetails = async (authorizationHeader) => {
         return {userId, organizationId};
     }catch(error){
       console.log(error);
-      return  {undefined, undefined};
+      return  {};
   
     }
     
@@ -109,7 +118,7 @@ export const getAuthDetails = async (authorizationHeader) => {
 
 
 
-   const verifyGoogleToken = async (token) => {
+   const verifyGoogleToken = async (token:any) => {
     try {
       // Fetch Google's public keys
       const response = await axios.get('https://www.googleapis.com/oauth2/v3/certs');

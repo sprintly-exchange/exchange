@@ -1,8 +1,9 @@
 import { userInfo } from "os";
 import { getAuthDetails } from "./getOrganization&User.mjs";
 import appEnumerations from "./severInitFunctions.mjs";
+import GlobalConfiguration from "../../GlobalConfiguration";
 
-export function setCommonHeaders(res){
+export function setCommonHeaders(res:any){
     res.setHeader("Access-Control-Allow-Methods", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,7 +14,7 @@ export function setCommonHeaders(res){
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 };
 
-export function mapEntrySearchByValue(map, searchKey, searchValue) {
+export function mapEntrySearchByValue(map:any, searchKey:any, searchValue:any) {
     // Iterate through the map entries
     for (let [key, value] of map.entries()) {
       // Check if the value is an object and has a property that matches searchKey and searchValue
@@ -27,10 +28,10 @@ export function mapEntrySearchByValue(map, searchKey, searchValue) {
   }
   
 //get role id when given a role
-export function getRoleId(role){
+export function getRoleId(role:string){
     let roleId = undefined;
 
-    for (let [key, value] of organizationsRolesMapNew.entries()) {
+    for (let [key, value] of GlobalConfiguration.organizationsRolesMapNew.entries()) {
         if (value.role === role) {
             roleId = value.id;
             break;
@@ -41,10 +42,10 @@ export function getRoleId(role){
 
 
 //get role name given the role Id
-export function getRoleById(roleId){
+export function getRoleById(roleId:string){
     let role = undefined;
     //console.log('roleId',roleId);
-    for (let [key, value] of organizationsRolesMapNew.entries()) {
+    for (let [key, value] of GlobalConfiguration.organizationsRolesMapNew.entries()) {
         //console.log('value',value);
         if (value.id === roleId) {
             role = value.role;
@@ -55,9 +56,9 @@ export function getRoleById(roleId){
     return role;
 };
 
-export function userExists(nameIn){
+export function userExists(nameIn:string){
     let userFound=false;
-    for (let user of organizationsUsersMap.values()) {
+    for (let user of GlobalConfiguration.organizationsUsersMap.values()) {
         if (user.username === nameIn) {
             userFound=true;
         }
@@ -66,9 +67,9 @@ export function userExists(nameIn){
 };
 
 
-export function getUserId(nameIn){
+export function getUserId(nameIn:string){
     let userId=null;
-    for (let user of organizationsUsersMap.values()) {
+    for (let user of GlobalConfiguration.organizationsUsersMap.values()) {
         if (user.username === nameIn) {
             userId = user.id;
         }
@@ -76,13 +77,13 @@ export function getUserId(nameIn){
     return userId;
 };
 
-export function getUserById(userId){
-    return organizationsUsersMap.get(userId);
+export function getUserById(userId:string){
+    return GlobalConfiguration.organizationsUsersMap.get(userId);
 };
 
-export function organizationExists(organizationIn){
+export function organizationExists(organizationIn:any){
     let orgFound = false;
-    for (let organization of organizationsMap.values()) {
+    for (let organization of GlobalConfiguration.organizationsMap.values()) {
         if (organization.name === organizationIn) {
             orgFound = true;
         }
@@ -90,9 +91,9 @@ export function organizationExists(organizationIn){
     return orgFound;
 };
 
-export function getOrgId(orgIn){
+export function getOrgId(orgIn:string){
     let orgId=null;
-    for (let org of organizationsMap.values()) {
+    for (let org of GlobalConfiguration.organizationsMap.values()) {
         if (org.name === orgIn) {
             orgId = org.id;
         }
@@ -100,12 +101,12 @@ export function getOrgId(orgIn){
     return orgId;
 };
 
-export async function userHasDeleteRights(req, map, id) {
+export async function userHasDeleteRights(req:any, map:any, id:string) {
     // Destructure userId and organizationId from getAuthDetails result
     const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
     
     // Retrieve user's membership information
-    const memberOfOrganizationIds = organizationsUsersMap.get(userId)?.memberOfOrganizationIds || [];
+    const memberOfOrganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId)?.memberOfOrganizationIds || [];
 
     // Retrieve the item from the map by id
     const item = map.get(id);
@@ -135,13 +136,13 @@ export async function userHasDeleteRights(req, map, id) {
 };
 
 
-export const filterResultsBasedOnUserRole = async (map,req) => {
+export const filterResultsBasedOnUserRole = async (map:any,req:any) => {
     
     let events =[];
 
     try {
         const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-        const memberOforganizationIds = organizationsUsersMap.get(userId).memberOforganizationIds;
+        const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
 
         console.log('organizationId',organizationId);
         console.log('event recevied for filtering',map.size);
@@ -175,11 +176,11 @@ export const filterResultsBasedOnUserRole = async (map,req) => {
     return events;
 }
 
-export const filterResultsBasedOnUserRoleAndUserId = async (map,req) => {
+export const filterResultsBasedOnUserRoleAndUserId = async (map:any,req:any) => {
     let events =[];
     try {
         const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-        const memberOforganizationIds = organizationsUsersMap.get(userId).memberOforganizationIds;
+        const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
 
         console.log('organizationId : ',organizationId);
         console.log('Events recevied for filtering : ',map.size);
@@ -228,7 +229,7 @@ export const filterResultsBasedOnUser = async (map,req) => {
 }
 
 //this is to retrn item in a map, stored by usierId, example user configuragion stored by userId
-export const getItemByUserId = async (map,req) => {
+export const getItemByUserId = async (map:any,req:any) => {
     const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
     let events =[];
     //console.log('userId',userId);
@@ -245,7 +246,7 @@ export const getItemByUserId = async (map,req) => {
 
 //get organization name by Id
 
-export const getOrganizatonNameById = async (id) => {
-    const {name} = organizationsMap.get(id);
+export const getOrganizatonNameById = async (id:string) => {
+    const {name} = GlobalConfiguration.organizationsMap.get(id);
     return name;
 }

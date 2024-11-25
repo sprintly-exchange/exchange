@@ -1,12 +1,15 @@
 import axios from 'axios';
 
 export class HTTPClient {
-    constructor(baseURL) {
+    baseURL;
+    client;
+
+    constructor(baseURL:string) {
         this.baseURL = baseURL;
         this.client = axios.create({ baseURL });
     }
 
-    async get(endpoint, headers) {
+    async get(endpoint:string, headers:any) {
         try {
             const response = await this.client.get(endpoint, { headers });
 
@@ -22,7 +25,7 @@ export class HTTPClient {
             }
 
             return [JSON.stringify(data), response.status];
-        } catch (error) {
+        } catch (error:any) {
             //console.log('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
@@ -31,7 +34,7 @@ export class HTTPClient {
         }
     }
 
-    async post(endpoint, sendData, headers) {
+    async post(endpoint:string, sendData:any, headers:any) {
         try {
             const response = await this.client.post(endpoint, sendData, { headers });
 
@@ -47,7 +50,7 @@ export class HTTPClient {
             }
 
             return [JSON.stringify(data), response.status];
-        } catch (error) {
+        } catch (error:any) {
             //disabled the logging to remove uncessary http logs when there is an error
             //console.log('error', error);
             if (error.response) {
@@ -57,7 +60,7 @@ export class HTTPClient {
         }
     }
 
-    async delete(endpoint, headers) {
+    async delete(endpoint:string, headers:any) {
         try {
             const response = await this.client.delete(endpoint, { headers });
 
@@ -73,7 +76,7 @@ export class HTTPClient {
             }
 
             return [JSON.stringify(data), response.status];
-        } catch (error) {
+        } catch (error:any) {
             //console.log('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
@@ -82,7 +85,7 @@ export class HTTPClient {
         }
     }
 
-    async put(endpoint, sendData, headers) {
+    async put(endpoint:string, sendData:any, headers:any) {
         try {
             const response = await this.client.put(endpoint, sendData, { headers });
 
@@ -98,7 +101,7 @@ export class HTTPClient {
             }
 
             return [JSON.stringify(data), response.status];
-        } catch (error) {
+        } catch (error:any) {
             //console.log('error', error);
             if (error.response) {
                 return [undefined, error.response.status];

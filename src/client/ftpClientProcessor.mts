@@ -1,9 +1,19 @@
 import * as ftp from 'basic-ftp';
-import { ftpTemplate } from './protocolTemplates.mjs'; // Adjust path as per your structure
 import { promises as fs } from 'fs'; // Import fs.promises
 
 export class FtpClientProcessor {
-  constructor(template = ftpTemplate) {
+  host;
+  port;
+  user;
+  password;
+  secure;
+  remotePath;
+  localPath;
+  passive;
+  timeout;
+  ftp;
+
+  constructor(template: any) {
     this.host = template.host;
     this.port = template.port;
     this.user = template.userName;
@@ -71,7 +81,7 @@ export class FtpClientProcessor {
     }
   }
 
-  async uploadFile(localFileName) {
+  async uploadFile(localFileName:string) {
     try {
       const localFilePath = `${this.localPath}/${localFileName}`;
       const remoteFilePath = `${this.remotePath}/${localFileName}`;
@@ -83,7 +93,7 @@ export class FtpClientProcessor {
     }
   }
 
-  async uploadFileCustom(localFileName,remoteFileName) {
+  async uploadFileCustom(localFileName:string,remoteFileName:string) {
     try {
       const localFilePath = `${localFileName}`;
       const remoteFilePath = `${this.remotePath}/${remoteFileName}`;
@@ -95,9 +105,9 @@ export class FtpClientProcessor {
     }
   }
 
-  async downloadFile(remoteFileName, localPath) {
+  async downloadFile(remoteFileName:string) {
     try {
-      const localFilePath = `${localPath}/${remoteFileName}`;
+      const localFilePath = `${this.localPath}/${remoteFileName}`;
       const remoteFilePath = `${this.remotePath}/${remoteFileName}`;
       
       await this.ftp.downloadTo(localFilePath, remoteFilePath);
@@ -138,7 +148,7 @@ export class FtpClientProcessor {
     }
   }
 
-  async readFileToString(localFileName) {
+  async readFileToString(localFileName:string) {
     try {
       const localFilePath = `${this.localPath}/${localFileName}`;
       const fileContent = await fs.readFile(localFilePath, 'utf8');
@@ -150,7 +160,7 @@ export class FtpClientProcessor {
     }
   }
 
-  async deleteFile(remoteFileName) {
+  async deleteFile(remoteFileName:string) {
     try {
       const remoteFilePath = `${this.remotePath}/${remoteFileName}`;
       await this.ftp.remove(remoteFilePath);
@@ -172,21 +182,3 @@ export class FtpClientProcessor {
   }
 }
 
-// Example usage
-async function main() {
-  const ftpProcessor = new FtpClientProcessor();
-  
-  try {
-    await ftpProcessor.connect();
-    await ftpProcessor.uploadFile('file.txt');
-    await ftpProcessor.downloadFile('remote-file.txt');
-    const fileContent = await ftpProcessor.readFileToString('remote-file.txt');
-    console.log('File Content:', fileContent);
-    await ftpProcessor.downloadAllFiles();
-    await ftpProcessor.deleteFile('remote-file.txt');
-  } catch (error) {
-    console.error('FTP operation failed:', error);
-  } finally {
-    await ftpProcessor.disconnect();
-  }
-}

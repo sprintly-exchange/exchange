@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const organizationRoutes = Router();
 
@@ -48,17 +49,17 @@ organizationRoutes.post('/register-organization', async (req, res) => {
     setCommonHeaders(res);
 
     // Check if the organization name already exists
-    for (let organization of organizationsMap.values()) {
+    for (let organization of GlobalConfiguration.organizationsMap.values()) {
       if (organization.name === name) {
         return res.status(400).send(new ResponseMessage(uuidv4(),'Organization name already exists','Failed'));
       }
     }
 
     // Add the new organization to the map
-    organizationsMap.set(id, req.body);
+    GlobalConfiguration.organizationsMap.set(id, req.body);
 
     res.status(201).send({ id, message: 'Organization registered successfully' });
-  } catch (error) {
+  } catch (error:any) {
     res.status(400).send(error.message);
   }
 });
@@ -93,9 +94,9 @@ organizationRoutes.get('/', (req, res) => {
   getOrganizations(req,res);
 });
 
-async function getOrganizations(req,res){
+async function getOrganizations(req:any,res:any){
   setCommonHeaders(res);
-  const events = await filterResultsBasedOnUserRole(organizationsMap,req);
+  const events = await filterResultsBasedOnUserRole(GlobalConfiguration.organizationsMap,req);
   return events.length > 0 ? res.status(200).send(events) : res.status(204).send('');
 }
 
@@ -132,7 +133,7 @@ async function getOrganizations(req,res){
 organizationRoutes.get('/name/:name', (req, res) => {
   const { name } = req.params;
   setCommonHeaders(res);
-  const organization = [...organizationsMap.values()].find(org => org.name === name);
+  const organization = [...GlobalConfiguration.organizationsMap.values()].find(org => org.name === name);
   if (organization) {
     res.status(200).send(organization);
   } else {
@@ -173,8 +174,8 @@ organizationRoutes.get('/name/:name', (req, res) => {
 organizationRoutes.get('/id/:id', (req, res) => {
   const { id } = req.params;
   setCommonHeaders(res);
-  if (organizationsMap.has(id)) {
-    const organization = organizationsMap.get(id);
+  if (GlobalConfiguration.organizationsMap.has(id)) {
+    const organization = GlobalConfiguration.organizationsMap.get(id);
     res.status(200).send(organization);
   } else {
     res.status(404).send(new ResponseMessage(uuidv4(),'Organization not found','Failed'));
@@ -201,24 +202,28 @@ organizationRoutes.get('/id/:id', (req, res) => {
  *         description: Organization not found
  */
 organizationRoutes.delete('/id/:id', (req, res) => {
+  deleteOrganisaton(req,res);
+});
+
+async function deleteOrganisaton(req:any,res:any){
   const { id } = req.params;
   setCommonHeaders(res);  
  
 
-  if (organizationsMap.has(id)) {
-    console.log('organizationsMap.get(id).isDefaultUiDisplayFalse',organizationsMap.get(id).isDefaultUiDisplayFalse);
-    if(organizationsMap.get(id).isDefaultUiDisplayFalse !== true){
+  if (GlobalConfiguration.organizationsMap.has(id)) {
+    console.log('organizationsMap.get(id).isDefaultUiDisplayFalse',GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse);
+    if(GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse !== true){
       //organizationsMap.delete(id);
-      userHasDeleteRights(req,organizationsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+      await userHasDeleteRights(req,GlobalConfiguration.organizationsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
       res.status(200).send(new ResponseMessage(uuidv4(),'Organization deleted successfully','Success'));
     } else {
-      res.status(404).send(new ResponseMessage(uuidv4(),`${organizationsMap.get(id).name} cannot be deleted.`,'Failed'));
+      res.status(404).send(new ResponseMessage(uuidv4(),`${GlobalConfiguration.organizationsMap.get(id).name} cannot be deleted.`,'Failed'));
     }
     
   } else {
     res.status(404).send(new ResponseMessage(uuidv4(),`Organization ${id} not found.`,'Failed'));
   }
-});
+}
 
 /**
  * @swagger
@@ -264,7 +269,7 @@ organizationRoutes.put('/id/:id', async (req, res) => {
     return res.status(400).send('Invalid request body');
   }
 
-  if (!organizationsMap.has(id)) {
+  if (!GlobalConfiguration.organizationsMap.has(id)) {
     return res.status(404).send('Organization not found.');
   }
 
@@ -273,7 +278,7 @@ organizationRoutes.put('/id/:id', async (req, res) => {
   //
 
   // Check if the updated name already exists in another organization
-  for (let organization of organizationsMap.values()) {
+  for (let organization of GlobalConfiguration.organizationsMap.values()) {
     if (organization.name === name && organization.id !== id) {
       return res.status(400).send(new ResponseMessage(uuidv4(),'Organization name already exists','Failed'));
     }
@@ -282,11 +287,11 @@ organizationRoutes.put('/id/:id', async (req, res) => {
 
 
   //not to remove the default organization attributes set by API server.
-  if( organizationsMap.get(id).isDefaultUiDisplayFalse === true) {
+  if( GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse === true) {
     const isDefaultUiDisplayFalse = true;
-    organizationsMap.set(id,{isDefaultUiDisplayFalse,id,name:'Default Organization', address , email, phone, web});
+    GlobalConfiguration.organizationsMap.set(id,{isDefaultUiDisplayFalse,id,name:'Default Organization', address , email, phone, web});
   } else {
-    organizationsMap.set(id,{id,name, address , email, phone, web});
+    GlobalConfiguration.organizationsMap.set(id,{id,name, address , email, phone, web});
   }
   
   res.status(200).send(new ResponseMessage(uuidv4(),'Organization updated successfully','Success'));

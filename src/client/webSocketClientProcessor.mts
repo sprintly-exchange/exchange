@@ -4,7 +4,17 @@ import WebSocket from 'ws';
 import { websocketRecordType } from './protocolTemplates.mjs'; // Adjust path as per your structure
 
 export class WebSocketClientProcessor {
-  constructor(config) {
+  connectionName;
+  host;
+  port;
+  protocol;
+  path;
+  contentType;
+  accept;
+  websocketUrl;
+  ws;
+
+  constructor(config:any) {
     const {
       connectionName,
       host,
@@ -50,12 +60,12 @@ export class WebSocketClientProcessor {
       console.log('WebSocket disconnected');
     });
 
-    this.ws.on('error', (error) => {
+    this.ws.on('error', (error:any) => {
       console.error('WebSocket error:', error.message);
     });
   }
 
-  sendWebSocketData(data) {
+  sendWebSocketData(data:any) {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
     } else {
@@ -66,7 +76,7 @@ export class WebSocketClientProcessor {
   main() {
     try {
       this.sendWebSocketData({ type: 'message', content: 'Hello WebSocket!' });
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error in main function:', error.message);
     }
   }

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { filterResultsBasedOnUserRoleAndUserId, mapEntrySearchByValue, setCommonHeaders, userHasDeleteRights } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const processingRoutes = Router();
 
@@ -41,15 +42,15 @@ processingRoutes.post('/', function (req, res) {
       res.status(400).send('No data');
  
     //Check If a record already exists with name
-    if(mapEntrySearchByValue(configurationProcessingMap,'processingName',req.body.processingName)){
+    if(mapEntrySearchByValue(GlobalConfiguration.configurationProcessingMap,'processingName',req.body.processingName)){
         res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
         return;
     }
        
 
     req.body.id === undefined ? req.body.id = uuidv4() :'';
-    configurationProcessingMap.set(req.body.id,req.body);
-    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id)));
+    GlobalConfiguration.configurationProcessingMap.set(req.body.id,req.body);
+    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'','')));
 });
 
 processingRoutes.put('/', function (req, res) {  
@@ -61,8 +62,8 @@ processingRoutes.put('/', function (req, res) {
     }
           
     setCommonHeaders(res);
-    configurationProcessingMap.set(req.body.id,req.body);
-    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 
+    GlobalConfiguration.configurationProcessingMap.set(req.body.id,req.body);
+    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'',''))); 
 });
 
 /**
@@ -87,7 +88,7 @@ processingRoutes.put('/', function (req, res) {
 processingRoutes.get('/:id', function (req, res) {   
     console.debug(`Processing id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    configurationProcessingMap.has(req.params.id) ? res.status(200).send(JSON.stringify(configurationProcessingMap.get(req.params.id))) : res.status(204).send('{}');
+    GlobalConfiguration.configurationProcessingMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationProcessingMap.get(req.params.id))) : res.status(204).send('{}');
 });
 
 processingRoutes.get('/', function (req, res) {   
@@ -95,9 +96,9 @@ processingRoutes.get('/', function (req, res) {
     getProcessing(req,res);
 });
 
-async function getProcessing(req,res){
+async function getProcessing(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRoleAndUserId(configurationProcessingMap,req);
+    const events = await filterResultsBasedOnUserRoleAndUserId(GlobalConfiguration.configurationProcessingMap,req);
     console.log(events);
     return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
   };
@@ -110,7 +111,7 @@ async function getProcessing(req,res){
     let flowFound=false;
     let flowId='';
     let flowName='';
-    configurationFlowMap.forEach(function (flow){
+    GlobalConfiguration.configurationFlowMap.forEach(function (flow:any){
           if(flow.processingId === `${req.params.id}`){
                 flowFound = true;
                 flowId = flow.id;
@@ -123,7 +124,7 @@ async function getProcessing(req,res){
         userHasDeleteRights(req,configurationProcessingMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
         //configurationProcessingMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(new ResponseMessage(uuidv4(),`Unable to delete id ${req.params.id}`,'Failed'));
     else 
-      res.status(400).send(new ResponseMessage(uuidv4(),`Processing :  ${configurationProcessingMap.get(req.params.id).processingName} used in flow :  ${flowName}`,'Failed')) ;
+      res.status(400).send(new ResponseMessage(uuidv4(),`Processing :  ${GlobalConfiguration.configurationProcessingMap.get(req.params.id).processingName} used in flow :  ${flowName}`,'Failed')) ;
 });
 
 export default processingRoutes;

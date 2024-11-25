@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders, userHasDeleteRights , mapEntrySearchByValue} from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
-import { filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const deliveryRoutes = Router();
 
@@ -47,14 +47,14 @@ deliveryRoutes.post('/', function (req, res) {
     }
 
     //Check If a record already exists with name
-    if(mapEntrySearchByValue(configurationDeliveryMap,'connectionName',req.body.connectionName)){
-        res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
+    if(mapEntrySearchByValue(GlobalConfiguration.configurationDeliveryMap,'connectionName',req.body.connectionName)){
+        res.status(400).send(new ResponseMessage(uuidv4(),'Record already exists with the same name','Failed'));
         return;
     }   
 
     req.body.id === undefined ? req.body.id = uuidv4() : '';
-    configurationDeliveryMap.set(req.body.id, req.body);
-    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 
+    GlobalConfiguration.configurationDeliveryMap.set(req.body.id, req.body);
+    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'',''))); 
 });
 
 /**
@@ -89,8 +89,8 @@ deliveryRoutes.put('/', function (req, res) {
         res.status(400).send('No data'); 
         return;
     }
-    configurationDeliveryMap.set(req.body.id, req.body);
-    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id))); 
+    GlobalConfiguration.configurationDeliveryMap.set(req.body.id, req.body);
+    res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'',''))); 
 });
 
 /**
@@ -115,15 +115,15 @@ deliveryRoutes.get('/', function (req, res) {
     getDeliveries(req, res);
   });
   
-  async function getDeliveries(req, res) {
+  async function getDeliveries(req:any, res:any) {
     setCommonHeaders(res);
   
     // Filter deliveries based on user role and ID
-    const events = await filterResultsBasedOnUserRoleAndUserId(configurationDeliveryMap, req);
+    const events = await filterResultsBasedOnUserRoleAndUserId(GlobalConfiguration.configurationDeliveryMap, req);
   
     // Get all deliveries used in flows
     const usedDeliveries = new Map();
-    configurationFlowMap.forEach(flow => {
+    GlobalConfiguration.configurationFlowMap.forEach(flow => {
       if (flow.deliveryId) {
         usedDeliveries.set(flow.deliveryId, flow.flowName);
       }
@@ -167,7 +167,7 @@ deliveryRoutes.get('/', function (req, res) {
 deliveryRoutes.get('/:id', function (req, res) {   
     console.debug(`Delivery id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    configurationDeliveryMap.has(req.params.id) ? res.status(200).send(JSON.stringify(configurationDeliveryMap.get(req.params.id))) : res.status(406).send('{}'); 
+    GlobalConfiguration.configurationDeliveryMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationDeliveryMap.get(req.params.id))) : res.status(406).send('{}'); 
 });
 
 /**
@@ -189,6 +189,10 @@ deliveryRoutes.get('/:id', function (req, res) {
  *         description: Unable to delete delivery ID due to usage in a flow
  */
 deliveryRoutes.delete('/:id', function (req, res) {   
+    
+});
+
+async function deleteDelivery(req:any,res:any) {
     console.debug(`Delivery deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     console.log(`Attempting to delete delivery with ID: ${req.params.id}`);
@@ -196,7 +200,7 @@ deliveryRoutes.delete('/:id', function (req, res) {
     let flowFound = false;
     let flowId = '';
     let flowName = '';
-    configurationFlowMap.forEach(function (flow) {
+    GlobalConfiguration.configurationFlowMap.forEach(function (flow) {
         console.log('flow.deliveryId', flow.deliveryId);
         console.log('req.params.id', req.params.id);
         if (flow.deliveryId === `${req.params.id}`) {
@@ -209,13 +213,13 @@ deliveryRoutes.delete('/:id', function (req, res) {
     console.log('flowFound:', flowFound);
 
     if (!flowFound) {
-        userHasDeleteRights(req,configurationDeliveryMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+        await userHasDeleteRights(req,GlobalConfiguration.configurationDeliveryMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
         //configurationDeliveryMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(`{"Status":"Unable to delete ID ${req.params.id}"}`);
     } else {
-        res.status(400).send(new ResponseMessage(uuidv4(),`Delivery :  ${configurationDeliveryMap.get(req.params.id).connectionName} used in flow :  ${flowName}`,'Failed')) ;
+        res.status(400).send(new ResponseMessage(uuidv4(),`Delivery :  ${GlobalConfiguration.configurationDeliveryMap.get(req.params.id).connectionName} used in flow :  ${flowName}`,'Failed')) ;
     }
 
-    console.log(`Current deliveries after deletion: ${configurationDeliveryMap.size}`);
-});
+    console.log(`Current deliveries after deletion: ${GlobalConfiguration.configurationDeliveryMap.size}`);
+}
 
 export default deliveryRoutes;

@@ -1,8 +1,22 @@
 import axios from 'axios';
-import { httpRecordTypeOAuth2 } from './protocolTemplates.mjs'; // Adjust path as per your structure
 
 export class HttpClientProcessorOAuth20 {
-  constructor(config) {
+  connectionName;
+  host;
+  port;
+  protocol;
+  basePath;
+  contentType;
+  accept;
+  method;
+  clientId;
+  clientSecret;
+  accessTokenUrl;
+  refreshTokenUrl;
+  scope;
+  apiUrl;
+
+  constructor(config:any) {
     const {
       connectionName,
       host,
@@ -38,7 +52,7 @@ export class HttpClientProcessorOAuth20 {
     this.apiUrl = `${protocol}://${host}:${port}${basePath}`;
   }
 
-  async makeHttpRequest(url, method, headers, data) {
+  async makeHttpRequest(url:string, method:string, headers:any, data:any) {
     try {
       const response = await axios({
         url,
@@ -47,7 +61,7 @@ export class HttpClientProcessorOAuth20 {
         data,
       });
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error making HTTP request:', error.message);
       throw error;
     }
@@ -62,13 +76,13 @@ export class HttpClientProcessorOAuth20 {
         scope: this.scope,
       });
       return tokenResponse.data.access_token;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error fetching access token:', error.message);
       throw error;
     }
   }
 
-  async refreshToken(refreshToken) {
+  async refreshToken(refreshToken:any) {
     try {
       const tokenResponse = await axios.post(this.refreshTokenUrl, {
         client_id: this.clientId,
@@ -77,13 +91,13 @@ export class HttpClientProcessorOAuth20 {
         refresh_token: refreshToken,
       });
       return tokenResponse.data.access_token;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error refreshing token:', error.message);
       throw error;
     }
   }
 
-  async makeAuthenticatedRequest(url, method, data) {
+  async makeAuthenticatedRequest(url:string, method:string, data:any) {
     try {
       let accessToken = await this.getAccessToken();
       const headers = {
@@ -92,7 +106,7 @@ export class HttpClientProcessorOAuth20 {
         Authorization: `Bearer ${accessToken}`,
       };
       return await this.makeHttpRequest(url, method, headers, data);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error making authenticated request:', error.message);
       throw error;
     }
@@ -105,7 +119,7 @@ export class HttpClientProcessorOAuth20 {
       };
       const response = await this.makeAuthenticatedRequest(this.apiUrl, this.method, data);
       console.log('Response:', response);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error in main function:', error.message);
     }
   }

@@ -2,33 +2,34 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import {v4 as uuidv4} from 'uuid';
-import { TransactionProcessManager } from './src/api/processor/transactionProcessManager.mjs';
-import { decodeToken } from './src/api/utilities/reqestInterceptor.mjs';
+import { TransactionProcessManager } from './api/processor/transactionProcessManager.mjs';
+import { decodeToken } from './api/utilities/reqestInterceptor.mjs';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.mjs';
 import bodyParser from 'body-parser';
-import { setCommonHeaders } from './src/api/utilities/serverCommon.mjs';
+import { setCommonHeaders } from './api/utilities/serverCommon.mjs';
 
 
 //import routes
-import demoRoutes from './src/routes/demo/demoRoutes.mjs';
-import pickupRoutes from './src/routes/pickup/pickupRoutes.mjs';
-import deliveryRoutes from  './src/routes/delivery/deliveryRoutes.mjs';
-import flowRoutes from  './src/routes/flow/flowRoutes.mjs';
-import transactionRoutes from './src/routes/transaction/transactionRoutes.mjs';
-import processingRoutes from './src/routes/processing/processingRoutes.mjs';
-import messageStoreRoutes from './src/routes/messageStore/messageStoreRoutes.mjs';
-import configurationRoutes from './src/routes/configuration/configurationRoutes.mjs';
-import systemStatusRoutes from './src/routes/systemStatus/systemStatusRoutes.mjs';
-import loginRoutes from './src/routes/login/loginRoutes.mjs';
-import organizationRoutes from './src/routes/organization/organizationRoutes.mjs';
-import userRoutes from './src/routes/user/userRoutes.mjs';
-import appEnumerations, { initFunction} from './src/api/utilities/severInitFunctions.mjs';
-import {CustomLogger } from './src/api/logging/customLogger.mjs';
-import requestId from 'express-request-id';
-import OpenApis from './src/routes/openapi/openApis.mjs';
+import demoRoutes from './routes/demo/demoRoutes.mjs';
+import pickupRoutes from './routes/pickup/pickupRoutes.mjs';
+import deliveryRoutes from  './routes/delivery/deliveryRoutes.mjs';
+import flowRoutes from  './routes/flow/flowRoutes.mjs';
+import transactionRoutes from './routes/transaction/transactionRoutes.mjs';
+import processingRoutes from './routes/processing/processingRoutes.mjs';
+import messageStoreRoutes from './routes/messageStore/messageStoreRoutes.mjs';
+import configurationRoutes from './routes/configuration/configurationRoutes.mjs';
+import systemStatusRoutes from './routes/systemStatus/systemStatusRoutes.mjs';
+import loginRoutes from './routes/login/loginRoutes.mjs';
+import organizationRoutes from './routes/organization/organizationRoutes.mjs';
+import userRoutes from './routes/user/userRoutes.mjs';
+import appEnumerations, { initFunction} from './api/utilities/severInitFunctions.mjs';
+import {CustomLogger } from './api/logging/customLogger.mjs';
+import { requestId } from 'express-request-id';
+import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
+import GlobalConfiguration from './GlobalConfiguration';
 
 
 const SERVER_PORT = process.env.SERVER_PORT || 4000;
@@ -123,12 +124,12 @@ app.get('/api/dummy', function (req, res) {
 });
 
 
-let processRulesInterval; // Store interval ID to clear it later
+let processRulesInterval:any; // Store interval ID to clear it later
 
 export function setProcessRulesInterval() {
   // Fetch interval time dynamically from the global server configuration map
-  let processRulesTimeInterval = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL)) 
-    ? global.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL) 
+  let processRulesTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL) 
     : 1000; // Default to 1000 if not defined
   console.log(appEnumerations.PROCESS_RULES_TIME_INTERVAL,processRulesTimeInterval);
   // Clear the previous interval if it exists
@@ -148,13 +149,13 @@ const timeoutMap = new Map();
 
 function processRules() {
   const date = new Date();
-  const configurationPickupMapSet = [...new Set(configurationPickupMap.values())];
-  const configurationDeliveryMapSet = [...new Set(configurationDeliveryMap.values())];
-  const configurationProcessingMapSet = [...new Set(configurationProcessingMap.values())];
+  const configurationPickupMapSet = [...new Set(GlobalConfiguration.configurationPickupMap.values())];
+  const configurationDeliveryMapSet = [...new Set(GlobalConfiguration.configurationDeliveryMap.values())];
+  const configurationProcessingMapSet = [...new Set(GlobalConfiguration.configurationProcessingMap.values())];
 
   console.info(`Processing rules started ${date.toLocaleTimeString()}`);
 
-  configurationFlowMap.forEach((configurationFlowMapItem) => {
+  GlobalConfiguration.configurationFlowMap.forEach((configurationFlowMapItem) => {
     if (configurationFlowMapItem.activationStatus) {
       console.debug('Processing flow : ', configurationFlowMapItem.flowName);
 
@@ -184,7 +185,7 @@ function processRules() {
 
         // Set a new timeout for this configurationFlowMapItem
         const timeoutId = setTimeout(() => {
-          pickupProcessingQueue.enqueue(transactionProcessManager);
+          GlobalConfiguration.pickupProcessingQueue.enqueue(transactionProcessManager);
           timeoutMap.delete(configurationFlowMapItem.flowName); // Clean up after enqueuing
         }, retryInterval);
 
@@ -204,13 +205,13 @@ function processRules() {
 // For example, this can be triggered whenever the map is updated
 
 
-let processPickupProcessingQueueInterval; // Store interval ID to clear it later
+let processPickupProcessingQueueInterval:any; // Store interval ID to clear it later
 
 export function setProcessPickupProcessingQueueInterval() {
 
   // Fetch interval time dynamically from the global server configuration map
-  let processPickupProcessingQueueTimeInterval = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) 
-    ? global.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processPickupProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
   console.log(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL,processPickupProcessingQueueTimeInterval);
@@ -229,7 +230,7 @@ setProcessPickupProcessingQueueInterval();
 
 // Function to process the pickup queue
 async function processPickupProcessingQueue() {
-  const queueEntry = pickupProcessingQueue.dequeue();
+  const queueEntry = GlobalConfiguration.pickupProcessingQueue.dequeue();
 
   if (queueEntry === undefined || queueEntry == null) {
     console.log('Nothing to process from the pickup queue.');
@@ -245,12 +246,12 @@ async function processPickupProcessingQueue() {
 // For example, this can be triggered whenever the map is updated
 
 
-let processDeliveryProcessingQueueInterval; // Store interval ID so it can be cleared later
+let processDeliveryProcessingQueueInterval:any; // Store interval ID so it can be cleared later
 
 export function setProcessDeliveryProcessingQueueInterval() {
   // Fetch interval time dynamically from the global server configuration map
-  let processDeliveryProcessingQueueTimeInterval = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL))
-    ? global.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processDeliveryProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL))
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
   console.log(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL,processDeliveryProcessingQueueTimeInterval);
@@ -268,7 +269,7 @@ setProcessDeliveryProcessingQueueInterval();
 
 // Function to process the delivery queue
 async function processDeliveryProcessingQueue() {
-  const queueEntry = deliveryProcessingQueue.dequeue();
+  const queueEntry = GlobalConfiguration.deliveryProcessingQueue.dequeue();
 
   if (queueEntry === undefined || queueEntry == null) {
     console.log('Nothing to process from delivery queue.');
@@ -285,12 +286,12 @@ async function processDeliveryProcessingQueue() {
 
 
 
-let processConfigurationProcessingQueueInterval; // Store interval ID so it can be cleared later
+let processConfigurationProcessingQueueInterval:any; // Store interval ID so it can be cleared later
 
 export function setProcessConfigurationProcessingQueueInterval() {
   // Fetch interval time dynamically from global server configuration map
-  let processConfigurationProcessingQueueTimeInterval = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) 
-    ? global.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processConfigurationProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
   console.log(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL,processConfigurationProcessingQueueTimeInterval);
@@ -308,7 +309,7 @@ setProcessConfigurationProcessingQueueInterval();
 
 // Function to process the configuration queue
 async function processConfigurationProcessingQueue() {
-  const queueEntry = configurationProcessingQueue.dequeue();
+  const queueEntry = GlobalConfiguration.configurationProcessingQueue.dequeue();
 
   if(queueEntry === undefined || queueEntry == null){
     console.log('Nothing to process from configuration queue.');
@@ -324,16 +325,16 @@ async function processConfigurationProcessingQueue() {
 // For example, you can call this whenever the map is updated
 
 
-let removeOldTransactionsInterval; // Store interval ID so it can be cleared later
+let removeOldTransactionsInterval:any; // Store interval ID so it can be cleared later
 
 export function setRemoveOldTransactionsInterval() {
   // Fetch interval time dynamically from global server configuration map
-  let removeOldTransactionsTimeInterval = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL))
-    ? global.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)
+  let removeOldTransactionsTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL))
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)
     : 30000; // Default to 30 seconds if not defined
 
-  let removeOldTransactionsArchiveDays = (global.serverConfigurationMap && global.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS))
-    ? global.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)
+  let removeOldTransactionsArchiveDays = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS))
+    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)
     : 1; // Default to 1 day if not defined
 
   
@@ -360,17 +361,17 @@ export function setRemoveOldTransactionsInterval() {
 setRemoveOldTransactionsInterval();
 
 // Function to remove old transactions
-async function removeOldTransactions(removeOldTransactionsArchiveDays) {
+async function removeOldTransactions(removeOldTransactionsArchiveDays:number) {
   const thresholdDate = new Date(Date.now() - removeOldTransactionsArchiveDays * 24 * 60 * 60 * 1000); // Calculate threshold based on archive days
 
   console.log(`START-TRANSACTION-PURGE ****************`);
   
   // Iterate over a copy of the Map entries to avoid modification during iteration
-  for (const [id, { processingTime }] of Array.from(transactonsStatisticsMap.entries())) {
+  for (const [id, { processingTime }] of Array.from(GlobalConfiguration.transactonsStatisticsMap.entries())) {
     const processingDate = new Date(processingTime); // Convert ISO 8601 string to Date object
 
     if (processingDate < thresholdDate) {
-      transactonsStatisticsMap.delete(id);
+      GlobalConfiguration.transactonsStatisticsMap.delete(id);
       console.log(`Old transaction removed with ID: ${id}`);
     }
   }

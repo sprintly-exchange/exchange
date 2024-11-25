@@ -2,34 +2,35 @@ import { ConnectionFS } from "../../api/models/ConnectionFS.mjs";
 import { ConnectionHTTP } from "../../api/models/ConnectionHTTP.mjs";
 import { Flow } from "../../api/models/Flow.mjs";
 import {v4 as uuidv4} from 'uuid';
+import GlobalConfiguration from "../../GlobalConfiguration";
 
 //variables used to run the demo mode
-let Pickup_Weather_Data=undefined;
-let Pickup_Orders=undefined;
-let Pickup_OrderResponses=undefined;
-let Pickup_Invoices=undefined;
+let Pickup_Weather_Data:any=undefined;
+let Pickup_Orders:any=undefined;
+let Pickup_OrderResponses:any=undefined;
+let Pickup_Invoices:any=undefined;
 
-let Pickup_PetstoreInvetory=undefined;
-let Delivery_RecycleBin=undefined;
-let Delivery_PetstoreInventory=undefined;
-let Deliver_OrderResponses=undefined;
-let Deliver_Invoices=undefined;
-let Deliver_Orders=undefined;
+let Pickup_PetstoreInvetory:any =undefined;
+let Delivery_RecycleBin:any=undefined;
+let Delivery_PetstoreInventory:any=undefined;
+let Deliver_OrderResponses:any=undefined;
+let Deliver_Invoices:any=undefined;
+let Deliver_Orders:any=undefined;
 
-let flow_pet_store_inventory=undefined;
-let flow_weather_data=undefined;
-let flow_process_order_respones=undefined;
-let flow_process_orders=undefined;
-let flow_process_invoices=undefined;
+let flow_pet_store_inventory:any =undefined;
+let flow_weather_data:any=undefined;
+let flow_process_order_respones:any=undefined;
+let flow_process_orders:any=undefined;
+let flow_process_invoices:any=undefined;
 
-let demoPickups = undefined;
-let demoDeliveries = undefined;
-let demoFlows = undefined;
+let demoPickups:any = undefined;
+let demoDeliveries:any = undefined;
+let demoFlows:any = undefined;
 
-let Processing_code_default = undefined;
-let Invoice_JSON_to_XML_Mapper_Example_Code = undefined;
+let Processing_code_default:any = undefined;
+let Invoice_JSON_to_XML_Mapper_Example_Code:any = undefined;
 
-export function addDemoCases(organizationId){
+export function addDemoCases(organizationId:string){
 
   Processing_code_default = {
     "id": uuidv4(),
@@ -202,21 +203,20 @@ export function addDemoCases(organizationId){
             Delivery_PetstoreInventory.organizationId = organizationId;
   
   //Set processing
-            configurationProcessingMap.set(Processing_code_default.id,Processing_code_default);
-            configurationProcessingMap.set(Invoice_JSON_to_XML_Mapper_Example_Code.id,Invoice_JSON_to_XML_Mapper_Example_Code);
+            GlobalConfiguration.configurationProcessingMap.set(Processing_code_default.id,Processing_code_default);
+            GlobalConfiguration.configurationProcessingMap.set(Invoice_JSON_to_XML_Mapper_Example_Code.id,Invoice_JSON_to_XML_Mapper_Example_Code);
   //Set pickups
-            configurationPickupMap.set(Pickup_PetstoreInvetory.getId(),Pickup_PetstoreInvetory);
-            configurationPickupMap.set(Pickup_Weather_Data.getId(),Pickup_Weather_Data);
-            configurationPickupMap.set(Pickup_Orders.id,Pickup_Orders);
-            configurationPickupMap.set(Pickup_OrderResponses.id,Pickup_OrderResponses);
-            configurationPickupMap.set(Pickup_Invoices.id,Pickup_Invoices);
+            GlobalConfiguration.configurationPickupMap.set(Pickup_PetstoreInvetory.getId(),Pickup_PetstoreInvetory);
+            GlobalConfiguration.configurationPickupMap.set(Pickup_Weather_Data.getId(),Pickup_Weather_Data);
+            GlobalConfiguration.configurationPickupMap.set(Pickup_Orders.id,Pickup_Orders);
+            GlobalConfiguration.configurationPickupMap.set(Pickup_OrderResponses.id,Pickup_OrderResponses);
+            GlobalConfiguration.configurationPickupMap.set(Pickup_Invoices.id,Pickup_Invoices);
 
    //Set deliveries
-            configurationDeliveryMap.set(Delivery_RecycleBin.getId(),Delivery_RecycleBin);
-            configurationDeliveryMap.set(Delivery_PetstoreInventory.getId(),Delivery_PetstoreInventory);
-            configurationDeliveryMap.set(Deliver_Orders.id,Deliver_Orders);
-            configurationDeliveryMap.set(Deliver_OrderResponses.id,Deliver_OrderResponses);
-            configurationDeliveryMap.set(Deliver_Invoices.id,Deliver_Invoices);
+            GlobalConfiguration.configurationDeliveryMap.set(Delivery_PetstoreInventory.getId(),Delivery_PetstoreInventory);
+            GlobalConfiguration.configurationDeliveryMap.set(Deliver_Orders.id,Deliver_Orders);
+            GlobalConfiguration.configurationDeliveryMap.set(Deliver_OrderResponses.id,Deliver_OrderResponses);
+            GlobalConfiguration.configurationDeliveryMap.set(Deliver_Invoices.id,Deliver_Invoices);
    //Set flows
       //Set flows flow_pet_store_inventory
             flow_pet_store_inventory= new Flow("Get petstore inventory",Pickup_PetstoreInvetory.getId(),Delivery_RecycleBin.getId(),Processing_code_default.id);
@@ -240,11 +240,11 @@ export function addDemoCases(organizationId){
             flow_process_invoices.activationStatus = false;  
   
   //set final configuration flows
-            configurationFlowMap.set(flow_pet_store_inventory.getId(),flow_pet_store_inventory,0); 
-            configurationFlowMap.set(flow_weather_data.getId(),flow_weather_data,0); 
-            configurationFlowMap.set(flow_process_orders.id,flow_process_orders,0); 
-            configurationFlowMap.set(flow_process_order_respones.id,flow_process_order_respones,0); 
-            configurationFlowMap.set(flow_process_invoices.id,flow_process_invoices,0); 
+            GlobalConfiguration.configurationFlowMap.set(flow_pet_store_inventory.getId(),flow_pet_store_inventory); 
+            GlobalConfiguration.configurationFlowMap.set(flow_weather_data.getId(),flow_weather_data); 
+            GlobalConfiguration.configurationFlowMap.set(flow_process_orders.id,flow_process_orders); 
+            GlobalConfiguration.configurationFlowMap.set(flow_process_order_respones.id,flow_process_order_respones); 
+            GlobalConfiguration.configurationFlowMap.set(flow_process_invoices.id,flow_process_invoices); 
 
             demoPickups = [Pickup_PetstoreInvetory.connectionName,Pickup_Weather_Data.connectionName,Pickup_Orders.connectionName,Pickup_OrderResponses.connectionName,Pickup_Invoices.connectionName];
             demoDeliveries = [Delivery_RecycleBin.connectionName,Delivery_PetstoreInventory.connectionName,Deliver_OrderResponses.connectionName,Deliver_Invoices.connectionName];
@@ -252,34 +252,34 @@ export function addDemoCases(organizationId){
             return true;
 }
 
-export function removeDemoCases(organizationId){
+export function removeDemoCases(organizationId:string){
     console.log("Removing all flows for org id : ",organizationId);
     try{
-      const flowsToDelete = [...configurationFlowMap.values()].filter((record) => record.organizationId === organizationId);
+      const flowsToDelete = [...GlobalConfiguration.configurationFlowMap.values()].filter((record) => record.organizationId === organizationId);
       // Step 2: Delete the filtered records using their id
       flowsToDelete.forEach((record) => {
           // Assuming configurationFlowMap is a Map where the key is the id of the flow
           if(demoFlows.includes(record.flowName)){
-            configurationFlowMap.delete(record.id);
+            GlobalConfiguration.configurationFlowMap.delete(record.id);
           }
             
       });
 
-      const pickupsToDelete = [...configurationPickupMap.values()].filter((record) => record.organizationId === organizationId);
+      const pickupsToDelete = [...GlobalConfiguration.configurationPickupMap.values()].filter((record) => record.organizationId === organizationId);
       // Step 2: Delete the filtered records using their id
       pickupsToDelete.forEach((record) => {
           // Assuming configurationFlowMap is a Map where the key is the id of the flow
           if(demoPickups.includes(record.connectionName)){
-            configurationPickupMap.delete(record.id);
+            GlobalConfiguration.configurationPickupMap.delete(record.id);
           }
       });
 
-      const deliveriesToDelete = [...configurationDeliveryMap.values()].filter((record) => record.organizationId === organizationId);
+      const deliveriesToDelete = [...GlobalConfiguration.configurationDeliveryMap.values()].filter((record) => record.organizationId === organizationId);
       // Step 2: Delete the filtered records using their id
-      deliveriesToDelete.forEach((flow) => {
+      deliveriesToDelete.forEach((record) => {
           // Assuming configurationFlowMap is a Map where the key is the id of the flow
           if(demoDeliveries.includes(record.connectionName)){
-            configurationDeliveryMap.delete(record.id);
+            GlobalConfiguration.configurationDeliveryMap.delete(record.id);
           }
       });
           

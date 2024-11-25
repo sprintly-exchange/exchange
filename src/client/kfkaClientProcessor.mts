@@ -1,8 +1,16 @@
-import { kafkaRecordType } from './protocolTemplates.mjs'; // Adjust path as per your structure
 import { Kafka, logLevel } from 'kafkajs';
 
 export class KfkaClientProcessor {
-  constructor(config) {
+  connectionName;
+  brokers: string[];
+  clientId;
+  username;
+  password;
+  ssl;
+  kafka;
+  sasl:any;
+
+  constructor(config:any) {
     const {
       connectionName,
       brokers,
@@ -27,7 +35,7 @@ export class KfkaClientProcessor {
         mechanism: 'plain',
         username: this.username,
         password: this.password,
-      } : null,
+      } : undefined,
       logLevel: logLevel.INFO,
     });
   }
@@ -48,7 +56,7 @@ export class KfkaClientProcessor {
         ],
       });
       console.log(`Produced message to topic: ${topic}`);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error producing message:', error.message);
     } finally {
       await producer.disconnect();
@@ -67,11 +75,11 @@ export class KfkaClientProcessor {
           console.log({
             partition,
             offset: message.offset,
-            value: message.value.toString(),
+            value: message?.value?.toString(),
           });
         },
       });
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error consuming messages:', error.message);
     } finally {
       await consumer.disconnect();

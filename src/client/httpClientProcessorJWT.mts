@@ -1,8 +1,19 @@
 import axios from 'axios';
-import { httpRecordTypeJWTAuth } from './protocolTemplates.mjs'; // Adjust path as per your structure
 
 export class httpClientProcessorJWT {
-  constructor(config) {
+  connectionName;
+  host;
+  port;
+  protocol;
+  basePath;
+  contentType;
+  accept;
+  method;
+  userName;
+  password;
+  apiUrl;
+
+  constructor(config:any) {
     const {
       connectionName,
       host,
@@ -32,7 +43,7 @@ export class httpClientProcessorJWT {
     this.apiUrl = `${protocol}://${host}:${port}${basePath}`;
   }
 
-  async makeHttpRequest(url, method, headers, data) {
+  async makeHttpRequest(url:string, method:string, headers:any, data:any) {
     try {
       const response = await axios({
         url,
@@ -41,13 +52,13 @@ export class httpClientProcessorJWT {
         data,
       });
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error making HTTP request:', error.message);
       throw error;
     }
   }
 
-  async getAuthToken(username, password) {
+  async getAuthToken(username:string, password:string) {
     try {
       // Example: Fetch token from authentication service
       const authResponse = await axios.post(`${this.apiUrl}/auth/login`, {
@@ -55,13 +66,13 @@ export class httpClientProcessorJWT {
         password,
       });
       return authResponse.data.token;
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error fetching auth token:', error.message);
       throw error;
     }
   }
 
-  async makeAuthenticatedRequest(url, method, data) {
+  async makeAuthenticatedRequest(url:string, method:string, data:any) {
     try {
       const token = await this.getAuthToken(this.userName, this.password);
       const headers = {
@@ -70,7 +81,7 @@ export class httpClientProcessorJWT {
         Authorization: `Bearer ${token}`,
       };
       return await this.makeHttpRequest(url, method, headers, data);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error making authenticated request:', error.message);
       throw error;
     }
@@ -84,7 +95,7 @@ export class httpClientProcessorJWT {
       };
       const response = await this.makeAuthenticatedRequest(this.apiUrl, this.method, data);
       console.log('Response:', response);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error in main function:', error.message);
     }
   }

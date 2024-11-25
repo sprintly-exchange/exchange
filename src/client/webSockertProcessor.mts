@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class TransactionProcessorWEBSOCKET {
   constructor() {}
 
-  async transactionProcessorPickup(transactionProcessManagerInput) {
-    const { host, port, protocol, headers } = websocketTemplate;
+  async transactionProcessorPickup(transactionProcessManagerInput:any) {
+    const { host, port, protocol, headers } = transactionProcessManagerInput.websocketTemplate;
     const websocket = new WebSocket(`${protocol}://${host}:${port}`);
 
     websocket.onopen = () => {
@@ -30,8 +30,8 @@ export class TransactionProcessorWEBSOCKET {
     };
   }
 
-  async transactionProcessorDelivery(transactionProcessManagerInput) {
-    const { host, port, protocol, headers } = websocketTemplate;
+  async transactionProcessorDelivery(transactionProcessManagerInput:any) {
+    const { host, port, protocol, headers } = transactionProcessManagerInput.websocketTemplate;
     const websocket = new WebSocket(`${protocol}://${host}:${port}`);
 
     websocket.onmessage = (event) => {
@@ -44,18 +44,18 @@ export class TransactionProcessorWEBSOCKET {
       transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
     };
 
-    websocket.onerror = (error) => {
+    websocket.onerror = (error:any) => {
       console.error('WebSocket error:', error);
       // Set the delivery error in case of WebSocket error
       transactionProcessManagerInput.transaction.deliveryError = error.message;
     };
   }
 
-  async setCommonPickupProcessingParameters(transaction) {
+  async setCommonPickupProcessingParameters(transaction:any) {
     return true;
   }
 
-  async setCommonDeliveryProcessingParameters(transaction) {
+  async setCommonDeliveryProcessingParameters(transaction:any) {
     return true;
   }
 }

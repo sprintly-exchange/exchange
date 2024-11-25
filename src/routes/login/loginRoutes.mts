@@ -91,7 +91,7 @@ loginRoutes.post('/login', async (req, res) => {
       const token = jwt.sign({ userId: foundUser.id, name: username , organizationId : foundUser.organizationId }, secret, { expiresIn: '1h' });
       // Return token as response
       res.send({ "status": "success", "token": token });
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
       res.status(400).send(error.message);
   }

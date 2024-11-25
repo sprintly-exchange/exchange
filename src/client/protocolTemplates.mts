@@ -139,6 +139,7 @@ export const sftpTemplate = {
     "privateKey": "/path/to/private/key", // Only if using key authentication
     "passphrase": "passphrase", // Only if the private key has a passphrase
     "remotePath": "/remote/path",
+    "basePath":"",
     "localPath": "/local/path",
     "secure": true, // SFTP is inherently secure
     "timeout": 30000, // Timeout in milliseconds
@@ -166,6 +167,19 @@ export const websocketTemplate = {
     "messageFormat": "json", // Format of the messages (json, text, binary)
     "timeout": 60000 // Timeout in milliseconds
 };
+
+export const websocketRecordType = {
+
+};
+
+export const kafkaRecordType = {
+  "connectionName":"",
+      "brokers":[],
+      "clientId":"",
+      "username":"",
+      "password":"",
+      "ssl": undefined
+}
 
 
 
