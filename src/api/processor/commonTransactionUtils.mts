@@ -1,3 +1,5 @@
+import GlobalConfiguration from "../../GlobalConfiguration";
+import Transaction from "../models/Transaction.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
 
 export class CommonTransactionUtils {
@@ -6,7 +8,7 @@ export class CommonTransactionUtils {
             //
       }
 
-      async addTransaction(transaction,transactonsStatisticsMap){
+      async addTransaction(transaction:Transaction){
             //console.log('Transaction Pickup Status  XXX : ',transaction.pickupStatus);
             //console.log('Transaction Delivery Status XXX : ',transaction.deliveryStatus);
             //console.debug(transaction);  
@@ -32,8 +34,12 @@ export class CommonTransactionUtils {
         //console.log('Transaction organizationId : ',transaction.organizationId);
         const redactedTransaction={};
         Object.assign(redactedTransaction,transaction);
-        delete redactedTransaction.currentMessage;
-        global.transactonsStatisticsMap.set(redactedTransaction.id,redactedTransaction);
-        console.debug(`Number of total transactions : ${global.transactonsStatisticsMap.size}`);
+        if ('currentMessage' in redactedTransaction) {
+            delete redactedTransaction.currentMessage;
+         }
+         if ('id' in redactedTransaction && typeof redactedTransaction.id === 'string') {
+            GlobalConfiguration.transactionsStatisticsMap.set(redactedTransaction.id, redactedTransaction);
+        }
+        console.debug(`Number of total transactions : ${GlobalConfiguration.transactonsStatisticsMap.size}`);
       }
 }

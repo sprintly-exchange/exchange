@@ -1,26 +1,23 @@
 import {TransactionProcessorHTTP} from "./transaction-processor-HTTP.mjs";
 import { TransactionProcessorFS } from "./transaction-processor-FS.mjs";;
 import { TransactionProcessorFTP } from "./transaction-processor-FTP.mjs";
-import { TransactionProcessorSFTP } from "./transaction-processor-SFTP.mjs";
-import { TransactionProcessorKAFKA } from "./transaction-processor-KAFKA.mjs";
-import { TransactionProcessorMQTT } from "./transaction-processor-MQTT.mjs";
 import xmldom from "xmldom";
 
 import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
+import GlobalConfiguration from "../../GlobalConfiguration";
 
 //processing transactions
 export class TransactionProcessManager{
       _STAGE_PICKUP='_STAGE_PICKUP';
-      _STAGE_DELIVERY='_STAGE_CONFIG_PROCESSING';
-      _STAGE_PROCESSING='_STAGE_DELIVERY';
+      _STAGE_DELIVERY='_STAGE_DELIVERY';
+      _STAGE_PROCESSING='_STAGE_CONFIG_PROCESSING';
 
       transactionProcessorHTTP;
       transactionProcessorFS;
-      trasactionProcessorKAFKA;
-      transactionProcessorMQTT;
+      transactionProcessorFTP;
       
       messageStore;
       transaction;
@@ -28,16 +25,14 @@ export class TransactionProcessManager{
       configDelivery;
       configProcessing;
       flowName;
-      transactionProcessManagerStage: TransactionProcessManager;
+      transactionProcessManagerStage:any;
       commonTransactionUtils;
       configurationFlow;
 
-      constructor(configPickup,configDelivery,configProcessing,configurationFlow){
+      constructor(configPickup:any,configDelivery:any,configProcessing:any,configurationFlow:any){
             this.transactionProcessorHTTP = new TransactionProcessorHTTP();
             this.transactionProcessorFS = new TransactionProcessorFS();
             this.transactionProcessorFTP = new TransactionProcessorFTP();
-            this.trasactionProcessorKAFKA = new TransactionProcessorKAFKA();
-            this.transactionProcessorMQTT = new TransactionProcessorMQTT();
             
 
             this.configPickup = configPickup;
@@ -47,9 +42,7 @@ export class TransactionProcessManager{
             this.flowName = configurationFlow.flowName;
             this.messageStore = new MessageStoreGeneric("FS");
             this.commonTransactionUtils = new CommonTransactionUtils();
-
-            try{
-                  this.transaction = new Transaction(
+            this.transaction = new Transaction(
                         new Date().toISOString(),
                         '',
                         configPickup.id,
@@ -68,16 +61,8 @@ export class TransactionProcessManager{
                         configurationFlow.flowName,
                         configurationFlow.organizationId,
 
-                  );
-                  
-            
-            } catch(error) {
-                        console.error('Error processing record flowName: ', flowName);
-                        console.error('Error processing record configDelivery: ', configDelivery);
-                        console.error('Error processing record configProcessing:  ', configProcessing);
-                        console.error('Error processing record configPickup: ', configPickup);
-                        return;
-            }
+            );
+
             
       }
 
@@ -90,14 +75,14 @@ export class TransactionProcessManager{
                   case 'FS': {
                         await this.transactionProcessorFS.transactionProcessorPickup(this);
                         this.commonTransactionUtils.addTransaction(this.transaction);   
-                        await configurationProcessingQueue.enqueue(this); 
+                        await GlobalConfiguration.configurationProcessingQueue.enqueue(this); 
                         break;   
                   } 
                    //Pikcup from http GET request
                   case 'HTTP': {
                         await this.transactionProcessorHTTP.transactionProcessorPickup(this)
                         this.commonTransactionUtils.addTransaction(this.transaction);  
-                        await configurationProcessingQueue.enqueue(this);   
+                        await GlobalConfiguration.configurationProcessingQueue.enqueue(this);   
                         break; 
                   }           
                   case 'FTP': {
@@ -108,21 +93,6 @@ export class TransactionProcessManager{
                         // no need to log a transaction in this level simialr to HTTP
                         break;
                   }
-                  case 'KAFKA': {
-                        //flow name is required as this is handled in seperate way
-                        await this.trasactionProcessorKAFKA.transactionProcessorPickup(this);
-                        //new transaction is created and added from kafka processor for each message from kafka server
-                        // no need to log a transaction in this level simialr to HTTP
-                        break;
-                  }
-                  case ('MQTTS' || 'MQTT'): {
-                        //flow name is required as this is handled in seperate way
-                        //console.log('********** MQTT PICKUP');
-                        await this.transactionProcessorMQTT.transactionProcessorPickup(this);
-                        //new transaction is created and added from kafka processor for each message from kafka server
-                        // no need to log a transaction in this level simialr to HTTP
-                        break;
-                  }
                   default:
         
             } 
@@ -130,7 +100,7 @@ export class TransactionProcessManager{
       }
 
       async configurationProcessing() {
-            this.transactionProcessManagerStage = this._STAGE_CONFIG_PROCESSING;
+            this.transactionProcessManagerStage = this._STAGE_PROCESSING;
             this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
             console.log('Processing configuration : ', this.transaction.id);
 
@@ -152,7 +122,7 @@ export class TransactionProcessManager{
                         console.log('Method is a function and will be executed.');
             
                         this.commonTransactionUtils.addTransaction(this.transaction);
-                        await deliveryProcessingQueue.enqueue(this);
+                        await GlobalConfiguration.deliveryProcessingQueue.enqueue(this);
             
                         // Execute the method
                         const result = await generatedObject.method(this);
@@ -161,7 +131,7 @@ export class TransactionProcessManager{
                   } else {
                         console.error('Generated object does not have a valid method to execute.');
                   }
-                  } catch (error) {
+                  } catch (error:any) {
                   this.transaction.configurationProcessingError=error.toString();
                   this.commonTransactionUtils.addTransaction(this.transaction);
                   console.error('Error executing processing transformation:', error);
@@ -169,7 +139,7 @@ export class TransactionProcessManager{
                   return false;
                   }
             }else {
-                  await deliveryProcessingQueue.enqueue(this);
+                  await GlobalConfiguration.deliveryProcessingQueue.enqueue(this);
             }
             
         }
@@ -201,20 +171,6 @@ export class TransactionProcessManager{
                         await this.transactionProcessorFTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
-                  }                  
-                  case 'KAFKA': {
-                        //flow name is required as this is handled in seperate way
-                        console.log('********** KAFKA DELIVERY');
-                        await this.trasactionProcessorKAFKA.transactionProcessorDelivery(this);
-                        // no need to log a transaction in this level simialr to HTTP
-                        break;
-                  }
-                  case ('MQTTS' || 'MQTT'): {
-                        //flow name is required as this is handled in seperate way
-                        console.log('********** MQTT/MQTTS DELIVERY');
-                        await this.transactionProcessorMQTT.transactionProcessorDelivery(this);
-                        // no need to log a transaction in this level simialr to HTTP
-                        break;
                   }
                   
                   case 'HTTPS':
@@ -224,7 +180,7 @@ export class TransactionProcessManager{
             }
       }
 
-      async setTransaction(transaction){
+      async setTransaction(transaction:any){
             this.transaction = transaction;
       }
 }

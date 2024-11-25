@@ -1,5 +1,7 @@
 import { HTTPClient } from "../../client/http-client.mjs";
+import Transaction from "../models/Transaction.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
+import { TransactionProcessManager } from "./transactionProcessManager.mjs";
 
 export class TransactionProcessorHTTP {
 
@@ -8,7 +10,7 @@ export class TransactionProcessorHTTP {
     }
 
 
-    async transactionProcessorPickup(transactionProcessManagerInput){
+    async transactionProcessorPickup(transactionProcessManagerInput:TransactionProcessManager){
         const baseURL = `${transactionProcessManagerInput.configPickup.port === 443}` 
         ? 
           `${transactionProcessManagerInput.configPickup.host}${transactionProcessManagerInput.configPickup.basePath}` 
@@ -35,7 +37,7 @@ export class TransactionProcessorHTTP {
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'PIM');
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
-              }catch(error){
+              }catch(error:any){
                   //console.error("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.pickupError = error.message;
                   transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -57,7 +59,7 @@ export class TransactionProcessorHTTP {
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'PIM');
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
-            }catch(error){
+            }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupError = error.message;
                 transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -81,7 +83,7 @@ export class TransactionProcessorHTTP {
         return value === undefined ? '' : value ;
     }
 
-    async transactionProcessorDelivery(transactionProcessManagerInput){
+    async transactionProcessorDelivery(transactionProcessManagerInput:TransactionProcessManager){
         const baseURL = `${transactionProcessManagerInput.configDelivery.host}:${transactionProcessManagerInput.configDelivery.port}${transactionProcessManagerInput.configDelivery.basePath}`;
         console.debug(`Trying to send  to ${baseURL}`);
         const headers={};
@@ -103,8 +105,8 @@ export class TransactionProcessorHTTP {
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
-                  await this.setCommonDeliverypProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction); 
-              }catch(error){
+                  await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction); 
+              }catch(error:any){
                   //console.error("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.deliveryProcessingError = error;
                   transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -127,7 +129,7 @@ export class TransactionProcessorHTTP {
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
-            }catch(error){
+            }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupProcessingError = error;
                 transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -146,7 +148,7 @@ export class TransactionProcessorHTTP {
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);         
-              }catch(error){
+              }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.deliveryProcessingError = error;
                 transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -170,7 +172,7 @@ export class TransactionProcessorHTTP {
               transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
               await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
               await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
-          }catch(error){
+          }catch(error:any){
               //console.error("Unexpected error : ",error);
               transactionProcessManagerInput.transaction.pickupProcessingError = error;
               transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
@@ -188,7 +190,7 @@ export class TransactionProcessorHTTP {
       return true;
     }
 
-    async setDeliveryStatusFromResponseCode(transaction,statusCode){
+    async setDeliveryStatusFromResponseCode(transaction:Transaction,statusCode:string){
       console.log('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
@@ -200,7 +202,7 @@ export class TransactionProcessorHTTP {
       }
     }
 
-    async setPickupStatusFromResponseCode(transaction,statusCode){
+    async setPickupStatusFromResponseCode(transaction:Transaction,statusCode:string){
       console.log('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
@@ -214,7 +216,7 @@ export class TransactionProcessorHTTP {
     }
 
 
-    async storeMessage(transaction,messageStore,leg) {
+    async storeMessage(transaction:Transaction,messageStore:any,leg:string) {
       console.log('Trying to store message HTTP : ',transaction.currentMessage);
       switch(leg){
         case 'PIM' : {
@@ -241,7 +243,7 @@ export class TransactionProcessorHTTP {
     }
 
 
-    async setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transaction){
+    async setCommonPickupProcessingParameters(responseFromHttpCall:any,statusCode:any,baseURL:string,transaction:Transaction){
       transaction.pickupStatusCode = statusCode;
       transaction.pickupPath = baseURL;
       await this.setPickupStatusFromResponseCode(transaction,statusCode);
@@ -249,7 +251,7 @@ export class TransactionProcessorHTTP {
      
     }
     
-    async setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transaction){
+    async setCommonDeliveryProcessingParameters(responseFromHttpCall:any,statusCode:any,baseURL:string,transaction:Transaction){
       transaction.deliveryStatusCode = statusCode;
       transaction.deliveryPath = baseURL;
       await this.setDeliveryStatusFromResponseCode(transaction,statusCode);

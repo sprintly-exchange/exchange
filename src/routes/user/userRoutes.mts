@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import appEnumerations from '../../api/utilities/severInitFunctions.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const userRoutes = Router();
 
@@ -46,19 +47,19 @@ const userRoutes = Router();
  *       '400':
  *         description: Username already exists, organization does not exist, or other error
  */
-userRoutes.post('/register-user', async (req, res) => {
+userRoutes.post('/register-user', async (req:any, res:any) => {
     try {
         const { username, password, email,mobileNumber, organizationId} = req.body;
         const registrationDate = new Date().toISOString();
         const id = uuidv4();
         setCommonHeaders(res);
         
-        if (!organizationsMap.has(organizationId)) {
+        if (!GlobalConfiguration.organizationsMap.has(organizationId)) {
             return res.status(403).send(new ResponseMessage(uuidv4(),'Organization does not exist','Failed'));
         }
 
         // Check if the username already exists in any user
-        for (const user of organizationsUsersMap.values()) {
+        for (const user of GlobalConfiguration.organizationsUsersMap.values()) {
             if (user.username === username) {
                 return res.status(403).send(new ResponseMessage(uuidv4(),'Username already exists','Failed'));
             }
@@ -67,10 +68,10 @@ userRoutes.post('/register-user', async (req, res) => {
 
         const roleId = getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
         const hashedPassword = await bcrypt.hash(password, 10);
-        organizationsUsersMap.set(id, { id, username, password: hashedPassword, email, mobileNumber, organizationId, roleId,registrationDate });
+        GlobalConfiguration.organizationsUsersMap.set(id, { id, username, password: hashedPassword, email, mobileNumber, organizationId, roleId,registrationDate });
         res.status(201).send(new ResponseMessage(uuidv4(),'User registered successfully','Success'));
         //console.log('organizationsUsersMap.', organizationsUsersMap);
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).send(error.message);
     }
 });
@@ -112,22 +113,22 @@ userRoutes.get('/', (req, res) => {
     }
 });
 
-const filterUsers = async  (req,res) =>  {
+const filterUsers = async  (req:any,res:any) =>  {
     try{
         const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
         //console.log('from auth ', { userId, organizationId });
         setCommonHeaders(res);
-        const currUser = organizationsUsersMap.get(userId);
+        const currUser = GlobalConfiguration.organizationsUsersMap.get(userId);
         //super admin user for the applications
         if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-            const users = Array.from(organizationsUsersMap.values());
+            const users = Array.from(GlobalConfiguration.organizationsUsersMap.values());
             users.length > 0 ? res.status(200).send(users) : res.status(204).send([]); 
         } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-            const users = Array.from(organizationsUsersMap.values()).filter((user) => user.organizationId === organizationId);
+            const users = Array.from(GlobalConfiguration.organizationsUsersMap.values()).filter((user) => user.organizationId === organizationId);
             users.length > 0 ? res.status(200).send(users) : res.status(204).send([]);
         }
         else {
-            res.status(200).send(organizationsUsersMap.get(userId));
+            res.status(200).send(GlobalConfiguration.organizationsUsersMap.get(userId));
         }
     }catch(error){
         console.log(error);
@@ -167,20 +168,20 @@ const filterUsers = async  (req,res) =>  {
  *       '400':
  *         description: User not found, organization does not exist, or other error
  */
-userRoutes.put('/edit-user', async (req, res) => {
+userRoutes.put('/edit-user', async (req:any, res:any) => {
     try {
         const { id, username, email,mobileNumber, organizationId, password,roleId } = req.body;
      
         setCommonHeaders(res);
 
-        if (!organizationsUsersMap.has(id)) {
+        if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
             return res.status(400).send('User not found');
         }
-        if (!organizationsMap.has(organizationId)) {
+        if (!GlobalConfiguration.organizationsMap.has(organizationId)) {
             return res.status(400).send(new ResponseMessage(uuidv4(),'Organization does not exist','Failed'));
         }
 
-        const user = organizationsUsersMap.get(id);
+        const user = GlobalConfiguration.organizationsUsersMap.get(id);
         user.username = username || user.username;
         user.email = email || user.email;
         user.organizationId = organizationId || user.organizationId;
@@ -201,7 +202,7 @@ userRoutes.put('/edit-user', async (req, res) => {
             }
         }
 
-        organizationsUsersMap.set(id, user);
+        GlobalConfiguration.organizationsUsersMap.set(id, user);
         res.status(200).send(new ResponseMessage(uuidv4(),'User updated successfully','Sucess'));
     } catch (error) {
         console.error(error); // Log the error for debugging purposes
@@ -230,29 +231,29 @@ userRoutes.put('/edit-user', async (req, res) => {
 userRoutes.delete('/id/:id', (req, res) => {
     try {
        deleteUser(req,res);
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).send(error.message);
     }
 });
 
-const deleteUser = async (req,res)  => {
+const deleteUser = async (req:any,res:any)  => {
     const { id } = req.params;
     setCommonHeaders(res);
-    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
+    const { userId } = await getAuthDetails(req.headers['authorization']);
     const currUser = getUserById(userId);
     if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-        if (!organizationsUsersMap.has(id)) {
+        if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
             return res.status(400).send(new ResponseMessage(uuidv4(),'User not found','Failed'));
         }
-        if (organizationsUsersMap.get(id)['username']  === appEnumerations.APP_DEFAULT_ADMIN_NAME) {
+        if (GlobalConfiguration.organizationsUsersMap.get(id)['username']  === appEnumerations.APP_DEFAULT_ADMIN_NAME) {
             return res.status(400).send(new ResponseMessage(uuidv4(),'Admin user cannot be removed.','Failed'));
         } else {
-            organizationsUsersMap.delete(id);
+            GlobalConfiguration.organizationsUsersMap.delete(id);
             res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
         }
     } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
         if(currUser.organizationId === currUser.organizationId){
-            organizationsUsersMap.delete(id);
+            GlobalConfiguration.organizationsUsersMap.delete(id);
             res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
         }
     }
@@ -292,16 +293,16 @@ const deleteUser = async (req,res)  => {
  *       '400':
  *         description: User not found or other error
  */
-userRoutes.get('/id/:id', (req, res) => {
+userRoutes.get('/id/:id', (req:any, res:any) => {
     try {
         const { id } = req.params;
         setCommonHeaders(res);
-        if (!organizationsUsersMap.has(id)) {
+        if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
             return res.status(400).send(new ResponseMessage(uuidv4(),'User not found','Success'));
         }
-        const user = organizationsUsersMap.get(id);
+        const user = GlobalConfiguration.organizationsUsersMap.get(id);
         res.status(200).send(user);
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).send(error.message);
     }
 });
@@ -351,12 +352,12 @@ userRoutes.get('/id/:id', (req, res) => {
  *                   description: The status of the response.
  */
 
-userRoutes.get('/username/:username', (req, res) => {
+userRoutes.get('/username/:username', (req:any, res:any) => {
     try {
         const { username } = req.params;
         setCommonHeaders(res);
         let userFound = null;
-        for (let user of organizationsUsersMap.values()) {
+        for (let user of GlobalConfiguration.organizationsUsersMap.values()) {
             if (user.username === username) {
                 userFound = user;
                 break;
@@ -367,7 +368,7 @@ userRoutes.get('/username/:username', (req, res) => {
         }
         userFound.password = '';
         res.status(200).send(userFound);
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).send(error.message);
     }
 });
@@ -378,22 +379,21 @@ userRoutes.get('/roles', (req, res) => {
     
 });
 
-const filterRoles = async  (req,res) =>  {
+const filterRoles = async  (req:any,res:any) =>  {
     try{
-        const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
-        //console.log('from auth ', { userId, organizationId });
+        const { userId } = await getAuthDetails(req.headers['authorization']);
         setCommonHeaders(res);
         let events = [];
         const currUser=getUserById(userId);
         //super admin user for the applications
         if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-            events = Array.from(organizationsRolesMapNew.values());
+            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values());
             events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
         } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-            events = Array.from(organizationsRolesMapNew.values()).filter((role)=> role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
             events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
         }  else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
-            events = Array.from(organizationsRolesMapNew.values()).filter((role)=>  role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
             events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
         }
         

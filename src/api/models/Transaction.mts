@@ -31,7 +31,6 @@ export class Transaction{
     deliveryMessageName='';
     deliverMessageSize=0;
     deliveryInboundMessageName='';
-    pickupInboundMessagePath='';
     deliveryInboundMessageSize=0;
     deliveryOutboundMessageName='';
     deliveryOutboundMessagePath='';
@@ -41,14 +40,21 @@ export class Transaction{
     deliveryStatus='';
     deliveryStatusCode='';
     messageName='';
-    currentMessage='';
     organizationId='';
+    status='';
+    processingId='';
+    processingTime:any;
+    configurationProcessingError:any;
+    currentMessage:string= '';
+    pickupError:any;
+    deliveryInboundMessagePath:string='';
+    deliveryError:any;
 
     deliveryProcessingError='';
     pickupProcessingError='';
     
 
-    constructor(processingTime,status,pickupId,pickupProtocol,pickupHost,pickupPort,pickupName,deliveryId,deliveryProtocol,deliveryHost,deliveryPort,deliveryName,processingId,parentId,childId,flowName,organizationId){
+    constructor(processingTime:any,status:any,pickupId:any,pickupProtocol:any,pickupHost:any,pickupPort:any,pickupName:any,deliveryId:any,deliveryProtocol:any,deliveryHost:any,deliveryPort:any,deliveryName:any,processingId:any,parentId:any,childId:any,flowName:any,organizationId:any){
       this.id = uuidv4();
       this.deliveryStatus = status;
       this.processingTime = processingTime;
@@ -67,6 +73,7 @@ export class Transaction{
       this.childId = childId;
       this.flowName = flowName;
       this.organizationId = organizationId;
+      this.status = status;
 
     }
 

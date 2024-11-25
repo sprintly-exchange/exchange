@@ -16,6 +16,7 @@ class GlobalConfiguration {
     public static organizationsMap: Map<string, any> = new Map();
     public static organizationsUsersMap: Map<string, any> = new Map();
     public static organizationsRolesMapNew: Map<string, any> = new Map();
+    public static  transactionsStatisticsMap: Map<string, any> = new Map();
     public static storage = new FileStorage('FS');
 
     public static configurationProcessingQueue  = new Queue([]);

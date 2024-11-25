@@ -97,7 +97,7 @@ export function countFlowNamePerMinute(events) {
   
 
 
-  export function countFlowsPerMinute(events) {
+  export function countFlowsPerMinute(events:any) {
     const counts = {};
     
     // Step 1: Count existing events per minute

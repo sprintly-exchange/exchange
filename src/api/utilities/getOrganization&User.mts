@@ -10,6 +10,7 @@ import bcrypt from 'bcryptjs';
 import appEnumerations from './severInitFunctions.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration';
 const {TokenExpiredError} = pkg;
+const returnObj =  {userId: '',organizationId: ''}
 
 export const getAuthDetails = async (authorizationHeader:string) => {
     if (
@@ -17,7 +18,7 @@ export const getAuthDetails = async (authorizationHeader:string) => {
       !authorizationHeader.startsWith('Bearer ')
     ) {
       throw new Error('Access Denied: No Token Provided!');
-      return  {};
+      return ;
     }
   
     const token = authorizationHeader.split(' ')[1];
@@ -32,7 +33,9 @@ export const getAuthDetails = async (authorizationHeader:string) => {
       if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded && 'organizationId' in decoded) {
           const { userId, organizationId } = decoded as JwtPayload;
           console.log(`User ID: ${userId}, Organization ID: ${organizationId}`);
-          return { userId, organizationId };
+          returnObj.userId = userId;
+          returnObj.organizationId = organizationId;
+          return returnObj;
       }
       //if found retun the userId and organizationId
       
@@ -59,7 +62,7 @@ export const getAuthDetails = async (authorizationHeader:string) => {
     //Check organization existance based on email
     try{
         const {email} = await verifyGoogleToken(token);
-        let {userId,organizationId}={};
+        
         if(!organizationExists(email)){
           const orgId=`${uuidv4()}`;
           const org = {
@@ -73,10 +76,10 @@ export const getAuthDetails = async (authorizationHeader:string) => {
             registrationDate: new Date().toISOString(),
           };
           GlobalConfiguration.organizationsMap.set(org.id,org);
-          organizationId = org.id;
+          returnObj.organizationId = org.id;
           console.log('rganization added : ',new Date().toISOString(), org);
         } else {
-          organizationId = getOrgId(email);
+          returnObj.organizationId = getOrgId(email);
         }
 
         //Check user existance based on email
@@ -88,26 +91,26 @@ export const getAuthDetails = async (authorizationHeader:string) => {
             email : email,
             mobileNumber : '',
             password :  `${await bcrypt.hash('changeme', 10)}`,
-            organizationId: organizationId,
+            organizationId: returnObj.organizationId,
             memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
             roleId : getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
             registrationDate: new Date().toISOString(),
             lastLoggedInTime: new Date(),
           };
           GlobalConfiguration.organizationsUsersMap.set(user.id,user);
-          userId = user.id;
+          returnObj.userId = user.id;
           console.log('User added : ',new Date().toISOString(), user);
           GlobalConfiguration.googleUserCreationStatus[email] = false;
         } else {
-          userId = getUserId(email);
-          const currUserSet = getUserById(userId);
+          returnObj.userId = getUserId(email);
+          const currUserSet = getUserById(returnObj.userId);
           currUserSet.lastLoggedInTime =  new Date();
         }
 
         //console.log('Google based user/organization ID',{userId, organizationId});
         //console.log('google user', organizationsUsersMap.get(userId) );
         //console.log('google org', organizationsMap.get(organizationId) );
-        return {userId, organizationId};
+        return returnObj;
     }catch(error){
       console.log(error);
       return  {};
@@ -136,7 +139,7 @@ export const getAuthDetails = async (authorizationHeader:string) => {
       //console.log('Key ID (kid):', kid);
   
       // Find the public key that matches the key ID
-      const key = keys.find((k) => k.kid === kid);
+      const key = keys.find((k:any) => k.kid === kid);
       if (!key) {
         throw new Error('Key not found');
       }
@@ -159,7 +162,7 @@ export const getAuthDetails = async (authorizationHeader:string) => {
       const decoded = jwt.verify(token, pubKey);
       const {email} = decoded;
       return {email};
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error verifying token:', error.message);
   
     }

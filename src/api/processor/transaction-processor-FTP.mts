@@ -6,6 +6,8 @@ import { promises as fs } from 'fs';
 import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
 import os from 'os';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
+import Transaction from '../models/Transaction.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 export class TransactionProcessorFTP {
     ftpClientProcessor;
@@ -126,13 +128,13 @@ export class TransactionProcessorFTP {
                         transactionProcessManagerInput.transaction.deliveryError = err.message;
                     });
 
-                this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+                this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             }
-        } catch (error) {
+        } catch (error:any) {
             console.log('Error sending file to ftp', error);
             transactionProcessManagerInput.transaction.deliveryError = error.message;
             transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
-            this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+            this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             return false;
         } finally {
             await ftpProcessor.disconnect(); // Ensure connection is closed
@@ -143,7 +145,7 @@ export class TransactionProcessorFTP {
         return false;
     }
 
-    async createTempFileFromString(content) {
+    async createTempFileFromString(content:any) {
         try {
             // Create a temporary file
             const tmpFile = fileSync();
@@ -161,7 +163,7 @@ export class TransactionProcessorFTP {
         }
     }
 
-    async storeMessage(transaction, messageStore, leg) {
+    async storeMessage(transaction:Transaction, messageStore:any, leg:string) {
         switch (leg) {
             case 'PIM': {
                 [transaction.pickupInboundMessagePath, transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
@@ -187,11 +189,4 @@ export class TransactionProcessorFTP {
         return true;
     }
 
-    async setCommonPickupProcessingParameters(transaction) {
-        return true;
-    }
-
-    async setCommonDeliveryProcessingParameters(transaction) {
-        return true;
-    }
 }

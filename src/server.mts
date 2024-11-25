@@ -84,7 +84,7 @@ app.use((req, res, next) => {
 
 // Use the decodeToken middleware
 app.use(decodeToken);
-await initFunction();
+initFunction();
 
 //swagger UI
 // Serve Swagger docs
