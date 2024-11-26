@@ -10,14 +10,14 @@ import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration';
 
 export class TransactionProcessorFTP {
-    ftpClientProcessor;
+    ftpClientProcessor:any;
     commonTransactionUtils;
 
     constructor() {
         this.commonTransactionUtils = new CommonTransactionUtils();
     }
 
-    async retryOperation(operation, maxRetries = 3, delay = 1000) {
+    async retryOperation(operation:any, maxRetries = 3, delay = 1000) {
         let attempt = 0;
         while (attempt < maxRetries) {
             try {
@@ -32,7 +32,7 @@ export class TransactionProcessorFTP {
         }
     }
 
-    async transactionProcessorPickup(transactionProcessManagerInput) {
+    async transactionProcessorPickup(transactionProcessManagerInput:TransactionProcessManager) {
         const ftpProcessor = new FtpClientProcessor(transactionProcessManagerInput.configPickup);
 
         try {
@@ -68,7 +68,7 @@ export class TransactionProcessorFTP {
                         childTransaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
 
                         await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
-                        this.commonTransactionUtils.addTransaction(childTransaction, transactonsStatisticsMap);
+                        this.commonTransactionUtils.addTransaction(childTransaction);
 
                         const transactionProcessManager = new TransactionProcessManager(
                             transactionProcessManagerInput.configPickup,
@@ -77,23 +77,23 @@ export class TransactionProcessorFTP {
                             transactionProcessManagerInput.configurationFlow
                         );
                         await transactionProcessManager.setTransaction(childTransaction);
-                        await configurationProcessingQueue.enqueue(transactionProcessManager);
+                        await GlobalConfiguration.configurationProcessingQueue.enqueue(transactionProcessManager);
                     }
 
-                    if(count >= global.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)){
-                        console.warn(`${appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION} limit exedded : `,global.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION))
+                    if(count >= GlobalConfiguration.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)){
+                        console.warn(`${appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION} limit exedded : `,GlobalConfiguration.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION))
                         break;
                     }
                 }
             } else {
                 transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
-                this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+                this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             }
-        } catch (error) {
+        } catch (error:any) {
             console.log('Error processing from ftp', error);
             transactionProcessManagerInput.transaction.pickupError = error.message;
             transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
-            this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
+            this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             return false;
         } finally {
             await ftpProcessor.disconnect(); // Ensure connection is closed
@@ -104,7 +104,7 @@ export class TransactionProcessorFTP {
         return false;
     }
 
-    async transactionProcessorDelivery(transactionProcessManagerInput) {
+    async transactionProcessorDelivery(transactionProcessManagerInput:TransactionProcessManager) {
         const ftpProcessor = new FtpClientProcessor(transactionProcessManagerInput.configDelivery);
 
         try {

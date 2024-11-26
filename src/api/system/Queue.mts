@@ -1,10 +1,11 @@
 class Queue {
-    constructor(initialData) {
+    entries;
+    constructor(initialData:any) {
       this.entries = initialData || [];
     }
   
     // Method to add an entry to the queue
-    enqueue(entry) {
+    enqueue(entry:any) {
       this.entries.push(entry);
     }
   
