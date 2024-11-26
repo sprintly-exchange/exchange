@@ -4,6 +4,7 @@ import { countFlowNamePerMinute, countFlows, countFlowsPerMinute, searchTranscat
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { userHasDeleteRights, filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const transactionRoutes = Router();
 
@@ -35,9 +36,9 @@ transactionRoutes.get('/', function (req, res) {
     getTransactions(req,res);   
 });
 
-async function getTransactions(req,res){
+async function getTransactions(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
 };
 
@@ -61,13 +62,18 @@ async function getTransactions(req,res){
  */
 
 transactionRoutes.delete('/:id', function (req, res) {   
+    deleteTransaction(req,res);
+});
+
+
+async function deleteTransaction(req:any, res:any) {   
     console.debug(`Transaction deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     console.log(`Attempting to delete transaction with id :  ${req.params.id}`);
-    console.log(`Current transactions : ${transactonsStatisticsMap.size}`);
-    userHasDeleteRights(req,transactonsStatisticsMap,req.params.id) === true ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
-    console.log(`Current transactions after deletion: ${transactonsStatisticsMap.size}`);
-});
+    console.log(`Current transactions : ${GlobalConfiguration.transactonsStatisticsMap.size}`);
+    await userHasDeleteRights(req,GlobalConfiguration.transactonsStatisticsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+    console.log(`Current transactions after deletion: ${GlobalConfiguration.transactonsStatisticsMap.size}`);
+};
 
 /**
  * @swagger
@@ -88,9 +94,9 @@ transactionRoutes.get('/statistics/minute', function (req, res) {
     statisticsPerMinute(req,res);
 });
 
-async function statisticsPerMinute(req,res){
+async function statisticsPerMinute(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     return events.length > 0 ? res.status(200).send(countFlowNamePerMinute(events)) : res.status(204).send('');
 }
 
@@ -113,8 +119,8 @@ transactionRoutes.get('/statistics/summary', function (req, res) {
     getSummary(req,res);
 });
 
-async function getSummary(req,res){
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+async function getSummary(req:any,res:any){
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send(''); 
 };
@@ -139,8 +145,8 @@ transactionRoutes.get('/statistics/summary/statuses', function (req, res) {
     getSummaryStatuses(req,res);
 });
 
-async function getSummaryStatuses(req,res){
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+async function getSummaryStatuses(req:any,res:any){
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(transactionSummaryWithTimeInMinutes(events)) : res.status(204).send(''); 
 };
@@ -164,8 +170,8 @@ transactionRoutes.get('/statistics/flows/minute', function (req, res) {
     getFlowsPerMinute(req,res);
 });
 
-async function getFlowsPerMinute(req,res){
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+async function getFlowsPerMinute(req:any,res:any){
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(countFlowsPerMinute(events)) : res.status(204).send(''); 
 };
@@ -192,8 +198,8 @@ transactionRoutes.get('/statistics/flows/count', function (req, res) {
 
 
 
-async function getFlowCounts(req,res){
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+async function getFlowCounts(req:any,res:any){
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(countFlows(events)) : res.status(204).send(''); 
 }
@@ -232,11 +238,11 @@ transactionRoutes.get('/search', function (req, res) {
     transationSearch(req,res);
 });
 
-async function transationSearch(req,res){
+async function transationSearch(req:any,res:any){
     const start = Number(req.query.start);
     const end = Number(req.query.end);
     //console.log('transactonsStatisticsMap length', transactonsStatisticsMap.size);
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     console.debug(`Transaction search request between start : ${new Date(start).toISOString()} and end : ${new Date(end).toISOString()}`);
     setCommonHeaders(res);
     const eventsByDate = searchTranscationsBetweenDatesByEpochTime(start, end,events);
@@ -248,8 +254,8 @@ transactionRoutes.get('/searchByIds', function (req, res) {
     transationSearchByIds(req,res);
 });
 
-async function transationSearchByIds(req,res){
-    const events = await filterResultsBasedOnUserRole(transactonsStatisticsMap,req);
+async function transationSearchByIds(req:any,res:any){
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
     setCommonHeaders(res);
     const eventsByIds = searcTransationSearchByIds(req.query.messageId,req.query.senderId,req.query.receiverId,events)
     return eventsByIds.length > 0 ? res.status(200).send(eventsByIds) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 
