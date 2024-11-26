@@ -4,13 +4,14 @@ import fs from 'fs';
 const { combine, timestamp, printf } = format;
 
 export class CustomLogger {
+  logFormat:any;
   constructor() {
     this.logFormat = printf(({ level, message, timestamp }) => {
       return `${timestamp} ${level}: ${message}`;
     });
   }
 
-  createLogger(logFileName) {
+  createLogger(logFileName:string) {
     const logPath = path.join(path.resolve(), 'logs', logFileName);
     if (!fs.existsSync(path.dirname(logPath))) {
       fs.mkdirSync(path.dirname(logPath), { recursive: true });

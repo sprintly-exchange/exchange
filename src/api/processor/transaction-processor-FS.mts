@@ -1,16 +1,18 @@
 import {v4 as uuidv4} from 'uuid';
 import { FSClient } from '../../client/fs-client.mjs';
+import { TransactionProcessManager } from './transactionProcessManager.mjs';
+import Transaction from '../models/Transaction.mjs';
 
 export class TransactionProcessorFS {
     constructor(){
 
     }
 
-    checkUndefined(value){
+    checkUndefined(value:any){
         return value === undefined ? '' : value ;
     }   
 
-    async transactionProcessorPickup(transactionProcessManagerInput){
+    async transactionProcessorPickup(transactionProcessManagerInput:TransactionProcessManager){
         const fsClient = new FSClient();
         const fileName = await fsClient.getOldestFile(transactionProcessManagerInput.configPickup.path);
         console.debug("File name from local disk recived is ", await fileName);
@@ -39,7 +41,7 @@ export class TransactionProcessorFS {
         }     
     }
 
-    async transactionProcessorDelivery(transactionProcessManagerInput){
+    async transactionProcessorDelivery(transactionProcessManagerInput:TransactionProcessManager){
         const fsClient = new FSClient();
         transactionProcessManagerInput.transaction.messageName != '' ? transactionProcessManagerInput.transaction.deliveryOutboundMessageName  = transactionProcessManagerInput.transaction.messageName: transactionProcessManagerInput.transaction.deliveryOutboundMessageName = `${uuidv4()}`;
         await fsClient.writeFile(`${transactionProcessManagerInput.configDelivery.path}/${transactionProcessManagerInput.transaction.deliveryOutboundMessageName}`,`${transactionProcessManagerInput.transaction.currentMessage}`) ? transactionProcessManagerInput.transaction.deliveryStatus = 'SUCCESS':transactionProcessManagerInput.transaction.deliveryStatus = 'ERROR';
@@ -47,7 +49,7 @@ export class TransactionProcessorFS {
         transactionProcessManagerInput.transaction.deliveryStatus = 'COMPLETED';
     }
 
-    async storeMessage(transaction,messageStore,leg) {
+    async storeMessage(transaction:Transaction,messageStore:any,leg:string) {
       switch(leg){
         case 'PIM' : {
           [transaction.pickupInboundMessagePath,transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
@@ -73,12 +75,12 @@ export class TransactionProcessorFS {
     }
 
 
-    async setCommonPickupProcessingParameters(transaction){
+    async setCommonPickupProcessingParameters(transaction:Transaction){
         
         return true;
     }
       
-    async setCommonDeliveryProcessingParameters(transaction){
+    async setCommonDeliveryProcessingParameters(transaction:Transaction){
         return true;
     }
    

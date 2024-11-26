@@ -8,8 +8,9 @@ export class ConnectionFS{
     protocol;
     retryInterval;
     retryAttemps;
+    id;
 
-    constructor(connectionName,path,retryInterval,retryAttemps){
+    constructor(connectionName:any,path:any,retryInterval:any,retryAttemps:any){
       this.id = uuidv4();
       this.connectionName = connectionName;
       this.protocol = 'FS';

@@ -48,7 +48,7 @@ export class TransactionProcessorFTP {
                 for (const file of fileList) {
                     if (file.isFile) {
                         count++;
-                        const childTransaction = {};
+                        const childTransaction:any = undefined;
                         Object.assign(childTransaction, transactionProcessManagerInput.transaction);
                         childTransaction.pickupPath = (await ftpProcessor.getFtpUrlWithoutPassword()).toString();
                         childTransaction.id = uuidv4();
@@ -59,7 +59,7 @@ export class TransactionProcessorFTP {
                         //this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction, transactonsStatisticsMap);
                         //childTransaction.parentId = transactionProcessManagerInput.transaction.id;
 
-                        childTransaction.currentMessage = await this.retryOperation(() => ftpProcessor.downloadFile(`${file.name}`, os.tmpdir()));
+                        childTransaction.currentMessage = await this.retryOperation(() => ftpProcessor.downloadFile(`${file.name}`));
                         await this.retryOperation(() => ftpProcessor.deleteFile(`${file.name}`));
 
                         childTransaction.messageName = `${file.name}`;

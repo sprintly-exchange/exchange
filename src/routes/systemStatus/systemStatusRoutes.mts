@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const systemStatusRoutes = Router();
 
@@ -38,9 +39,9 @@ systemStatusRoutes.get('/queue/statistics', function (req, res) {
     setCommonHeaders(res);
 
     const queueStat = {
-        'Pickup Processing Queue': pickupProcessingQueue.size(),
-        'Configuration Processing Queue': configurationProcessingQueue.size(),
-        'Delivery Processing Queue': deliveryProcessingQueue.size(),
+        'Pickup Processing Queue': GlobalConfiguration.pickupProcessingQueue.size(),
+        'Configuration Processing Queue': GlobalConfiguration.configurationProcessingQueue.size(),
+        'Delivery Processing Queue': GlobalConfiguration.deliveryProcessingQueue.size(),
     };
     res.status(200).send(queueStat);
 });

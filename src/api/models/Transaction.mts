@@ -45,10 +45,13 @@ export class Transaction{
     processingId='';
     processingTime:any;
     configurationProcessingError:any;
-    currentMessage:string= '';
+    currentMessage:any= '';
     pickupError:any;
     deliveryInboundMessagePath:string='';
     deliveryError:any;
+    messageId='';
+    senderId='';
+    receiverId='';
 
     deliveryProcessingError='';
     pickupProcessingError='';

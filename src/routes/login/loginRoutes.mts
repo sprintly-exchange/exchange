@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import GlobalConfiguration from '../../GlobalConfiguration';
 
 const loginRoutes = Router();
 
@@ -51,14 +52,14 @@ const loginRoutes = Router();
  *       '400':
  *         description: Invalid credentials
  */
-loginRoutes.post('/login', async (req, res) => {
+loginRoutes.post('/login', async (req:any, res:any) => {
   try {
       const { username, password } = req.body;
       setCommonHeaders(res);
 
       // Find the user in organizationsUsersMap by username
       let foundUser = null;
-      for (const user of organizationsUsersMap.values()) {
+      for (const user of GlobalConfiguration.organizationsUsersMap.values()) {
           if (user.username === username) {
               foundUser = user;
               break;

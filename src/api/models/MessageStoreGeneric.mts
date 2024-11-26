@@ -2,11 +2,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileStorage } from './FileStorage.mjs';
 
 export class MessageStoreGeneric {
-    _id;
+    _id:string;
     _messageStorage;
 
-    constructor(storageType) {
-        this.id = uuidv4();
+    constructor(storageType:any) {
+        this._id = uuidv4();
         switch (storageType) {
             case 'FS': {
                 this._messageStorage = new FileStorage('FS');
@@ -15,6 +15,9 @@ export class MessageStoreGeneric {
                 break;
             }
             default: {
+                this._messageStorage = new FileStorage('FS');
+                this._messageStorage.storageLocation = '/tmp';
+                console.log("Setting storage type to FS");
                 console.error("Storage type not defined, current supported type is FS (file system)");
             }
         }
@@ -28,7 +31,7 @@ export class MessageStoreGeneric {
     }
 
     // Set methods
-    async storeMessage(value) {
+    async storeMessage(value:any) {
         if (value === undefined) 
             return ['', 0];
         
@@ -40,7 +43,7 @@ export class MessageStoreGeneric {
     }
 
     // Get methods
-    async getMessage(id) {
+    async getMessage(id:string) {
         console.debug("Reading file from id:", id);
         return await this._messageStorage.getMessage(id);
     }

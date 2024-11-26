@@ -1,6 +1,7 @@
+import Transaction from "../../api/models/Transaction.mjs";
 import appEnumerations from "../../api/utilities/severInitFunctions.mjs";
 
-export function countFlowNamePerMinute(events) {
+export function countFlowNamePerMinute(events:any) {
     const counts = {};
     events.forEach(entry => {
       const date = new Date(entry.processingTime);
@@ -17,7 +18,7 @@ export function countFlowNamePerMinute(events) {
 
    
   }
-  export function transactionSummary(events) {
+  export function transactionSummary(events:any) {
     const counts = { 'SUCCESS': 0, 'FAILED': 0, 'INPROCESSING': 0 };
     
     events.forEach(entry => {
@@ -42,7 +43,7 @@ export function countFlowNamePerMinute(events) {
   }
   
 
-  export function transactionSummaryWithTimeInMinutes(events) {
+  export function transactionSummaryWithTimeInMinutes(events:any) {
     const counts = {};
   
     // Step 1: Count existing events per minute and status
@@ -151,7 +152,7 @@ export function countFlowNamePerMinute(events) {
   
   
 
-  export function countFlows(events) {
+  export function countFlows(events:any) {
     const counts = {};
   
     events.forEach(entry => {
@@ -167,8 +168,8 @@ export function countFlowNamePerMinute(events) {
     return counts;
   }
 
-  export function searchTranscationsBetweenDatesByEpochTime(start, end, events) {
-    return events.filter((transaction) => {
+  export function searchTranscationsBetweenDatesByEpochTime(start:any, end:any, events:any) {
+    return events.filter((transaction:Transaction) => {
       const transactionEpochTime = new Date(transaction.processingTime).getTime();
       // Check if transaction's time is within the start and end range
       return start <= transactionEpochTime && transactionEpochTime <= end;
@@ -176,8 +177,8 @@ export function countFlowNamePerMinute(events) {
   }
   
 
-  export function searcTransationSearchByIds(messageId, senderId, receiverId, events) {
-    return events.filter((transaction) => {
+  export function searcTransationSearchByIds(messageId:string, senderId:string, receiverId:string, events:any) {
+    return events.filter((transaction:Transaction) => {
       // Log for debugging purposes
       console.log('Searching for:', messageId, senderId, receiverId);
   

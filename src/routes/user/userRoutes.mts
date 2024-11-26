@@ -115,21 +115,29 @@ userRoutes.get('/', (req, res) => {
 
 const filterUsers = async  (req:any,res:any) =>  {
     try{
-        const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
-        //console.log('from auth ', { userId, organizationId });
-        setCommonHeaders(res);
-        const currUser = GlobalConfiguration.organizationsUsersMap.get(userId);
-        //super admin user for the applications
-        if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-            const users = Array.from(GlobalConfiguration.organizationsUsersMap.values());
-            users.length > 0 ? res.status(200).send(users) : res.status(204).send([]); 
-        } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-            const users = Array.from(GlobalConfiguration.organizationsUsersMap.values()).filter((user) => user.organizationId === organizationId);
-            users.length > 0 ? res.status(200).send(users) : res.status(204).send([]);
+        
+        const authDetails = await getAuthDetails(req.headers['authorization']);
+
+        if (authDetails) {
+            const { userId, organizationId } = authDetails;
+            //console.log('from auth ', { userId, organizationId });
+            setCommonHeaders(res);
+            const currUser = GlobalConfiguration.organizationsUsersMap.get(userId);
+            //super admin user for the applications
+            if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+                const users = Array.from(GlobalConfiguration.organizationsUsersMap.values());
+                users.length > 0 ? res.status(200).send(users) : res.status(204).send([]); 
+            } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+                const users = Array.from(GlobalConfiguration.organizationsUsersMap.values()).filter((user) => user.organizationId === organizationId);
+                users.length > 0 ? res.status(200).send(users) : res.status(204).send([]);
+            }
+            else {
+                res.status(200).send(GlobalConfiguration.organizationsUsersMap.get(userId));
+            }
+        } else {
+            throw new Error('Authorization details are missing');
         }
-        else {
-            res.status(200).send(GlobalConfiguration.organizationsUsersMap.get(userId));
-        }
+        
     }catch(error){
         console.log(error);
         res.status(400).send('');
@@ -239,27 +247,36 @@ userRoutes.delete('/id/:id', (req, res) => {
 const deleteUser = async (req:any,res:any)  => {
     const { id } = req.params;
     setCommonHeaders(res);
-    const { userId } = await getAuthDetails(req.headers['authorization']);
-    const currUser = getUserById(userId);
-    if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-        if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
-            return res.status(400).send(new ResponseMessage(uuidv4(),'User not found','Failed'));
+
+    const authDetails = await getAuthDetails(req.headers['authorization']);
+
+    if (authDetails && 'userId' in authDetails) {
+        const { userId } = authDetails;
+        const currUser = getUserById(userId);
+        if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+            if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
+                return res.status(400).send(new ResponseMessage(uuidv4(),'User not found','Failed'));
+            }
+            if (GlobalConfiguration.organizationsUsersMap.get(id)['username']  === appEnumerations.APP_DEFAULT_ADMIN_NAME) {
+                return res.status(400).send(new ResponseMessage(uuidv4(),'Admin user cannot be removed.','Failed'));
+            } else {
+                GlobalConfiguration.organizationsUsersMap.delete(id);
+                res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
+            }
+        } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+            if(currUser.organizationId === currUser.organizationId){
+                GlobalConfiguration.organizationsUsersMap.delete(id);
+                res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
+            }
         }
-        if (GlobalConfiguration.organizationsUsersMap.get(id)['username']  === appEnumerations.APP_DEFAULT_ADMIN_NAME) {
-            return res.status(400).send(new ResponseMessage(uuidv4(),'Admin user cannot be removed.','Failed'));
-        } else {
-            GlobalConfiguration.organizationsUsersMap.delete(id);
-            res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
+        else {
+            return res.status(403).send(new ResponseMessage(uuidv4(),'Users with admin role cannot be removed.','Failed'));
         }
-    } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-        if(currUser.organizationId === currUser.organizationId){
-            GlobalConfiguration.organizationsUsersMap.delete(id);
-            res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
-        }
+    } else {
+        // Handle case where authDetails is undefined or missing userId
+        console.error('Authorization details are missing or invalid');
     }
-     else {
-        return res.status(403).send(new ResponseMessage(uuidv4(),'Users with admin role cannot be removed.','Failed'));
-    }
+    
 }
 
 /**
@@ -381,25 +398,34 @@ userRoutes.get('/roles', (req, res) => {
 
 const filterRoles = async  (req:any,res:any) =>  {
     try{
-        const { userId } = await getAuthDetails(req.headers['authorization']);
-        setCommonHeaders(res);
-        let events = [];
-        const currUser=getUserById(userId);
-        //super admin user for the applications
-        if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values());
-            events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
-        } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
-            events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
-        }  else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
-            events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
-            events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
-        }
+        const authDetails = await getAuthDetails(req.headers['authorization']);
+
+        if (authDetails && 'userId' in authDetails) {
+            const { userId } = authDetails;
+            // Proceed with userId
+            setCommonHeaders(res);
+            let events = [];
+            const currUser=getUserById(userId);
+            //super admin user for the applications
+            if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values());
+                events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
+            } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+                events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
+            }  else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
+                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+                events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
+            }
+            
+            else {
+                res.status(204).send([]);
+            }
+            } else {
+                // Handle case where authDetails is undefined or missing userId
+                console.error('Authorization details are missing or invalid');
+            }
         
-        else {
-            res.status(204).send([]);
-        }
     }catch(error){
         res.status(400).send('');
     }

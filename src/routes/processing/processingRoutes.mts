@@ -43,7 +43,7 @@ processingRoutes.post('/', function (req, res) {
  
     //Check If a record already exists with name
     if(mapEntrySearchByValue(GlobalConfiguration.configurationProcessingMap,'processingName',req.body.processingName)){
-        res.status(400).send(new ResponseMessage(uuidv4,'Record already exists with the same name','Failed'));
+        res.status(400).send(new ResponseMessage(uuidv4(),'Record already exists with the same name','Failed'));
         return;
     }
        

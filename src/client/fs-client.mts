@@ -6,7 +6,7 @@ export class FSClient {
 
   }
 
-   async readFile(filePath) {
+   async readFile(filePath:string) {
     try {
       const data = await fs.readFileSync(filePath, 'utf8');
       return await data;
@@ -16,7 +16,7 @@ export class FSClient {
     }
   }
 
-   async writeFile(filePath, data) {
+   async writeFile(filePath:string, data:any) {
     try {
       await fs.writeFileSync(filePath, data);
       console.debug('File successfully written.', filePath);
@@ -27,7 +27,7 @@ export class FSClient {
     }
   }
 
-  async getOldestFile(directoryPath) {
+  async getOldestFile(directoryPath:string) {
     try {
       console.debug(`Reading directory path : ${directoryPath}`);
       // Read the directory contents
@@ -61,7 +61,7 @@ export class FSClient {
   }
 
 
-async  deleteFile(filePath) {
+async  deleteFile(filePath:string) {
   try {
     // Use fs.promises.unlink to delete the file
     await fs.promises.unlink(filePath);

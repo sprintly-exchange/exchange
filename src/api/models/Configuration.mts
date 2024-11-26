@@ -14,7 +14,7 @@ export class Configuration{
       return this.id;
     }
 
-    setPickup(pickup){
+    setPickup(pickup:any){
       this.pickup = pickup;
     }
 
@@ -22,7 +22,7 @@ export class Configuration{
       return this.pickup;
     }
 
-    setDelivery(delivery){
+    setDelivery(delivery:any){
       this.delivery = delivery;
     }
 
@@ -30,7 +30,7 @@ export class Configuration{
       return this.delivery;
     }
     
-    setProcessing(processing){
+    setProcessing(processing:any){
       this.processing = this.processing;
     }
 

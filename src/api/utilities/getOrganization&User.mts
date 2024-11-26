@@ -11,14 +11,18 @@ import appEnumerations from './severInitFunctions.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration';
 const {TokenExpiredError} = pkg;
 const returnObj =  {userId: '',organizationId: ''}
+type AuthDetails = {
+  userId: string;
+  organizationId: string; // Mark as optional if it can be undefined
+};
 
-export const getAuthDetails = async (authorizationHeader:string) => {
+export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDetails | undefined> => {
     if (
       typeof authorizationHeader !== 'string' ||
       !authorizationHeader.startsWith('Bearer ')
     ) {
       throw new Error('Access Denied: No Token Provided!');
-      return ;
+      return returnObj;
     }
   
     const token = authorizationHeader.split(' ')[1];
@@ -56,64 +60,68 @@ export const getAuthDetails = async (authorizationHeader:string) => {
     }
    };
 
-   const checkGoogleAuth = async (token:any) => {
+   const checkGoogleAuth = async (token:any) : Promise<AuthDetails | undefined>  => {
     //attempt to move forward, check for google token to enable the other features to google authenticated user
     
     //Check organization existance based on email
     try{
-        const {email} = await verifyGoogleToken(token);
-        
-        if(!organizationExists(email)){
-          const orgId=`${uuidv4()}`;
-          const org = {
-            id : orgId,
-            name : email,
-            address: 'N/A',
-            email: email,
-            web:'N/A',
-            phone:'+00 000 000 000', 
-            organizationId: orgId,
-            registrationDate: new Date().toISOString(),
-          };
-          GlobalConfiguration.organizationsMap.set(org.id,org);
-          returnObj.organizationId = org.id;
-          console.log('rganization added : ',new Date().toISOString(), org);
-        } else {
-          returnObj.organizationId = getOrgId(email);
-        }
+      const result = await verifyGoogleToken(token);
 
-        //Check user existance based on email
-        if(!userExists(email) && GlobalConfiguration.googleUserCreationStatus[email] !== true){
-          GlobalConfiguration.googleUserCreationStatus[email] = true;
-          const user = {
-            id: `${uuidv4()}`,
-            username : email,
-            email : email,
-            mobileNumber : '',
-            password :  `${await bcrypt.hash('changeme', 10)}`,
-            organizationId: returnObj.organizationId,
-            memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
-            roleId : getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
-            registrationDate: new Date().toISOString(),
-            lastLoggedInTime: new Date(),
-          };
-          GlobalConfiguration.organizationsUsersMap.set(user.id,user);
-          returnObj.userId = user.id;
-          console.log('User added : ',new Date().toISOString(), user);
-          GlobalConfiguration.googleUserCreationStatus[email] = false;
-        } else {
-          returnObj.userId = getUserId(email);
-          const currUserSet = getUserById(returnObj.userId);
-          currUserSet.lastLoggedInTime =  new Date();
-        }
-
-        //console.log('Google based user/organization ID',{userId, organizationId});
-        //console.log('google user', organizationsUsersMap.get(userId) );
-        //console.log('google org', organizationsMap.get(organizationId) );
-        return returnObj;
-    }catch(error){
+      if (result && result.email) {
+          const { email } = result;
+          // Proceed with email
+          if(!organizationExists(email)){
+            const orgId=`${uuidv4()}`;
+            const org = {
+              id : orgId,
+              name : email,
+              address: 'N/A',
+              email: email,
+              web:'N/A',
+              phone:'+00 000 000 000', 
+              organizationId: orgId,
+              registrationDate: new Date().toISOString(),
+            };
+            GlobalConfiguration.organizationsMap.set(org.id,org);
+            returnObj.organizationId = org.id;
+            console.log('rganization added : ',new Date().toISOString(), org);
+          } else {
+            returnObj.organizationId = getOrgId(email);
+          }
+  
+          //Check user existance based on email
+          if(!userExists(email) && GlobalConfiguration.googleUserCreationStatus[email] !== true){
+            GlobalConfiguration.googleUserCreationStatus[email] = true;
+            const user = {
+              id: `${uuidv4()}`,
+              username : email,
+              email : email,
+              mobileNumber : '',
+              password :  `${await bcrypt.hash('changeme', 10)}`,
+              organizationId: returnObj.organizationId,
+              memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
+              roleId : getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
+              registrationDate: new Date().toISOString(),
+              lastLoggedInTime: new Date(),
+            };
+            GlobalConfiguration.organizationsUsersMap.set(user.id,user);
+            returnObj.userId = user.id;
+            console.log('User added : ',new Date().toISOString(), user);
+            GlobalConfiguration.googleUserCreationStatus[email] = false;
+          } else {
+            returnObj.userId = getUserId(email);
+            const currUserSet = getUserById(returnObj.userId);
+            currUserSet.lastLoggedInTime =  new Date();
+          }
+      } else {
+          // Handle the case where email or result is undefined
+          console.error('Google token verification failed or email is missing');
+      }
+      
+      return returnObj;
+    }catch(error:any){
       console.log(error);
-      return  {};
+      return  returnObj;
   
     }
     
@@ -160,8 +168,13 @@ export const getAuthDetails = async (authorizationHeader:string) => {
   
       // Verify the token
       const decoded = jwt.verify(token, pubKey);
-      const {email} = decoded;
-      return {email};
+
+      if (typeof decoded === 'object' && decoded !== null && 'email' in decoded) {
+          const { email } = decoded as JwtPayload; // Narrow down the type to JwtPayload
+          return { email };
+      } else {
+          throw new Error('Token does not contain a valid payload with an email');
+      }
     } catch (error:any) {
       console.error('Error verifying token:', error.message);
   

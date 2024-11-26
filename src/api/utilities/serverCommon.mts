@@ -77,7 +77,7 @@ export function getUserId(nameIn:string){
     return userId;
 };
 
-export function getUserById(userId:string){
+export function getUserById(userId:any){
     return GlobalConfiguration.organizationsUsersMap.get(userId);
 };
 
@@ -102,37 +102,49 @@ export function getOrgId(orgIn:string){
 };
 
 export async function userHasDeleteRights(req:any, map:any, id:string) {
-    // Destructure userId and organizationId from getAuthDetails result
-    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
-    
-    // Retrieve user's membership information
-    const memberOfOrganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId)?.memberOfOrganizationIds || [];
 
-    // Retrieve the item from the map by id
-    const item = map.get(id);
+    const authDetails = await getAuthDetails(req.headers['authorization']);
 
-    // Ensure item exists before checking delete rights
-    if (!item) {
-        console.log(" DELETE ****************  LOG : item does not exists.");
-        return false; // Return false if no such item exists
-    }
+    if (authDetails && 'userId' in  authDetails && 'organizationId' in authDetails) {
+        const { userId, organizationId } = authDetails;
 
-    // First condition: The user is the owner or an admin
-    if (item.userId === userId || getUserById(userId).roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN)) {
-        console.log(" DELETE ****************  LOG : First condition: The user is the owner or an admin. Deleting record");
-        map.delete(id);
-        return true;
-    // Second condition: The user belongs to the organization and is an organization admin
-    } else if (item.organizationId === organizationId 
-        && memberOfOrganizationIds.includes(organizationId) 
-        && getRoleById(getUserById(userId)) === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)) {
-        console.log(" DELETE ****************  LOG : Second condition: The user belongs to the organization and is an organization admin. Deleting record");
-        map.delete(id);
-        return true;
+    if (typeof userId === 'string') {
+            const memberOfOrganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId)?.memberOfOrganizationIds || [];
+            // Proceed with memberOfOrganizationIds
+            // Retrieve the item from the map by id
+        const item = map.get(id);
+
+        // Ensure item exists before checking delete rights
+        if (!item) {
+            console.log(" DELETE ****************  LOG : item does not exists.");
+            return false; // Return false if no such item exists
+        }
+
+        // First condition: The user is the owner or an admin
+        if (item.userId === userId || getUserById(userId).roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN)) {
+            console.log(" DELETE ****************  LOG : First condition: The user is the owner or an admin. Deleting record");
+            map.delete(id);
+            return true;
+        // Second condition: The user belongs to the organization and is an organization admin
+        } else if (item.organizationId === organizationId 
+            && memberOfOrganizationIds.includes(organizationId) 
+            && getRoleById(getUserById(userId)) === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)) {
+            console.log(" DELETE ****************  LOG : Second condition: The user belongs to the organization and is an organization admin. Deleting record");
+            map.delete(id);
+            return true;
+        } else {
+            console.log(" DELETE ****************  LOG : User does not have delete rights. Deleting record");
+            return false; // User does not have delete rights
+        }
+        } else {
+            throw new Error('Authorization details are missing');
+        }
     } else {
-        console.log(" DELETE ****************  LOG : User does not have delete rights. Deleting record");
-        return false; // User does not have delete rights
+            throw new Error('Invalid userId: must be a string');
     }
+
+    
+    
 };
 
 
@@ -141,8 +153,11 @@ export const filterResultsBasedOnUserRole = async (map:any,req:any) => {
     let events =[];
 
     try {
-        const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-        const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
+        const authDetails = await getAuthDetails(req.headers['authorization']);
+
+        if (authDetails && 'userId' in  authDetails && 'organizationId' in authDetails) {
+            const { userId, organizationId } = authDetails;
+            const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
 
         console.log('organizationId',organizationId);
         console.log('event recevied for filtering',map.size);
@@ -169,6 +184,8 @@ export const filterResultsBasedOnUserRole = async (map:any,req:any) => {
                 default:     
                     break;
             }
+        }
+        
     }catch(error){
         console.log('Error handling the user');
     }
@@ -176,11 +193,15 @@ export const filterResultsBasedOnUserRole = async (map:any,req:any) => {
     return events;
 }
 
+
 export const filterResultsBasedOnUserRoleAndUserId = async (map:any,req:any) => {
     let events =[];
     try {
-        const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-        const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
+        const authDetails = await getAuthDetails(req.headers['authorization']);
+
+        if (authDetails && 'userId' in  authDetails && 'organizationId' in authDetails) {
+            const { userId, organizationId } = authDetails;
+            const memberOforganizationIds = GlobalConfiguration.organizationsUsersMap.get(userId).memberOforganizationIds;
 
         console.log('organizationId : ',organizationId);
         console.log('Events recevied for filtering : ',map.size);
@@ -209,6 +230,8 @@ export const filterResultsBasedOnUserRoleAndUserId = async (map:any,req:any) => 
                 default:     
                     break;
             }
+        }
+        
     }catch(error){
         console.log('Error handling the user');
     }
@@ -216,31 +239,39 @@ export const filterResultsBasedOnUserRoleAndUserId = async (map:any,req:any) => 
     return events;
 }
 
-export const filterResultsBasedOnUser = async (map,req) => {
-    const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
+export const filterResultsBasedOnUser = async (map:any,req:any) => {
+    const authDetails = await getAuthDetails(req.headers['authorization']);
     let events =[];
-    try {
-        events = [...map.values()].filter((item) => item.userId === userId);
-    }catch(error){
-        console.log('Error handling the user');
-    }
+        if (authDetails && 'userId' in  authDetails && 'organizationId' in authDetails) {
+            const { userId, organizationId } = authDetails;
+            
+            try {
+                events = [...map.values()].filter((item) => item.userId === userId);
+            }catch(error){
+                console.log('Error handling the user');
+            }
+        }
+    
 
     return events;
 }
 
 //this is to retrn item in a map, stored by usierId, example user configuragion stored by userId
 export const getItemByUserId = async (map:any,req:any) => {
-    const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
+    const authDetails = await getAuthDetails(req.headers['authorization']);
     let events =[];
-    //console.log('userId',userId);
-    //console.log('map',map);
-    try {
-        events = await map.get(userId);
-        //console.log('events selected : ',events);
-    }catch(error){
-        console.log('Error handling the user');
+        if (authDetails && 'userId' in  authDetails && 'organizationId' in authDetails) {
+            const { userId, organizationId } = authDetails;
+            //console.log('userId',userId);
+        //console.log('map',map);
+        try {
+            events = await map.get(userId);
+            //console.log('events selected : ',events);
+        }catch(error){
+            console.log('Error handling the user');
+     }
     }
-
+    
     return events;
 }
 

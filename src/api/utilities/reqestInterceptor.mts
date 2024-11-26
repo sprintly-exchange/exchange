@@ -3,7 +3,7 @@ import { getAuthDetails } from './getOrganization&User.mjs';
 import { v4 as uuidv4 } from 'uuid';
 
 // Middleware to decode JWT token and inject userId and organizationId into request body
-export const decodeToken = async (req, res, next) => {
+export const decodeToken = async (req:any, res:any, next:any) => {
   // Paths that do not require token decoding
   const exemptPaths = [
     '/api/iam/login',
@@ -43,7 +43,7 @@ export const decodeToken = async (req, res, next) => {
 };
 
 // Apply CORS headers if needed
-export const applyCorsHeaders = (req, res, next) => {
+export const applyCorsHeaders = (req:any, res:any, next:any) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept');

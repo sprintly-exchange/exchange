@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
-
+import GlobalConfiguration from '../../GlobalConfiguration';
 const messageStoreRoutes = Router();
 
 /**
@@ -30,12 +30,12 @@ const messageStoreRoutes = Router();
  *       '404':
  *         description: Not found
  */
-messageStoreRoutes.get('/download', async function (req, res) {  
+messageStoreRoutes.get('/download', async function (req:any, res:any) {  
     const messagePath = req.query.messagePath;
     console.debug(`Message received to be retrieved from message store : ${messagePath}`);
     setCommonHeaders(res);
     // Assuming storage is defined somewhere in your application
-    res.status(200).send(await storage.getMessage(messagePath));
+    res.status(200).send(await GlobalConfiguration.storage.getMessage(messagePath));
 });
 
 export default messageStoreRoutes;

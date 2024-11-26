@@ -2,18 +2,23 @@ import fs from 'fs';
 import path from 'path';
 
 export class ConfigurationFileStorage {
-  constructor(prefix,storagePath, maxFileSize = 1024 * 1024 * 10) { // Default max file size is 1MB
+  _storageLocation;
+  prefix;
+  maxFileSize;
+  currentFileNumber;
+
+  constructor(prefix:string,storagePath:string, maxFileSize = 1024 * 1024 * 10) { // Default max file size is 1MB
     this._storageLocation = storagePath;
     this.prefix = prefix;
     this.maxFileSize = maxFileSize;
     this.currentFileNumber = 0;
   }
 
-  async saveStaticFile(filename, data) {
+  async saveStaticFile(filename:string, data:any) {
     fs.writeFileSync( path.join(this._storageLocation, `${this.prefix}_${filename}`), data);
   }
 
-  async load(filename) {
+  async load(filename:string) {
     try {
       return fs.readFileSync(path.join(this._storageLocation, `${this.prefix}_${filename}`), 'utf-8');
     } catch (error) {
@@ -22,7 +27,7 @@ export class ConfigurationFileStorage {
     }
   }
 
-  async loadStaticFile(filename) {
+  async loadStaticFile(filename:string) {
     try {
       return fs.readFileSync(path.join(this._storageLocation, `${this.prefix}_${filename}`), 'utf-8');
     } catch (error) {

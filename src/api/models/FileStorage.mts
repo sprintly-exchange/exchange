@@ -4,7 +4,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 export class FileStorage extends Storage {
-    _storageLocation;
+    _storageLocation:any;
     
     get storageLocation() {
       return this._storageLocation;
@@ -13,7 +13,7 @@ export class FileStorage extends Storage {
       this._storageLocation = value;
     }
  
-    constructor(storageType){
+    constructor(storageType:any){
      super(storageType);
     }
  
@@ -27,13 +27,13 @@ export class FileStorage extends Storage {
          return `${year}/${month}/${day}/${hour}`;
      }
  
-     createDirectory(dirPath) {
+     createDirectory(dirPath:any) {
        if (!fs.existsSync(dirPath)) {
          fs.mkdirSync(dirPath, { recursive: true });
        }
      }
  
-     async storeMessage(payload) {
+     async storeMessage(payload:any) {
        console.debug('Setting file storage location - this.storageLocation',this.storageLocation);
        const baseDir = await path.join(this.storageLocation, 'storage'); // Base directory for storage
        console.debug('baseDir',baseDir);
@@ -52,7 +52,7 @@ export class FileStorage extends Storage {
        return  `${await filePath}`;
      }
 
-    async getMessage(id){
+    async getMessage(id:string){
       try{
         const payload = await fs.readFileSync(id,'utf8');
         return await payload;

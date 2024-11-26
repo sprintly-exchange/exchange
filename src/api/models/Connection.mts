@@ -8,8 +8,8 @@ export class Connection{
     protocol;
     retryInterval;
     retryAttemps;
-    authenticationType;
-    constructor(connectionName,host,port,protocol,retryInterval,retryAttemps){
+    authenticationType:any;
+    constructor(connectionName:any,host:any,port:any,protocol:any,retryInterval:any,retryAttemps:any){
       this.id = uuidv4();
       this.connectionName = connectionName;
       this.host = host;

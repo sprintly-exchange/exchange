@@ -7,7 +7,7 @@ import {v4 as uuidv4} from 'uuid';
     deliveryId;
     processingId;
     flowName;
-    constructor(flowName,pickupId,deliveryId,processingId){
+    constructor(flowName:string,pickupId:string,deliveryId:string,processingId:string){
       this.id = uuidv4();
       this.flowName = flowName;
       this.pickupId = pickupId;

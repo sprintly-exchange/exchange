@@ -79,7 +79,7 @@ export class TransactionProcessorHTTP {
     }
 
   
-    async checkUndefined(value){
+    async checkUndefined(value:any){
         return value === undefined ? '' : value ;
     }
 
