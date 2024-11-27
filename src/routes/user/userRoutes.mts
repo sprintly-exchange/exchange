@@ -5,7 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import appEnumerations from '../../api/utilities/severInitFunctions.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const userRoutes = Router();
 

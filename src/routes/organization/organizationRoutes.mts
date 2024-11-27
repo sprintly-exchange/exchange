@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const organizationRoutes = Router();
 
@@ -41,7 +41,7 @@ const organizationRoutes = Router();
  *       '400':
  *         description: Organization name already exists or other error
  */
-organizationRoutes.post('/register-organization', async (req, res) => {
+organizationRoutes.post('/register-organization', async (req:any, res:any) => {
   try {
     const { name, address, mobile, email, web , phone } = req.body;
     req.body.id === undefined ? req.body.id = uuidv4() : '';
@@ -260,7 +260,7 @@ async function deleteOrganisaton(req:any,res:any){
  *       '404':
  *         description: Organization not found
  */
-organizationRoutes.put('/id/:id', async (req, res) => {
+organizationRoutes.put('/id/:id', async (req:any, res:any) => {
   const { id } = req.params;
   const { name, address, email, phone, web } = req.body;
   setCommonHeaders(res);

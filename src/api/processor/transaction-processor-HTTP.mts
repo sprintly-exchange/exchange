@@ -17,7 +17,7 @@ export class TransactionProcessorHTTP {
         :
           `${transactionProcessManagerInput.configPickup.host}:${transactionProcessManagerInput.configPickup.port}${transactionProcessManagerInput.configPickup.basePath}`;
         console.debug(`Trying to fetch from ${baseURL}`);
-        const headers={};
+        const headers: Record<string, string> = {};
         //add all headers if defined
       Object.keys(transactionProcessManagerInput.configPickup.headers).length > 0 ? Object.assign(headers,transactionProcessManagerInput.configPickup.headers):'';
       console.debug('HTTP Request Type : ',`${transactionProcessManagerInput.configPickup.method}-${transactionProcessManagerInput.configPickup.authenticationType}`.toUpperCase());
@@ -31,7 +31,12 @@ export class TransactionProcessorHTTP {
           case 'GET-NOAUTH':{
               try{ 
                   const httpClient = new HTTPClient(baseURL);
-                  const [responseFromHttpCall,statusCode] = await httpClient.get('',headers);
+                  const response = await httpClient.get('', headers);
+                  if (response === false) {
+                      throw new Error("HTTP request failed");
+                  }
+                  const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
+
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
@@ -50,10 +55,14 @@ export class TransactionProcessorHTTP {
             try{
                   //in case of basic auth, set basic auth to headers
                   const credentials = btoa(`${transactionProcessManagerInput.configPickup.username}:${transactionProcessManagerInput.configPickup.password}`);
-                  headers.add(`{'Authorization': Basic ${credentials}}`);
+                  headers['Authorization'] = `Basic ${credentials}`
 
                   const httpClient = new HTTPClient(baseURL);
-                  const [responseFromHttpCall,statusCode] = await httpClient.get('',headers);
+                  const response = await httpClient.get('', headers);
+                  if (response === false) {
+                      throw new Error("HTTP request failed");
+                  }
+                  const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
@@ -86,7 +95,7 @@ export class TransactionProcessorHTTP {
     async transactionProcessorDelivery(transactionProcessManagerInput:TransactionProcessManager){
         const baseURL = `${transactionProcessManagerInput.configDelivery.host}:${transactionProcessManagerInput.configDelivery.port}${transactionProcessManagerInput.configDelivery.basePath}`;
         console.debug(`Trying to send  to ${baseURL}`);
-        const headers={};
+        const headers: Record<string, string> = {};
         //add all headers if defined
       Object.keys(transactionProcessManagerInput.configDelivery.headers).length > 0 ? Object.assign(headers,transactionProcessManagerInput.configDelivery.headers):'';
       console.debug('HTTP Request Type : ',`${transactionProcessManagerInput.configDelivery.method}-${transactionProcessManagerInput.configDelivery.authenticationType}`.toUpperCase());
@@ -100,7 +109,11 @@ export class TransactionProcessorHTTP {
           case 'GET-NOAUTH':{
               try{ 
                   const httpClient = new HTTPClient(baseURL);
-                  const [responseFromHttpCall,statusCode] = await httpClient.get('',headers);
+                  const response = await httpClient.get('', headers);
+                  if (response === false) {
+                      throw new Error("HTTP request failed");
+                  }
+                  const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
@@ -120,10 +133,14 @@ export class TransactionProcessorHTTP {
             try{
                 //in case of basic auth, set basic auth to headers
                 const credentials = btoa(`${transactionProcessManagerInput.configPickup.username}:${transactionProcessManagerInput.configPickup.password}`);
-                headers.add(`{'Authorization': Basic ${credentials}}`);
+                headers['Authorization'] = `Basic ${credentials}`
                 
                 const httpClient = new HTTPClient(baseURL);
-                const [responseFromHttpCall,statusCode] = await httpClient.get('',headers);
+                  const response = await httpClient.get('', headers);
+                  if (response === false) {
+                      throw new Error("HTTP request failed");
+                  }
+                const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
                 console.log('responseFromHttpCall : ', await responseFromHttpCall);
                 console.log('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
@@ -142,7 +159,12 @@ export class TransactionProcessorHTTP {
           case 'POST-NOAUTH':{
             try{ 
                 const httpClient = new HTTPClient(baseURL);
-                const [responseFromHttpCall,statusCode] =  await httpClient.post('',transactionProcessManagerInput.transaction.currentMessage,headers);
+                const response = await httpClient.post('',transactionProcessManagerInput.transaction.currentMessage,headers);
+                if (response === false) {
+                    throw new Error("HTTP request failed");
+                }
+                const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
+
                 console.log('responseFromHttpCall : ', await responseFromHttpCall);
                 console.log('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
@@ -162,11 +184,14 @@ export class TransactionProcessorHTTP {
           try{
               //in case of basic auth, set basic auth to headers
               const credentials = btoa(`${transactionProcessManagerInput.configPickup.username}:${transactionProcessManagerInput.configPickup.password}`);
-              headers.add(`{'Authorization': Basic ${credentials}}`);
+              headers['Authorization'] = `Basic ${credentials}`
               
               const httpClient = new HTTPClient(baseURL);
-              const sendData = await transactionProcessManagerInput.transaction.currentMessage;
-              const [responseFromHttpCall,statusCode] =  await httpClient.post('',sendData,headers);
+              const response = await httpClient.post('',transactionProcessManagerInput.transaction.currentMessage,headers);
+              if (response === false) {
+                  throw new Error("HTTP request failed");
+              }
+              const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
               console.log('responseFromHttpCall : ', await responseFromHttpCall);
               console.log('statusCode : ', await statusCode);
               transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;

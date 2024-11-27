@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const loginRoutes = Router();
 
@@ -59,6 +59,7 @@ loginRoutes.post('/login', async (req:any, res:any) => {
 
       // Find the user in organizationsUsersMap by username
       let foundUser = null;
+    
       for (const user of GlobalConfiguration.organizationsUsersMap.values()) {
           if (user.username === username) {
               foundUser = user;
@@ -77,10 +78,7 @@ loginRoutes.post('/login', async (req:any, res:any) => {
 
       // Check if password matches
       const isMatch = await bcrypt.compare(password, foundUser.password);
-      console.log('foundUser',foundUser);
-      console.log('foundUser.password',foundUser.password);
-      console.log('received pass',`${await bcrypt.hash(password, 10)}`);
-      console.log('received pass',password);
+
       
       if (!isMatch) {
           return res.status(400).send('Invalid credentials');
@@ -88,9 +86,12 @@ loginRoutes.post('/login', async (req:any, res:any) => {
 
       
       // Generate JWT token
-      const secret = process.env.JWT_SECRET ;
-      const token = jwt.sign({ userId: foundUser.id, name: username , organizationId : foundUser.organizationId }, secret, { expiresIn: '1h' });
-      // Return token as response
+      const secret = process.env.JWT_SECRET || 'default_secret_key';
+      const token = jwt.sign({ userId: foundUser.id, 
+        name: username , 
+        organizationId : foundUser.organizationId }, 
+        secret, 
+        { expiresIn: '1h' });
       res.send({ "status": "success", "token": token });
   } catch (error:any) {
     console.log(error);

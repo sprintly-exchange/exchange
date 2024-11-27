@@ -1,4 +1,4 @@
-import GlobalConfiguration from "../../GlobalConfiguration";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 export class ConfigurationProcessor {
   async saveConfigurations() {

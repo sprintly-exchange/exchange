@@ -3,7 +3,7 @@ import {v4 as uuidv4} from 'uuid';
 import { FileStorage } from '../models/FileStorage.mjs';
 import Queue from '../system/Queue.mjs';
 import {ConfigurationFileStorage } from '../configurationProcessor/ConfigurationFileStorage.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 import bcrypt from 'bcryptjs';
 
@@ -58,15 +58,32 @@ const defaultOrg = {
     registrationDate: new Date().toISOString(),
 };
 
-const defaultUser = {
+let defaultUser = {
+  id:'',
+  username:'',
+  password:'',
+  organizationId:'',
+  roleId:'',
+  registrationDate:''
+
+};
+
+async function generatePassword() {
+  const password = await bcrypt.hash('changeme', 10);
+  return password;
+}
+
+async function ensureDefaultUser() {
+  defaultUser = {
     id: `${uuidv4()}`,
     username : appEnumerations.APP_DEFAULT_ADMIN_NAME,
-    password :  `${await bcrypt.hash('changeme', 10)}`,
+    password :  `${await generatePassword()}`,
     organizationId: `${defaultOrg.id}`,
     roleId : `${defaultRoleAdmin.id}`,
     registrationDate: new Date().toISOString(),
 };
-
+  
+};
 
  const ensureDefaultOrganization = async () => {
     // Check if the default organization exists
@@ -176,6 +193,8 @@ export const initFunction = async () => {
 
 
         await GlobalConfiguration.configruationProcessor.loadConfigurations();
+        await ensureDefaultUser();
+        console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', defaultUser);
         await ensureDefaultOrganization();
         await ensureDefaultRoles();
         await ensureSystemSettings();

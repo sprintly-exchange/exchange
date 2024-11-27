@@ -1,4 +1,4 @@
-import GlobalConfiguration from "../../GlobalConfiguration";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 import Transaction from "../models/Transaction.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
 

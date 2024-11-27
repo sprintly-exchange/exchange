@@ -1,7 +1,7 @@
 import { userInfo } from "os";
 import { getAuthDetails } from "./getOrganization&User.mjs";
 import appEnumerations from "./severInitFunctions.mjs";
-import GlobalConfiguration from "../../GlobalConfiguration";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 export function setCommonHeaders(res:any){
     res.setHeader("Access-Control-Allow-Methods", "*");

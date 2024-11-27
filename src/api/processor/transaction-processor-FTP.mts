@@ -7,7 +7,7 @@ import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
 import os from 'os';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
 import Transaction from '../models/Transaction.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 export class TransactionProcessorFTP {
     ftpClientProcessor:any;

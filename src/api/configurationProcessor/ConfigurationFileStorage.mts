@@ -7,10 +7,15 @@ export class ConfigurationFileStorage {
   maxFileSize;
   currentFileNumber;
 
-  constructor(prefix:string,storagePath:string, maxFileSize = 1024 * 1024 * 10) { // Default max file size is 1MB
-    this._storageLocation = storagePath;
+  constructor(prefix:string) { // Default max file size is 1MB
+    if(process.env.CONFIG_STORAGE_DIR){
+      this._storageLocation = process.env.CONFIG_STORAGE_DIR;
+    } 
+    else {
+      this._storageLocation = "/tmp";
+    }
     this.prefix = prefix;
-    this.maxFileSize = maxFileSize;
+    this.maxFileSize = 1024 * 1024 * 10
     this.currentFileNumber = 0;
   }
 
@@ -33,6 +38,8 @@ export class ConfigurationFileStorage {
     } catch (error) {
       console.log(error);
       console.log("No files found to initialize : ", path.join(this._storageLocation, `${this.prefix}_${filename}`));
+      return "";
+    
     }
   }
 }

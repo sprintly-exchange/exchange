@@ -5,7 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import { setProcessConfigurationProcessingQueueInterval, setProcessDeliveryProcessingQueueInterval, setProcessPickupProcessingQueueInterval, setProcessRulesInterval, setRemoveOldTransactionsInterval } from '../../server.mjs';
 import appEnumerations from '../../api/utilities/severInitFunctions.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const configurationRoutes = Router();
 
@@ -41,7 +41,7 @@ const configurationRoutes = Router();
  *             schema:
  *               $ref: '#/components/schemas/ResponseMessage'
  */
-configurationRoutes.post('app/', function (req, res) {   
+configurationRoutes.post('app/', function (req:any, res:any) {   
     console.debug(`Configuration received : ${JSON.stringify(req.body)}`);
     req.body.id === undefined ? req.body.id = uuidv4() :'';
     GlobalConfiguration.forntEndConfigurationMap.set(req.body.id, req.body);
@@ -49,17 +49,24 @@ configurationRoutes.post('app/', function (req, res) {
     res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'','')));
 });
 
-configurationRoutes.post('/user', function (req, res) {   
+configurationRoutes.post('/user', function (req:any, res:any) {   
     console.debug(`User configuration received : ${JSON.stringify(req.body)}`);
     saveUserConfig(req,res);
 });
 
 async function saveUserConfig(req:any,res:any)
 {
-    const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-    GlobalConfiguration.forntEndConfigurationMap.set(userId, req.body);
-    setCommonHeaders(res);
-    res.status(201).send(JSON.stringify(new ResponseMessage(userId,'','')));
+    const authDetails = await getAuthDetails(req.headers['authorization']);
+
+    if (authDetails) {
+        const { userId, organizationId } = authDetails;
+        GlobalConfiguration.forntEndConfigurationMap.set(userId, req.body);
+        setCommonHeaders(res);
+        res.status(201).send(JSON.stringify(new ResponseMessage(userId,'','')));
+    } else {
+        throw new Error('Authorization details are missing');
+    }
+   
 };
 
 /**
@@ -86,14 +93,14 @@ async function saveUserConfig(req:any,res:any)
  *       '204':
  *         description: No content
  */
-configurationRoutes.get('app/:id', function (req, res) {   
+configurationRoutes.get('app/:id', function (req:any, res:any) {   
     console.debug(`Configuration id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.forntEndConfigurationMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.forntEndConfigurationMap.get(req.params.id))) : res.status(204).send('{}');
 });
 
 
-configurationRoutes.get('/user', function (req, res) {   
+configurationRoutes.get('/user', function (req:any, res:any) {   
     console.debug(`User configuration requested`);
     getUserConfig(req,res);
    });
@@ -110,23 +117,30 @@ async function getUserConfig(req:any,res:any) {
     }
 }
 
-configurationRoutes.get('/system/settings', function (req, res) {   
+configurationRoutes.get('/system/settings', function (req:any, res:any) {   
     console.debug(`System settings configuration requested`);
     getSystemSettings(req,res);
 });
 
 async function getSystemSettings(req:any,res:any) {
-    const { userId, organizationId } = await getAuthDetails( req.headers['authorization']);
-    setCommonHeaders(res); 
-    // Assuming global.serverConfigurationMap is a Map
-    const events = Object.fromEntries(GlobalConfiguration.serverConfigurationMap);
-    // Convert to JSON string
-    const eventsJson = JSON.stringify(events);
-    return res.status(200).send(eventsJson);
+    const authDetails = await getAuthDetails(req.headers['authorization']);
+
+    if (authDetails) {
+        const { userId, organizationId } = authDetails;
+        setCommonHeaders(res); 
+        // Assuming global.serverConfigurationMap is a Map
+        const events = Object.fromEntries(GlobalConfiguration.serverConfigurationMap);
+        // Convert to JSON string
+        const eventsJson = JSON.stringify(events);
+        return res.status(200).send(eventsJson);
+    } else {
+        throw new Error('Authorization details are missing');
+    }
+   
     
 }
 
-configurationRoutes.put('/system/settings', function (req, res) {   
+configurationRoutes.put('/system/settings', function (req:any, res:any) {   
     console.debug(`System settings configuration requested`);
     updateSystemSettings(req,res);
 });

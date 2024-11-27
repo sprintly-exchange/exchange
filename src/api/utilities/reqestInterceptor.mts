@@ -21,21 +21,25 @@ export const decodeToken = async (req:any, res:any, next:any) => {
   }
 
   try {
-    const { userId, organizationId } = await getAuthDetails(req.headers['authorization']);
-    // Inject userId and organizationId into request body if they exist
-    if (req.method === 'POST' || req.method === 'PUT') {
+    const authDetails = await getAuthDetails(req.headers['authorization']);
+    if (authDetails) {
+      const { userId, organizationId } = authDetails;
+   
+      // Inject userId and organizationId into request body if they exist
+      if (req.method === 'POST' || req.method === 'PUT') {
 
-      req.body = {
-        ...req.body,
-        ...(userId && { "userId":userId }),
-        ...(organizationId && { 'organizationId':organizationId }),
-        id: req.body.id || uuidv4(),
-      };
+        req.body = {
+          ...req.body,
+          ...(userId && { "userId":userId }),
+          ...(organizationId && { 'organizationId':organizationId }),
+          id: req.body.id || uuidv4(),
+        };
 
-      //console.log( 'req.body', req.body);
+        //console.log( 'req.body', req.body);
+      }
+
+      next();
     }
-
-    next();
   } catch (error) {
     console.error('JWT verification error:', error);
     return res.status(400).send('Invalid Token');

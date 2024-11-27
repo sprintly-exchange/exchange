@@ -69,9 +69,7 @@ export class FtpClientProcessor {
         port: this.port,
         user: this.user,
         password: this.password,
-        secure: this.secure,
-        passive: this.passive,
-        timeout: this.timeout,
+        secure: this.secure
       });
       console.log('Connected to FTP server');
       return true;

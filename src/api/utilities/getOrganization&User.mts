@@ -8,7 +8,7 @@ import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userEx
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 import appEnumerations from './severInitFunctions.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 const {TokenExpiredError} = pkg;
 const returnObj =  {userId: '',organizationId: ''}
 type AuthDetails = {

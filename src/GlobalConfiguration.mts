@@ -24,7 +24,8 @@ class GlobalConfiguration {
     public static deliveryProcessingQueue = new  Queue([]);
 
     public static configruationProcessor = new ConfigurationProcessor();
-    public static storageConfiguration:ConfigurationFileStorage = new ConfigurationFileStorage('FS',process.env.CONFIG_STORAGE_DIR,);
+    
+    public static storageConfiguration:ConfigurationFileStorage = new ConfigurationFileStorage('FS');
 
     public static googleUserCreationStatus:any = {};
 }

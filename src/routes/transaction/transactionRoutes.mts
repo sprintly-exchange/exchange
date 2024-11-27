@@ -4,7 +4,7 @@ import { countFlowNamePerMinute, countFlows, countFlowsPerMinute, searchTranscat
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { userHasDeleteRights, filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const transactionRoutes = Router();
 

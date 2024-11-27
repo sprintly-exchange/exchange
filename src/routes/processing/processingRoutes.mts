@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { filterResultsBasedOnUserRoleAndUserId, mapEntrySearchByValue, setCommonHeaders, userHasDeleteRights } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const processingRoutes = Router();
 
@@ -103,7 +103,11 @@ async function getProcessing(req:any,res:any){
     return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
   };
 
-  processingRoutes.delete('/:id', function (req, res) {   
+  processingRoutes.delete('/:id', function (req, res){
+    deleteProcessing(req,res);
+  });
+
+ async function deleteProcessing(req:any,res:any) {
     console.debug(`Processing deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     console.log(`Attemting to delete processing with id :  ${req.params.id}`);
@@ -121,10 +125,11 @@ async function getProcessing(req:any,res:any){
     }    
     );
     if(!flowFound)
-        userHasDeleteRights(req,configurationProcessingMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+        await userHasDeleteRights(req,GlobalConfiguration.configurationProcessingMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
         //configurationProcessingMap.delete(req.params.id) ? res.status(204).send('') : res.status(400).send(new ResponseMessage(uuidv4(),`Unable to delete id ${req.params.id}`,'Failed'));
     else 
       res.status(400).send(new ResponseMessage(uuidv4(),`Processing :  ${GlobalConfiguration.configurationProcessingMap.get(req.params.id).processingName} used in flow :  ${flowName}`,'Failed')) ;
-});
+    };
+    
 
 export default processingRoutes;

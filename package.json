@@ -5,8 +5,8 @@
   "main": "server.mjs",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node src/server.js"
+    "start": "node dist/server.mjs",
+    "dev": "ts-node src/server.mjs"
   },
   "repository": {
     "type": "git",

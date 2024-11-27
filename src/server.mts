@@ -25,11 +25,9 @@ import loginRoutes from './routes/login/loginRoutes.mjs';
 import organizationRoutes from './routes/organization/organizationRoutes.mjs';
 import userRoutes from './routes/user/userRoutes.mjs';
 import appEnumerations, { initFunction} from './api/utilities/severInitFunctions.mjs';
-import {CustomLogger } from './api/logging/customLogger.mjs';
-import { requestId } from 'express-request-id';
 import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
-import GlobalConfiguration from './GlobalConfiguration';
+import GlobalConfiguration from './GlobalConfiguration.mjs';
 
 
 const SERVER_PORT = process.env.SERVER_PORT || 4000;
@@ -41,16 +39,6 @@ dotenv.config();
 app.use(bodyParser.json() );      
 app.use(bodyParser.urlencoded({  extended: true }));
 
-//Logging
-//app.use(logRequest);
-//app.use(logError);
-
-// Middleware to create and attach a custom logger to each request
-// Add request ID middleware
-app.use(requestId());
-
-// Add request ID middleware
-app.use(requestId());
 
 // Or configure specific options
 // app.use(cors({ origin: 'http://example.com' }));

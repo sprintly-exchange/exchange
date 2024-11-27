@@ -2,7 +2,7 @@ import { ConnectionFS } from "../../api/models/ConnectionFS.mjs";
 import { ConnectionHTTP } from "../../api/models/ConnectionHTTP.mjs";
 import { Flow } from "../../api/models/Flow.mjs";
 import {v4 as uuidv4} from 'uuid';
-import GlobalConfiguration from "../../GlobalConfiguration";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 //variables used to run the demo mode
 let Pickup_Weather_Data:any=undefined;

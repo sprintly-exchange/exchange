@@ -7,7 +7,7 @@ import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
-import GlobalConfiguration from "../../GlobalConfiguration";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 //processing transactions
 export class TransactionProcessManager{

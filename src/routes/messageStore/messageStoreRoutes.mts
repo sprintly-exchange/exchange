@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 const messageStoreRoutes = Router();
 
 /**
