@@ -30,7 +30,6 @@ const appEnumerations = Object.freeze({
   FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION: 'FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION',
 });
 
-
 const defaultRoleAdmin = {
   id: `${uuidv4()}`,
   role : appEnumerations.APP_DEFAULT_ROLE_ADMIN,
@@ -187,12 +186,13 @@ async function ensureDefaultUser() {
 
 export const initFunction = async () => {
      //Configruation save funtionality
+       
         console.log('global.storageConfiguration',GlobalConfiguration.storageConfiguration);
         
         GlobalConfiguration.storage._storageLocation= process.env.FILE_STORAGE_DIR;
 
 
-        await GlobalConfiguration.configruationProcessor.loadConfigurations();
+        await GlobalConfiguration.configurationProcessor.loadConfigurations();
         await ensureDefaultUser();
         console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', defaultUser);
         await ensureDefaultOrganization();
@@ -202,7 +202,7 @@ export const initFunction = async () => {
         //Setting config saving interval
         const saveInterval = 10000; // 10 seconds
         setInterval(() => {
-          GlobalConfiguration.configruationProcessor.saveConfigurations();
+          GlobalConfiguration.configurationProcessor.saveConfigurations();
           console.log('Configurations saved at', new Date());
         }, saveInterval);
 };

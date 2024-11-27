@@ -1,5 +1,6 @@
 import * as ftp from 'basic-ftp';
 import { promises as fs } from 'fs'; // Import fs.promises
+import os from "os";
 
 export class FtpClientProcessor {
   host;
@@ -20,7 +21,7 @@ export class FtpClientProcessor {
     this.password = template.password;
     this.secure = template.secure;
     this.remotePath = template.remotePath;
-    this.localPath = template.localPath;
+    this.localPath = os.tmpdir();
     this.passive = template.passive;
     this.timeout = template.timeout;
     this.ftp = new ftp.Client();

@@ -48,8 +48,8 @@ export class TransactionProcessorFTP {
                 for (const file of fileList) {
                     if (file.isFile) {
                         count++;
-                        let childTransaction:any;
-                        Object.assign(childTransaction, transactionProcessManagerInput.transaction);
+                        let childTransaction:any = {};
+                        childTransaction && Object.assign(childTransaction, transactionProcessManagerInput.transaction);
                         childTransaction.pickupPath = (await ftpProcessor.getFtpUrlWithoutPassword()).toString();
                         childTransaction.id = uuidv4();
                         childTransaction.currentMessage = await this.retryOperation(() => ftpProcessor.downloadFile(`${file.name}`));

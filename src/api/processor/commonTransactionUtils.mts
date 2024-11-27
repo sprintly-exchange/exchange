@@ -26,20 +26,17 @@ export class CommonTransactionUtils {
               //transaction.status = appEnumerations.TRANSACTION_STATUS_FAILED;
         }
               
-        //console.log('Transaction Id : ',transaction.id);
-        //console.log('Flow Name : ',transaction.flowName);
-        //console.log('Transaction Pickup Status : ',transaction.pickupStatus);
-        //console.log('Transaction Delivery Status : ',transaction.deliveryStatus);
-        //console.log('Transaction Overall Status : ',transaction.status);
-        //console.log('Transaction organizationId : ',transaction.organizationId);
         const redactedTransaction={};
         Object.assign(redactedTransaction,transaction);
         if ('currentMessage' in redactedTransaction) {
             delete redactedTransaction.currentMessage;
          }
          if ('id' in redactedTransaction && typeof redactedTransaction.id === 'string') {
+            console.debug(`Trasnaction added with id : ${redactedTransaction.id}`);
+            console.debug(`Number of total transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
             GlobalConfiguration.transactionsStatisticsMap.set(redactedTransaction.id, redactedTransaction);
+            
         }
-        console.debug(`Number of total transactions : ${GlobalConfiguration.transactonsStatisticsMap.size}`);
+        
       }
 }
