@@ -146,13 +146,21 @@ function processRules() {
   GlobalConfiguration.configurationFlowMap.forEach((configurationFlowMapItem) => {
     if (configurationFlowMapItem.activationStatus) {
       console.debug('Processing flow : ', configurationFlowMapItem.flowName);
-
+      let transactionProcessManager:TransactionProcessManager;
       const configPickup = configurationPickupMapSet.find((object) => object.id === configurationFlowMapItem.pickupId);
       const configDelivery = configurationDeliveryMapSet.find((object) => object.id === configurationFlowMapItem.deliveryId);
       const configProcessing = configurationProcessingMapSet.find((object) => object.id === configurationFlowMapItem.processingId);
-
-      const transactionProcessManager = new TransactionProcessManager(configPickup, configDelivery, configProcessing, configurationFlowMapItem);
-      
+      if(configPickup && configDelivery && configProcessing && configurationFlowMapItem ){
+        transactionProcessManager = new TransactionProcessManager(configPickup, configDelivery, configProcessing, configurationFlowMapItem);
+      } else {
+        console.error('Setting up processing rule error');
+        !configPickup && console.error('configPickup:',configPickup);
+        !configDelivery && console.error('configDelivery:',configDelivery);
+        !configProcessing && console.error('configProcessing:',configProcessing);
+        !configurationFlowMapItem && console.error('configurationFlowMapItem :',configurationFlowMapItem);
+        return;
+      }
+     
       // Determine retryInterval from configPickup or set a default of 60 seconds
       const retryInterval = Number(configPickup.retryInterval) > 0
         ? Number(configPickup.retryInterval) * 1000

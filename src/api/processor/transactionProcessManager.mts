@@ -8,6 +8,7 @@ import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import e from "express";
 
 //processing transactions
 export class TransactionProcessManager{
@@ -42,6 +43,8 @@ export class TransactionProcessManager{
             this.flowName = configurationFlow.flowName;
             this.messageStore = new MessageStoreGeneric("FS");
             this.commonTransactionUtils = new CommonTransactionUtils();
+      
+           
             this.transaction = new Transaction(
                         new Date().toISOString(),
                         '',
@@ -60,8 +63,8 @@ export class TransactionProcessManager{
                         0,
                         configurationFlow.flowName,
                         configurationFlow.organizationId,
-
             );
+            
 
             
       }
