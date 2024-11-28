@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
-import appEnumerations from '../../api/utilities/severInitFunctions.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const userRoutes = Router();
@@ -66,7 +65,7 @@ userRoutes.post('/register-user', async (req:any, res:any) => {
         }
 
 
-        const roleId = getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+        const roleId = getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
         const hashedPassword = await bcrypt.hash(password, 10);
         GlobalConfiguration.organizationsUsersMap.set(id, { id, username, password: hashedPassword, email, mobileNumber, organizationId, roleId,registrationDate });
         res.status(201).send(new ResponseMessage(uuidv4(),'User registered successfully','Success'));
@@ -124,10 +123,10 @@ const filterUsers = async  (req:any,res:any) =>  {
             setCommonHeaders(res);
             const currUser = GlobalConfiguration.organizationsUsersMap.get(userId);
             //super admin user for the applications
-            if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+            if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
                 const users = Array.from(GlobalConfiguration.organizationsUsersMap.values());
                 users.length > 0 ? res.status(200).send(users) : res.status(204).send([]); 
-            } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+            } else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
                 const users = Array.from(GlobalConfiguration.organizationsUsersMap.values()).filter((user) => user.organizationId === organizationId);
                 users.length > 0 ? res.status(200).send(users) : res.status(204).send([]);
             }
@@ -253,17 +252,17 @@ const deleteUser = async (req:any,res:any)  => {
     if (authDetails && 'userId' in authDetails) {
         const { userId } = authDetails;
         const currUser = getUserById(userId);
-        if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+        if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
             if (!GlobalConfiguration.organizationsUsersMap.has(id)) {
                 return res.status(400).send(new ResponseMessage(uuidv4(),'User not found','Failed'));
             }
-            if (GlobalConfiguration.organizationsUsersMap.get(id)['username']  === appEnumerations.APP_DEFAULT_ADMIN_NAME) {
+            if (GlobalConfiguration.organizationsUsersMap.get(id)['username']  ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME) {
                 return res.status(400).send(new ResponseMessage(uuidv4(),'Admin user cannot be removed.','Failed'));
             } else {
                 GlobalConfiguration.organizationsUsersMap.delete(id);
                 res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
             }
-        } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+        } else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
             if(currUser.organizationId === currUser.organizationId){
                 GlobalConfiguration.organizationsUsersMap.delete(id);
                 res.status(200).send(new ResponseMessage(uuidv4(),'User deleted successfully','Success'));
@@ -407,14 +406,14 @@ const filterRoles = async  (req:any,res:any) =>  {
             let events = [];
             const currUser=getUserById(userId);
             //super admin user for the applications
-            if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
+            if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
                 events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values());
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
-            } else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+            } else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
+                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
-            }  else if(currUser.roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
-                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role === appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+            }  else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
+                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
             }
             

@@ -1,20 +1,20 @@
 import pkg from 'jsonwebtoken';
 
-
 import jwt, { decode,JwtPayload } from 'jsonwebtoken';
 import axios from 'axios';
 import jwkToPem from 'jwk-to-pem';
 import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userExists } from './serverCommon.mjs';
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
-import appEnumerations from './severInitFunctions.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+
 const {TokenExpiredError} = pkg;
 const returnObj =  {userId: '',organizationId: ''}
 type AuthDetails = {
   userId: string;
   organizationId: string; // Mark as optional if it can be undefined
 };
+
 
 export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDetails | undefined> => {
     if (
@@ -99,8 +99,8 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
               mobileNumber : '',
               password :  `${await bcrypt.hash('changeme', 10)}`,
               organizationId: returnObj.organizationId,
-              memberOforganizationIds: [getOrgId(appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
-              roleId : getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
+              memberOforganizationIds: [getOrgId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME)],
+              roleId : getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN),
               registrationDate: new Date().toISOString(),
               lastLoggedInTime: new Date(),
             };

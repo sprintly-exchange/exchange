@@ -5,7 +5,6 @@ import { fileSync } from 'tmp';
 import { promises as fs } from 'fs';
 import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
 import os from 'os';
-import appEnumerations from '../utilities/severInitFunctions.mjs';
 import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 import { TransactionProcessorA } from './TransactionProcessorA.js';
@@ -60,7 +59,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                         childTransaction.messageName = `${file.name}`;
                         childTransaction.processingTime = new Date().toISOString();
                         childTransaction.pickupTime = new Date().toISOString();
-                        childTransaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
+                        childTransaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
 
                         await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
                         this.commonTransactionUtils.addTransaction(childTransaction);
@@ -75,19 +74,19 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                         await GlobalConfiguration.configurationProcessingQueue.enqueue(transactionProcessManager);
                     }
 
-                    if(count >= GlobalConfiguration.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)){
-                        console.warn(`${appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION} limit exedded : `,GlobalConfiguration.serverConfigurationMap.get(appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION))
+                    if(count >= GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)){
+                        console.warn(`${ GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION} limit exedded : `,GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION))
                         break;
                     }
                 }
             } else {
-                transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             }
         } catch (error:any) {
             console.log('Error processing from ftp', error);
             transactionProcessManagerInput.transaction.pickupError = error.message;
-            transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+            transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             return false;
         } finally {
@@ -114,12 +113,12 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
 
                         await this.storeMessage(transactionProcessManagerInput.transaction, transactionProcessManagerInput.messageStore, 'DOM');
                         transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
-                        transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_COMPLETED;
+                        transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
                     })
                     .catch((err) => {
                         console.error(err);
                         transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
-                        transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                        transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                         transactionProcessManagerInput.transaction.deliveryError = err.message;
                     });
 
@@ -128,7 +127,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
         } catch (error:any) {
             console.log('Error sending file to ftp', error);
             transactionProcessManagerInput.transaction.deliveryError = error.message;
-            transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+            transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             return false;
         } finally {

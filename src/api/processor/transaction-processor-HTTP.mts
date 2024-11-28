@@ -1,8 +1,8 @@
 import { HTTPClient } from "../../client/http-client.mjs";
 import Transaction from "../models/Transaction.mjs";
-import appEnumerations from "../utilities/severInitFunctions.mjs";
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
 import { TransactionProcessorA } from "./TransactionProcessorA.js";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 export class TransactionProcessorHTTP extends TransactionProcessorA {
 
@@ -46,7 +46,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
               }catch(error:any){
                   //console.error("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.pickupError = error.message;
-                  transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                  transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                   return false;
                   
               }
@@ -72,7 +72,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
             }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupError = error.message;
-                transactionProcessManagerInput.transaction.pickupStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 return false;
                 
             }
@@ -123,7 +123,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
               }catch(error:any){
                   //console.error("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.deliveryProcessingError = error;
-                  transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                  transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                   transactionProcessManagerInput.transaction.deliveryError = error.message;
                   return false;
                   
@@ -150,7 +150,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
             }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupProcessingError = error;
-                transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 transactionProcessManagerInput.transaction.deliveryError = error.message;
                 return false;
                 
@@ -174,7 +174,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
               }catch(error:any){
                 //console.error("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.deliveryProcessingError = error;
-                transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+                transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 transactionProcessManagerInput.transaction.deliveryError = error.message;
                 return false;
                 
@@ -201,7 +201,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
           }catch(error:any){
               //console.error("Unexpected error : ",error);
               transactionProcessManagerInput.transaction.pickupProcessingError = error;
-              transactionProcessManagerInput.transaction.deliveryStatus = appEnumerations.TRANSACTION_STATUS_FAILED;
+              transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
               transactionProcessManagerInput.transaction.deliveryError = error.message;
               return false;
               
@@ -220,11 +220,11 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
       console.log('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
-        transaction.deliveryStatus= appEnumerations.TRANSACTION_STATUS_COMPLETED;
+        transaction.deliveryStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
       } else if((200 <= checkStatus) && (checkStatus <= 299)){
-        transaction.deliveryStatus= appEnumerations.TRANSACTION_STATUS_FAILED;
+        transaction.deliveryStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
       } else {
-        transaction.deliveryStatus= appEnumerations.TRANSACTION_STATUS_FAILED;
+        transaction.deliveryStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
       }
     }
 
@@ -232,11 +232,11 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
       console.log('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
-        transaction.pickupStatus= appEnumerations.TRANSACTION_STATUS_COMPLETED;
+        transaction.pickupStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
       } else if((200 <= checkStatus) && (checkStatus <= 299)){
-        transaction.pickupStatus= appEnumerations.TRANSACTION_STATUS_FAILED;
+        transaction.pickupStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
       } else {
-        transaction.pickupStatus= appEnumerations.TRANSACTION_STATUS_FAILED;
+        transaction.pickupStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
       }
       console.log('transaction.pickupStatus : ', transaction.pickupStatus);
     }

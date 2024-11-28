@@ -4,7 +4,6 @@ import {v4 as uuidv4} from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import { setProcessConfigurationProcessingQueueInterval, setProcessDeliveryProcessingQueueInterval, setProcessPickupProcessingQueueInterval, setProcessRulesInterval, setRemoveOldTransactionsInterval } from '../../server.mjs';
-import appEnumerations from '../../api/utilities/severInitFunctions.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 const configurationRoutes = Router();
@@ -154,11 +153,11 @@ async function updateSystemSettings(req:any, res:any) {
         for (const [key, value] of Object.entries(newSettings)) {
             if (GlobalConfiguration.serverConfigurationMap.has(key)) {
                 GlobalConfiguration.serverConfigurationMap.set(key, Number(value));
-                key === appEnumerations.PROCESS_RULES_TIME_INTERVAL ? setProcessRulesInterval() : '';
-                key === appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessPickupProcessingQueueInterval(): '';
-                key === appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessConfigurationProcessingQueueInterval(): '';
-                key === appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessDeliveryProcessingQueueInterval(): '';
-                key === appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL || key === appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS ? setRemoveOldTransactionsInterval(): '';
+                key ===  GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL ? setProcessRulesInterval() : '';
+                key ===  GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessPickupProcessingQueueInterval(): '';
+                key ===  GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessConfigurationProcessingQueueInterval(): '';
+                key ===  GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessDeliveryProcessingQueueInterval(): '';
+                key ===  GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL || key ===  GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS ? setRemoveOldTransactionsInterval(): '';
             } else {
                 console.log(`Key ${key} not found in global serverConfigurationMap.`);
             }

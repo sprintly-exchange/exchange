@@ -1,5 +1,5 @@
 import Transaction from "../../api/models/Transaction.mjs";
-import appEnumerations from "../../api/utilities/severInitFunctions.mjs";
+import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 interface Event {
   flowName: string;
@@ -24,29 +24,22 @@ export function countFlowNamePerMinute(events: Event[]): Record<string, number> 
   return counts;
 }
   
-enum AppEnumerations {
-  TRANSACTION_STATUS_INPROCESSING = "INPROCESSING",
-  TRANSACTION_STATUS_PROCESSING_PICKUP = "PROCESSING_PICKUP",
-  TRANSACTION_STATUS_PROCESSING_DELIVERY = "PROCESSING_DELIVERY",
-  TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS = "PROCESSING_CONFIGURATIONS",
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED"
-}
+
 
 export function transactionSummary(events: Event[]): string {
   const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
 
   events.forEach((entry) => {
       if (
-          entry.status === AppEnumerations.TRANSACTION_STATUS_INPROCESSING ||
-          entry.status === AppEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
-          entry.status === AppEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
-          entry.status === AppEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
+          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
+          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
+          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
+          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
       ) {
           counts.INPROCESSING++;
-      } else if (entry.status === AppEnumerations.SUCCESS) {
+      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS) {
           counts.SUCCESS++;
-      } else if (entry.status === AppEnumerations.FAILED) {
+      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED) {
           counts.FAILED++;
       }
   });

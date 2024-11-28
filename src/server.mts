@@ -24,7 +24,7 @@ import systemStatusRoutes from './routes/systemStatus/systemStatusRoutes.mjs';
 import loginRoutes from './routes/login/loginRoutes.mjs';
 import organizationRoutes from './routes/organization/organizationRoutes.mjs';
 import userRoutes from './routes/user/userRoutes.mjs';
-import appEnumerations, { initFunction} from './api/utilities/severInitFunctions.mjs';
+import { initFunction} from './api/utilities/severInitFunctions.mjs';
 import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
 import GlobalConfiguration from './GlobalConfiguration.mjs';
@@ -116,10 +116,10 @@ let processRulesInterval:any; // Store interval ID to clear it later
 
 export function setProcessRulesInterval() {
   // Fetch interval time dynamically from the global server configuration map
-  let processRulesTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL)) 
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_RULES_TIME_INTERVAL) 
+  let processRulesTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL) 
     : 1000; // Default to 1000 if not defined
-  console.log(appEnumerations.PROCESS_RULES_TIME_INTERVAL,processRulesTimeInterval);
+  console.log( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL,processRulesTimeInterval);
   // Clear the previous interval if it exists
   if (processRulesInterval) {
     clearInterval(processRulesInterval);
@@ -207,11 +207,11 @@ let processPickupProcessingQueueInterval:any; // Store interval ID to clear it l
 export function setProcessPickupProcessingQueueInterval() {
 
   // Fetch interval time dynamically from the global server configuration map
-  let processPickupProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) 
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processPickupProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log(appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL,processPickupProcessingQueueTimeInterval);
+  console.log( GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL,processPickupProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processPickupProcessingQueueInterval) {
     clearInterval(processPickupProcessingQueueInterval);
@@ -247,11 +247,11 @@ let processDeliveryProcessingQueueInterval:any; // Store interval ID so it can b
 
 export function setProcessDeliveryProcessingQueueInterval() {
   // Fetch interval time dynamically from the global server configuration map
-  let processDeliveryProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL))
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processDeliveryProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL))
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log(appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL,processDeliveryProcessingQueueTimeInterval);
+  console.log( GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL,processDeliveryProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processDeliveryProcessingQueueInterval) {
     clearInterval(processDeliveryProcessingQueueInterval);
@@ -287,11 +287,11 @@ let processConfigurationProcessingQueueInterval:any; // Store interval ID so it 
 
 export function setProcessConfigurationProcessingQueueInterval() {
   // Fetch interval time dynamically from global server configuration map
-  let processConfigurationProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) 
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)
+  let processConfigurationProcessingQueueTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) 
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log(appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL,processConfigurationProcessingQueueTimeInterval);
+  console.log( GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL,processConfigurationProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processConfigurationProcessingQueueInterval) {
     clearInterval(processConfigurationProcessingQueueInterval);
@@ -326,12 +326,12 @@ let removeOldTransactionsInterval:any; // Store interval ID so it can be cleared
 
 export function setRemoveOldTransactionsInterval() {
   // Fetch interval time dynamically from global server configuration map
-  let removeOldTransactionsTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL))
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)
+  let removeOldTransactionsTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL))
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)
     : 30000; // Default to 30 seconds if not defined
 
-  let removeOldTransactionsArchiveDays = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS))
-    ? GlobalConfiguration.serverConfigurationMap.get(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)
+  let removeOldTransactionsArchiveDays = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS))
+    ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)
     : 1; // Default to 1 day if not defined
 
   
@@ -345,8 +345,8 @@ export function setRemoveOldTransactionsInterval() {
     clearInterval(removeOldTransactionsInterval);
   }
 
-  console.log(appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL,removeOldTransactionsTimeInterval);
-  console.log(appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS,removeOldTransactionsArchiveDays);
+  console.log( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL,removeOldTransactionsTimeInterval);
+  console.log( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS,removeOldTransactionsArchiveDays);
 
   // Set the new interval dynamically based on the configuration
   removeOldTransactionsInterval = setInterval(() => {

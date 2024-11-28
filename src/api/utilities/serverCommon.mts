@@ -1,6 +1,5 @@
 import { userInfo } from "os";
 import { getAuthDetails } from "./getOrganization&User.mjs";
-import appEnumerations from "./severInitFunctions.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 export function setCommonHeaders(res:any){
@@ -121,14 +120,14 @@ export async function userHasDeleteRights(req:any, map:any, id:string) {
         }
 
         // First condition: The user is the owner or an admin
-        if (item.userId === userId || getUserById(userId).roleId === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ADMIN)) {
+        if (item.userId === userId || getUserById(userId).roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN)) {
             console.log(" DELETE ****************  LOG : First condition: The user is the owner or an admin. Deleting record");
             map.delete(id);
             return true;
         // Second condition: The user belongs to the organization and is an organization admin
         } else if (item.organizationId === organizationId 
             && memberOfOrganizationIds.includes(organizationId) 
-            && getRoleById(getUserById(userId)) === getRoleId(appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)) {
+            && getRoleById(getUserById(userId)) === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)) {
             console.log(" DELETE ****************  LOG : Second condition: The user belongs to the organization and is an organization admin. Deleting record");
             map.delete(id);
             return true;
@@ -142,9 +141,6 @@ export async function userHasDeleteRights(req:any, map:any, id:string) {
     } else {
             throw new Error('Invalid userId: must be a string');
     }
-
-    
-    
 };
 
 
@@ -166,17 +162,17 @@ export const filterResultsBasedOnUserRole = async (map:any,req:any) => {
 
             switch (getRoleById(getUserById(userId).roleId)) 
             {
-                case appEnumerations.APP_DEFAULT_ROLE_ADMIN : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN : {
                     events = [...map.values()];
                     console.log('events admin',events.length);
                     break;
                 }
-                case appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN  : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN  : {
                     events = [...map.values()].filter((item) => item.organizationId === organizationId || memberOforganizationIds.includes(item.organizationId));
                     console.log('events org admin' ,events.length);
                     break;
                 }
-                case appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER : {
                     events = [...map.values()].filter((item) => item.organizationId === organizationId || memberOforganizationIds.includes(item.organizationId));
                     console.log('events org user' ,events.length);
                     break;
@@ -210,18 +206,18 @@ export const filterResultsBasedOnUserRoleAndUserId = async (map:any,req:any) => 
     
             switch (getRoleById(getUserById(userId).roleId)) 
             {
-                case appEnumerations.APP_DEFAULT_ROLE_ADMIN : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN : {
                     events = [...map.values()];
                     console.log('events admin',events.length);
                     break;
                 }
-                case appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN  : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN  : {
                     events = [...map.values()].filter((item) => (item.organizationId === organizationId || item.userId === userId ||  memberOforganizationIds.includes(item.organizationId)));
                     //events = [...events,[...map.values()].filter((item) => item.userId === userId)]
                     console.log('events org admin/user' ,events.length);
                     break;
                 }
-                case appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER : {
+                case  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER : {
                     events = [...map.values()].filter((item) => (item.organizationId === organizationId || item.userId === userId || memberOforganizationIds.includes(item.organizationId)));
                     //events = [...events,[...map.values()].filter((item) => item.userId === userId)]
                     console.log('events org admin/user' ,events.length);

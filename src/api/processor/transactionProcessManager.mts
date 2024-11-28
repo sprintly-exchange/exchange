@@ -6,7 +6,6 @@ import xmldom from "xmldom";
 import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
-import appEnumerations from "../utilities/severInitFunctions.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 
@@ -71,7 +70,7 @@ export class TransactionProcessManager{
 
       async processPickup(){
             this.transactionProcessManagerStage = this._STAGE_PICKUP;
-            this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP;
+            this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP;
             console.log('Processing pickup : ', this.transaction.id);
             switch(this.configPickup.protocol){
                   //Pickup from file connector from localhost
@@ -104,7 +103,7 @@ export class TransactionProcessManager{
 
       async configurationProcessing() {
             this.transactionProcessManagerStage = this._STAGE_PROCESSING;
-            this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
+            this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
             console.log('Processing configuration : ', this.transaction.id);
 
             //console.log(this.configProcessing);
@@ -152,7 +151,7 @@ export class TransactionProcessManager{
       
       async processDelivery(){
             this.transactionProcessManagerStage = this._STAGE_DELIVERY;
-            this.transaction.status = appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY;
+            this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY;
             console.log('Processing delivery : ', this.transaction.id);
             switch(this.configDelivery.protocol){
                   //Delviery to localhost through file connector
