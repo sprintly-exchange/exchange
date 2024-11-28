@@ -134,32 +134,36 @@ async function ensureDefaultUser() {
 
   export const ensureSystemSettings = async () => {
     // Set or update the configuration values based on whether the key exists
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL, 1000);
+
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS, 100);
+    }
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL, 1000);
     } 
 
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
     }
 
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
     }
 
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL, 1000);
     }
 
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL, 30000);
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL)) {
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL, 30000);
     }
 
-    if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)) {
+    if (!GlobalConfiguration.serverConfigurationMap.has(GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS)) {
       GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS, 1);
     }
 
     if (!GlobalConfiguration.serverConfigurationMap.has (GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION)) {
-      GlobalConfiguration.serverConfigurationMap.set (GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION, 10);
+      GlobalConfiguration.serverConfigurationMap.set(GlobalConfiguration.appEnumerations.FTP_PICKUP_MAX_FILE_DOWNLOAD_LIST_LIMIT_PER_SESSION, 10);
   }
   };
   

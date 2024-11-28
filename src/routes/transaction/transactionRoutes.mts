@@ -5,8 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { userHasDeleteRights, filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import CacheManager from '../../api/utilities/CacheManager.mjs';
 
 const transactionRoutes = Router();
+const cacheManagerTransactionRoutes = new CacheManager(GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
 
 /**
  * @swagger
@@ -38,8 +40,18 @@ transactionRoutes.get('/', function (req, res) {
 
 async function getTransactions(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-    return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
+    if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS)){
+        const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS);
+        console.log(cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS));
+        return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
+
+    }else{
+        const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
+        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS,events,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
+        return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
+    }
+    
+    
 };
 
 /**
@@ -96,8 +108,15 @@ transactionRoutes.get('/statistics/minute', function (req, res) {
 
 async function statisticsPerMinute(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-    return events.length > 0 ? res.status(200).send(countFlowNamePerMinute(events)) : res.status(204).send('');
+    if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_STATISTICS_PER_MINIUE)){
+        const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_STATISTICS_PER_MINIUE);
+        return events.length > 0 ? res.status(200).send(countFlowNamePerMinute(events)) : res.status(204).send('');
+    } else {
+        const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
+        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_STATISTICS_PER_MINIUE,events,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
+        return events.length > 0 ? res.status(200).send(countFlowNamePerMinute(events)) : res.status(204).send('');
+    }
+    
 }
 
 /**
@@ -120,9 +139,16 @@ transactionRoutes.get('/statistics/summary', function (req, res) {
 });
 
 async function getSummary(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
-    return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send(''); 
+    if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY)){
+        const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY);
+        return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send('');
+    } else {
+        const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
+        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY,events,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
+        return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send('');
+    }
+     
 };
 
 
