@@ -42,7 +42,6 @@ export class TransactionProcessManager{
             this.flowName = configurationFlow.flowName;
             this.messageStore = new MessageStoreGeneric("FS");
             this.commonTransactionUtils = new CommonTransactionUtils();
-            console.log('configurationFlow',configurationFlow);
            
             this.transaction = new Transaction(
                         new Date().toISOString(),
