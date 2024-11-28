@@ -214,6 +214,7 @@ export function addDemoCases(organizationId:string){
 
    //Set deliveries
             GlobalConfiguration.configurationDeliveryMap.set(Delivery_PetstoreInventory.getId(),Delivery_PetstoreInventory);
+            GlobalConfiguration.configurationDeliveryMap.set(Delivery_RecycleBin.getId(),Delivery_RecycleBin);
             GlobalConfiguration.configurationDeliveryMap.set(Deliver_Orders.id,Deliver_Orders);
             GlobalConfiguration.configurationDeliveryMap.set(Deliver_OrderResponses.id,Deliver_OrderResponses);
             GlobalConfiguration.configurationDeliveryMap.set(Deliver_Invoices.id,Deliver_Invoices);
