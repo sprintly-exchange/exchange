@@ -2,11 +2,12 @@ import { HTTPClient } from "../../client/http-client.mjs";
 import Transaction from "../models/Transaction.mjs";
 import appEnumerations from "../utilities/severInitFunctions.mjs";
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
+import { TransactionProcessorA } from "./TransactionProcessorA.js";
 
-export class TransactionProcessorHTTP {
+export class TransactionProcessorHTTP extends TransactionProcessorA {
 
     constructor(){
-
+      super();
     }
 
 
@@ -239,34 +240,6 @@ export class TransactionProcessorHTTP {
       }
       console.log('transaction.pickupStatus : ', transaction.pickupStatus);
     }
-
-
-    async storeMessage(transaction:Transaction,messageStore:any,leg:string) {
-      console.log('Trying to store message HTTP : ',transaction.currentMessage);
-      switch(leg){
-        case 'PIM' : {
-          [transaction.pickupInboundMessagePath,transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'POM' : {
-          [transaction.pickupOutboundMessagePath,transaction.pickupOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'DIM' : {
-          [transaction.deliveryInboundMessagePath,transaction.deliveryInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'DOM' : {
-          [transaction.deliveryOutboundMessagePath,transaction.deliveryOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        } default : {
-
-        }
-      }
-        
-      return true;
-    }
-
 
     async setCommonPickupProcessingParameters(responseFromHttpCall:any,statusCode:any,baseURL:string,transaction:Transaction){
       transaction.pickupStatusCode = statusCode;

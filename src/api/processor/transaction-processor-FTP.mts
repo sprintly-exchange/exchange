@@ -8,12 +8,14 @@ import os from 'os';
 import appEnumerations from '../utilities/severInitFunctions.mjs';
 import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { TransactionProcessorA } from './TransactionProcessorA.js';
 
-export class TransactionProcessorFTP {
+export class TransactionProcessorFTP  extends TransactionProcessorA {
     ftpClientProcessor:any;
     commonTransactionUtils;
 
     constructor() {
+        super();
         this.commonTransactionUtils = new CommonTransactionUtils();
     }
 
@@ -154,32 +156,6 @@ export class TransactionProcessorFTP {
             console.error("Error creating temporary file:", err);
             throw err;
         }
-    }
-
-    async storeMessage(transaction:Transaction, messageStore:any, leg:string) {
-        switch (leg) {
-            case 'PIM': {
-                [transaction.pickupInboundMessagePath, transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-                break;
-            }
-            case 'POM': {
-                [transaction.pickupOutboundMessagePath, transaction.pickupOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-                break;
-            }
-            case 'DIM': {
-                [transaction.deliveryInboundMessagePath, transaction.deliveryInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-                break;
-            }
-            case 'DOM': {
-                [transaction.deliveryOutboundMessagePath, transaction.deliveryOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-                break;
-            }
-            default: {
-                // Handle default case if necessary
-            }
-        }
-
-        return true;
     }
 
 }

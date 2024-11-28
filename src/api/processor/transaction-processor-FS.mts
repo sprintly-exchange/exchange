@@ -2,10 +2,11 @@ import {v4 as uuidv4} from 'uuid';
 import { FSClient } from '../../client/fs-client.mjs';
 import { TransactionProcessManager } from './transactionProcessManager.mjs';
 import Transaction from '../models/Transaction.mjs';
+import { TransactionProcessorA } from './TransactionProcessorA.js';
 
-export class TransactionProcessorFS {
+export class TransactionProcessorFS extends TransactionProcessorA{
     constructor(){
-
+      super();
     }
 
     checkUndefined(value:any){
@@ -32,6 +33,7 @@ export class TransactionProcessorFS {
                     console.debug('No config processing defined, setting messageStore.setDeliveryOutboundMessage');
                     return true;
               }else{
+                    return true;
                     //apply processing rules
               }
         }else{
@@ -47,32 +49,9 @@ export class TransactionProcessorFS {
         await fsClient.writeFile(`${transactionProcessManagerInput.configDelivery.path}/${transactionProcessManagerInput.transaction.deliveryOutboundMessageName}`,`${transactionProcessManagerInput.transaction.currentMessage}`) ? transactionProcessManagerInput.transaction.deliveryStatus = 'SUCCESS':transactionProcessManagerInput.transaction.deliveryStatus = 'ERROR';
         await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
         transactionProcessManagerInput.transaction.deliveryStatus = 'COMPLETED';
+        return true;
     }
 
-    async storeMessage(transaction:Transaction,messageStore:any,leg:string) {
-      switch(leg){
-        case 'PIM' : {
-          [transaction.pickupInboundMessagePath,transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'POM' : {
-          [transaction.pickupOutboundMessagePath,transaction.pickupOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'DIM' : {
-          [transaction.deliveryInboundMessagePath,transaction.deliveryInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        }
-        case 'DOM' : {
-          [transaction.deliveryOutboundMessagePath,transaction.deliveryOutboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);
-          break;
-        } default : {
-
-        }
-      }
-        
-      return true;
-    }
 
 
     async setCommonPickupProcessingParameters(transaction:Transaction){
