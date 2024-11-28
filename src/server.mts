@@ -363,11 +363,11 @@ async function removeOldTransactions(removeOldTransactionsArchiveDays:number) {
   console.log(`START-TRANSACTION-PURGE ****************`);
   
   // Iterate over a copy of the Map entries to avoid modification during iteration
-  for (const [id, { processingTime }] of Array.from(GlobalConfiguration.transactonsStatisticsMap.entries())) {
+  for (const [id, { processingTime }] of Array.from(GlobalConfiguration.transactionsStatisticsMap.entries())) {
     const processingDate = new Date(processingTime); // Convert ISO 8601 string to Date object
 
     if (processingDate < thresholdDate) {
-      GlobalConfiguration.transactonsStatisticsMap.delete(id);
+      GlobalConfiguration.transactionsStatisticsMap.delete(id);
       console.log(`Old transaction removed with ID: ${id}`);
     }
   }

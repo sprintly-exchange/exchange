@@ -194,7 +194,6 @@ export const initFunction = async () => {
 
         await GlobalConfiguration.configurationProcessor.loadConfigurations();
         await ensureDefaultUser();
-        console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', defaultUser);
         await ensureDefaultOrganization();
         await ensureDefaultRoles();
         await ensureSystemSettings();

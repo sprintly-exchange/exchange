@@ -15,13 +15,13 @@ class GlobalConfiguration {
     public static organizationsMap: Map<string, any> = new Map();
     public static organizationsUsersMap: Map<string, any> = new Map();
     public static organizationsRolesMapNew: Map<string, any> = new Map();
-    public static storage = new FileStorage('FS');
+    public static storage: FileStorage = new FileStorage('FS');
 
-    public static configurationProcessingQueue = new Queue([]);
-    public static pickupProcessingQueue = new Queue([]);
-    public static deliveryProcessingQueue = new Queue([]);
+    public static configurationProcessingQueue: Queue = new Queue([]);
+    public static pickupProcessingQueue: Queue = new Queue([]);
+    public static deliveryProcessingQueue: Queue = new Queue([]);
 
-    public static configurationProcessor = new ConfigurationProcessor(); // Fixed typo
+    public static configurationProcessor: ConfigurationProcessor = new ConfigurationProcessor(); // Fixed typo
 
     public static storageConfiguration: ConfigurationFileStorage = new ConfigurationFileStorage('FS');
 

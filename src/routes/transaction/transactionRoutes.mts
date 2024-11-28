@@ -38,7 +38,7 @@ transactionRoutes.get('/', function (req, res) {
 
 async function getTransactions(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
 };
 
@@ -70,9 +70,9 @@ async function deleteTransaction(req:any, res:any) {
     console.debug(`Transaction deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     console.log(`Attempting to delete transaction with id :  ${req.params.id}`);
-    console.log(`Current transactions : ${GlobalConfiguration.transactonsStatisticsMap.size}`);
-    await userHasDeleteRights(req,GlobalConfiguration.transactonsStatisticsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
-    console.log(`Current transactions after deletion: ${GlobalConfiguration.transactonsStatisticsMap.size}`);
+    console.log(`Current transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
+    await userHasDeleteRights(req,GlobalConfiguration.transactionsStatisticsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
+    console.log(`Current transactions after deletion: ${GlobalConfiguration.transactionsStatisticsMap.size}`);
 };
 
 /**
@@ -96,7 +96,7 @@ transactionRoutes.get('/statistics/minute', function (req, res) {
 
 async function statisticsPerMinute(req:any,res:any){
     setCommonHeaders(res);
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     return events.length > 0 ? res.status(200).send(countFlowNamePerMinute(events)) : res.status(204).send('');
 }
 
@@ -120,7 +120,7 @@ transactionRoutes.get('/statistics/summary', function (req, res) {
 });
 
 async function getSummary(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send(''); 
 };
@@ -146,7 +146,7 @@ transactionRoutes.get('/statistics/summary/statuses', function (req, res) {
 });
 
 async function getSummaryStatuses(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(transactionSummaryWithTimeInMinutes(events)) : res.status(204).send(''); 
 };
@@ -171,7 +171,7 @@ transactionRoutes.get('/statistics/flows/minute', function (req, res) {
 });
 
 async function getFlowsPerMinute(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(countFlowsPerMinute(events)) : res.status(204).send(''); 
 };
@@ -199,7 +199,7 @@ transactionRoutes.get('/statistics/flows/count', function (req, res) {
 
 
 async function getFlowCounts(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
     return events.length > 0 ? res.status(200).send(countFlows(events)) : res.status(204).send(''); 
 }
@@ -242,7 +242,7 @@ async function transationSearch(req:any,res:any){
     const start = Number(req.query.start);
     const end = Number(req.query.end);
     //console.log('transactonsStatisticsMap length', transactonsStatisticsMap.size);
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     console.debug(`Transaction search request between start : ${new Date(start).toISOString()} and end : ${new Date(end).toISOString()}`);
     setCommonHeaders(res);
     const eventsByDate = searchTranscationsBetweenDatesByEpochTime(start, end,events);
@@ -255,7 +255,7 @@ transactionRoutes.get('/searchByIds', function (req, res) {
 });
 
 async function transationSearchByIds(req:any,res:any){
-    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactonsStatisticsMap,req);
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     setCommonHeaders(res);
     const eventsByIds = searcTransationSearchByIds(req.query.messageId,req.query.senderId,req.query.receiverId,events)
     return eventsByIds.length > 0 ? res.status(200).send(eventsByIds) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 

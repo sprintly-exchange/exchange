@@ -6,7 +6,7 @@ export class ConfigurationProcessor {
         organizationsMap: this.mapToJson(GlobalConfiguration.organizationsMap),
         organizationsUsersMap: this.mapToJson(GlobalConfiguration.organizationsUsersMap),
         organizationsRolesMapNew: this.mapToJson(GlobalConfiguration.organizationsRolesMapNew),
-        forntEndConfigurationMap: this.mapToJson(GlobalConfiguration.forntEndConfigurationMap),
+        forntEndConfigurationMap: this.mapToJson(GlobalConfiguration.frontEndConfigurationMap),
       };
 
       await GlobalConfiguration.storageConfiguration.saveStaticFile('User_Configurations.json', JSON.stringify(userConfigurations));
@@ -49,7 +49,7 @@ export class ConfigurationProcessor {
 
 
       const dataTransactions = {
-          transactonsStatisticsMap: this.mapToJson(GlobalConfiguration.transactonsStatisticsMap),
+          transactonsStatisticsMap: this.mapToJson(GlobalConfiguration.transactionsStatisticsMap),
       };
       await GlobalConfiguration.storageConfiguration.saveStaticFile('Transactions.json',JSON.stringify(dataTransactions));
   }
@@ -60,7 +60,7 @@ export class ConfigurationProcessor {
             GlobalConfiguration.organizationsMap = this.jsonToMap(userConfigurations.organizationsMap);
             GlobalConfiguration.organizationsUsersMap = this.jsonToMap(userConfigurations.organizationsUsersMap);
             GlobalConfiguration.organizationsRolesMapNew = this.jsonToMap(userConfigurations.organizationsRolesMapNew);
-            GlobalConfiguration.forntEndConfigurationMap = this.jsonToMap(userConfigurations.forntEndConfigurationMap);
+            GlobalConfiguration.frontEndConfigurationMap = this.jsonToMap(userConfigurations.forntEndConfigurationMap);
         } catch (error:any) {
             console.log('userConfigurations not found for loading.');
         }
@@ -97,7 +97,7 @@ export class ConfigurationProcessor {
     
       try {
           const dataTransactions = JSON.parse(await GlobalConfiguration.storageConfiguration.loadStaticFile('Transactions.json'));
-          GlobalConfiguration.transactonsStatisticsMap = this.jsonToMap(dataTransactions.transactonsStatisticsMap);
+          GlobalConfiguration.transactionsStatisticsMap = this.jsonToMap(dataTransactions.transactonsStatisticsMap);
       } catch (error:any) {
           console.log('dataTransactions not found for loading.');
       }

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.mjs",
-    "dev": "ts-node src/server.mjs"
+    "dev": "nodemon dist/server.mjs"
   },
   "repository": {
     "type": "git",
@@ -31,7 +31,6 @@
     "mqtt": "^5.10.1",
     "n": "^9.2.3",
     "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.7",
     "os": "^0.1.2",
     "path": "^0.12.7",
     "power-assert": "^1.6.1",
@@ -70,6 +69,7 @@
     "@types/tmp": "^0.2.6",
     "@types/uuid": "^10.0.0",
     "@types/xmldom": "^0.1.34",
+    "nodemon": "^3.1.7",
     "typescript": "^5.7.2"
   }
 }

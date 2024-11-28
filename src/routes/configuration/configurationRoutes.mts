@@ -44,7 +44,7 @@ const configurationRoutes = Router();
 configurationRoutes.post('app/', function (req:any, res:any) {   
     console.debug(`Configuration received : ${JSON.stringify(req.body)}`);
     req.body.id === undefined ? req.body.id = uuidv4() :'';
-    GlobalConfiguration.forntEndConfigurationMap.set(req.body.id, req.body);
+    GlobalConfiguration.frontEndConfigurationMap.set(req.body.id, req.body);
     setCommonHeaders(res);
     res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'','')));
 });
@@ -60,7 +60,7 @@ async function saveUserConfig(req:any,res:any)
 
     if (authDetails) {
         const { userId, organizationId } = authDetails;
-        GlobalConfiguration.forntEndConfigurationMap.set(userId, req.body);
+        GlobalConfiguration.frontEndConfigurationMap.set(userId, req.body);
         setCommonHeaders(res);
         res.status(201).send(JSON.stringify(new ResponseMessage(userId,'','')));
     } else {
@@ -96,7 +96,7 @@ async function saveUserConfig(req:any,res:any)
 configurationRoutes.get('app/:id', function (req:any, res:any) {   
     console.debug(`Configuration id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    GlobalConfiguration.forntEndConfigurationMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.forntEndConfigurationMap.get(req.params.id))) : res.status(204).send('{}');
+    GlobalConfiguration.frontEndConfigurationMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.frontEndConfigurationMap.get(req.params.id))) : res.status(204).send('{}');
 });
 
 
@@ -108,7 +108,7 @@ configurationRoutes.get('/user', function (req:any, res:any) {
 async function getUserConfig(req:any,res:any) {
     setCommonHeaders(res);
 
-    const events = await getItemByUserId(GlobalConfiguration.forntEndConfigurationMap,req);
+    const events = await getItemByUserId(GlobalConfiguration.frontEndConfigurationMap,req);
     if (events !== undefined ) {
         res.status(200).send(events);
     } else {
