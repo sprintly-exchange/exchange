@@ -144,6 +144,7 @@ function processRules() {
   console.info(`Processing rules started ${date.toLocaleTimeString()}`);
 
   GlobalConfiguration.configurationFlowMap.forEach((configurationFlowMapItem) => {
+    console.log(`Flow "${configurationFlowMapItem.flowName}" status -> ${configurationFlowMapItem.activationStatus}`);
     if (configurationFlowMapItem.activationStatus) {
       console.debug('Processing flow : ', configurationFlowMapItem.flowName);
       let transactionProcessManager:TransactionProcessManager;
