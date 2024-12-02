@@ -29,5 +29,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/exchange:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/exchange-ts:latest
           platforms: linux/amd64,linux/arm64
