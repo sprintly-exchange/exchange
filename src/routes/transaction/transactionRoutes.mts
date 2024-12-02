@@ -140,13 +140,16 @@ transactionRoutes.get('/statistics/summary', function (req, res) {
 
 async function getSummary(req:any,res:any){
     setCommonHeaders(res);
-    if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY)){
+     if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY)){
         const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY);
-        return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send('');
+        const out:string = transactionSummary(events);
+        return out !== '' ? res.status(200).send(out) : res.status(204).send('');
     } else {
-        const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY,events,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
-        return events.length > 0 ? res.status(200).send(transactionSummary(events)) : res.status(204).send('');
+        const events:any = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
+        const out:string = transactionSummary(events);
+        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY,out,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
+
+        return out !== ''  ? res.status(200).send(out) : res.status(204).send('');
     }
      
 };

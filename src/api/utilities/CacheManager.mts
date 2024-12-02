@@ -13,7 +13,7 @@ class CacheManager {
   }
 
   // Get the value for a given key
-  get(key:string) {
+  get(key:string):any {
     return this.cache.get(key);
   }
 

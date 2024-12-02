@@ -26,31 +26,35 @@ export function countFlowNamePerMinute(events: Event[]): Record<string, number> 
   
 
 
-export function transactionSummary(events: Event[]): string {
+export function transactionSummary(events: Map<any,any>): string {
   const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
 
-  events.forEach((entry) => {
-      if (
-          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
-          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
-          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
-          entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
-      ) {
-          counts.INPROCESSING++;
-      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS) {
-          counts.SUCCESS++;
-      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED) {
-          counts.FAILED++;
-      }
-  });
+    events.forEach((entry) => {
+        console.log('XXXXXXXXXXXXX',entry.status);
+        if (
+            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
+            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
+            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
+            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
+        ) {
+            counts.INPROCESSING++;
+        } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS) {
+            counts.SUCCESS++;
+        } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED) {
+            counts.FAILED++;
+        }
+    });
+    
 
-  const summary = {
-      total: `${events.length}`,
-      failures: `${counts.FAILED}`,
-      successes: `${counts.SUCCESS}`,
-      inprocessing: `${counts.INPROCESSING}`,
-  };
 
+    const summary = {
+        total: `${events.size ? events.size : 0}`,
+        failures: `${counts.FAILED}`,
+        successes: `${counts.SUCCESS}`,
+        inprocessing: `${counts.INPROCESSING}`,
+    };
+    console.log('XXXXXXXXXXXXX',summary);
+    
   return JSON.stringify(summary);
 }
   
