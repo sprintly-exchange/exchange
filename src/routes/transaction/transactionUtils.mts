@@ -1,16 +1,11 @@
 import Transaction from "../../api/models/Transaction.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
-interface Event {
-  flowName: string;
-  processingTime: string,
-  status: string,
-}
 
 export function countFlowNamePerMinute(events: Event[]): Record<string, number> {
   const counts: Record<string, number> = {};
 
-  events.forEach((entry) => {
+  events.forEach((entry:any) => {
       const date = new Date(entry.processingTime);
       const minute = date.toISOString().substring(0, 16) + "Z"; // Format: "YYYY-MM-DDTHH:MM"
 
@@ -26,11 +21,10 @@ export function countFlowNamePerMinute(events: Event[]): Record<string, number> 
   
 
 
-export function transactionSummary(events: Map<any,any>): string {
+export function transactionSummary(events: any): string {
   const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
 
-    events.forEach((entry) => {
-        console.log('XXXXXXXXXXXXX',entry.status);
+    events.forEach((entry:any) => {
         if (
             entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
             entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
@@ -59,11 +53,11 @@ export function transactionSummary(events: Map<any,any>): string {
 }
   
 
-  export function transactionSummaryWithTimeInMinutes(events: Event[]): Record<string, Record<string, number>> {
+  export function transactionSummaryWithTimeInMinutes(events: any): Record<string, Record<string, number>> {
     const counts: Record<string, Record<string, number>> = {};
 
     // Step 1: Count existing events per minute and status
-    events.forEach((entry) => {
+    events.forEach((entry:any) => {
         const date = new Date(entry.processingTime);
         const minute = date.toISOString().substring(0, 16) + "Z"; // Format: "YYYY-MM-DDTHH:MM"
         const status = entry.status;
@@ -81,11 +75,11 @@ export function transactionSummary(events: Map<any,any>): string {
 
     // Step 2: Find the earliest processing time in events (firstEntryTime)
     const firstEntryTime = new Date(
-        Math.min(...events.map((entry) => new Date(entry.processingTime).getTime()))
+        Math.min(...events.map((entry:any) => new Date(entry.processingTime).getTime()))
     );
 
     // Step 3: Get all unique statuses
-    const allStatuses = [...new Set(events.map((entry) => entry.status))];
+    const allStatuses = [...new Set(events.map((entry:any) => entry.status))];
 
     // Step 4: Fill missing minutes with counts of 0 up to the current time
     const currentTime = new Date();
@@ -98,7 +92,7 @@ export function transactionSummary(events: Map<any,any>): string {
             counts[minuteKey] = {};
         }
 
-        allStatuses.forEach((status) => {
+        allStatuses.forEach((status:any) => {
             if (!counts[minuteKey][status]) {
                 counts[minuteKey][status] = 0;
             }
@@ -118,7 +112,7 @@ export function transactionSummary(events: Map<any,any>): string {
     const counts: Record<string, Record<string, number>> = {};
 
     // Step 1: Count existing events per minute
-    events.forEach((entry) => {
+    events.forEach((entry:any) => {
         const date = new Date(entry.processingTime);
         const minute = date.toISOString().substring(0, 16) + "Z"; // Format: "YYYY-MM-DDTHH:MM"
         const flowName = entry.flowName;
@@ -136,11 +130,11 @@ export function transactionSummary(events: Map<any,any>): string {
 
     // Step 2: Find the earliest processing time in events (firstEntryTime)
     const firstEntryTime = new Date(
-        Math.min(...events.map((entry) => new Date(entry.processingTime).getTime()))
+        Math.min(...events.map((entry:any) => new Date(entry.processingTime).getTime()))
     );
 
     // Step 3: Get all unique flow names
-    const allFlows = [...new Set(events.map((entry) => entry.flowName))];
+    const allFlows = [...new Set(events.map((entry:any) => entry.flowName))];
 
     // Step 4: Fill missing minutes with counts of 0 up to the current time
     const currentTime = new Date();
@@ -168,7 +162,7 @@ export function transactionSummary(events: Map<any,any>): string {
   
   export function countFlows(events: Event[]): Record<string, number> {
       const counts: Record<string, number> = {};
-      events.forEach((entry) => {
+      events.forEach((entry:any) => {
           const flowName = entry.flowName;
 
           if (!counts[flowName]) {
