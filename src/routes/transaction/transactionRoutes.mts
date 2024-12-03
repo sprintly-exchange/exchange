@@ -5,11 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { userHasDeleteRights, filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
-import CacheManager from '../../api/utilities/CacheManager.mjs';
 
 const transactionRoutes = Router();
-const cacheManagerTransactionRoutes = new CacheManager(GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
-
 /**
  * @swagger
  * tags:
@@ -40,18 +37,8 @@ transactionRoutes.get('/', function (req, res) {
 
 async function getTransactions(req:any,res:any){
     setCommonHeaders(res);
-    if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS)){
-        const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS);
-        console.log(cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS));
-        return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
-
-    }else{
-        const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-        cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_ALL_TRANSACTIONS,events,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
-        return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
-    }
-    
-    
+    const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
+    return events.length > 0 ? res.status(200).send(events) : res.status(204).send('');     
 };
 
 /**
