@@ -61,7 +61,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                         childTransaction.pickupTime = new Date().toISOString();
                         childTransaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
 
-                        await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, 'PIM');
+                        await this.storeMessage(childTransaction, transactionProcessManagerInput.messageStore, GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                         this.commonTransactionUtils.addTransaction(childTransaction);
 
                         const transactionProcessManager = new TransactionProcessManager(
@@ -111,7 +111,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                         console.log('`${transactionProcessManagerInput.transaction.messageName}`', `${transactionProcessManagerInput.transaction.messageName}`);
                         await this.retryOperation(() => ftpProcessor.uploadFileCustom(tempFilePath, `${transactionProcessManagerInput.transaction.messageName}`));
 
-                        await this.storeMessage(transactionProcessManagerInput.transaction, transactionProcessManagerInput.messageStore, 'DOM');
+                        await this.storeMessage(transactionProcessManagerInput.transaction, transactionProcessManagerInput.messageStore, GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                         transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
                         transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
                     })

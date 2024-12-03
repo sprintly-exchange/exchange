@@ -41,7 +41,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'PIM');
+                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
               }catch(error:any){
                   //console.error("Unexpected error : ",error);
@@ -67,7 +67,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'PIM');
+                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
             }catch(error:any){
                 //console.error("Unexpected error : ",error);
@@ -118,7 +118,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   console.log('responseFromHttpCall : ', await responseFromHttpCall);
                   console.log('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
+                  await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                   await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction); 
               }catch(error:any){
                   //console.error("Unexpected error : ",error);
@@ -145,7 +145,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                 console.log('responseFromHttpCall : ', await responseFromHttpCall);
                 console.log('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-                await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
+                await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
             }catch(error:any){
                 //console.error("Unexpected error : ",error);
@@ -169,7 +169,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                 console.log('responseFromHttpCall : ', await responseFromHttpCall);
                 console.log('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-                await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
+                await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);         
               }catch(error:any){
                 //console.error("Unexpected error : ",error);
@@ -196,7 +196,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
               console.log('responseFromHttpCall : ', await responseFromHttpCall);
               console.log('statusCode : ', await statusCode);
               transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
-              await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
+              await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
               await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
           }catch(error:any){
               //console.error("Unexpected error : ",error);
