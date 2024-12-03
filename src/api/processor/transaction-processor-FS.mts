@@ -3,6 +3,7 @@ import { FSClient } from '../../client/fs-client.mjs';
 import { TransactionProcessManager } from './transactionProcessManager.mjs';
 import Transaction from '../models/Transaction.mjs';
 import { TransactionProcessorA } from './TransactionProcessorA.js';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 export class TransactionProcessorFS extends TransactionProcessorA{
     constructor(){
@@ -27,8 +28,8 @@ export class TransactionProcessorFS extends TransactionProcessorA{
               transactionProcessManagerInput.transaction.messageName = fileName;
               transactionProcessManagerInput.transaction.currentMessage = message;
               transactionProcessManagerInput.transaction.pickupPath = `${this.checkUndefined(transactionProcessManagerInput.configPickup.path)}`;
-              transactionProcessManagerInput.transaction.pickupStatus = 'COMPLETED';
-              await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'PIM');
+              transactionProcessManagerInput.transaction.pickupStatus = GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
+              await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
               if(transactionProcessManagerInput.configProcessing === undefined || transactionProcessManagerInput.configProcessing === ''){
                     console.debug('No config processing defined, setting messageStore.setDeliveryOutboundMessage');
                     return true;
@@ -47,8 +48,8 @@ export class TransactionProcessorFS extends TransactionProcessorA{
         const fsClient = new FSClient();
         transactionProcessManagerInput.transaction.messageName != '' ? transactionProcessManagerInput.transaction.deliveryOutboundMessageName  = transactionProcessManagerInput.transaction.messageName: transactionProcessManagerInput.transaction.deliveryOutboundMessageName = `${uuidv4()}`;
         await fsClient.writeFile(`${transactionProcessManagerInput.configDelivery.path}/${transactionProcessManagerInput.transaction.deliveryOutboundMessageName}`,`${transactionProcessManagerInput.transaction.currentMessage}`) ? transactionProcessManagerInput.transaction.deliveryStatus = 'SUCCESS':transactionProcessManagerInput.transaction.deliveryStatus = 'ERROR';
-        await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,'DOM');
-        transactionProcessManagerInput.transaction.deliveryStatus = 'COMPLETED';
+        await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
+        transactionProcessManagerInput.transaction.deliveryStatus = GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
         return true;
     }
 
