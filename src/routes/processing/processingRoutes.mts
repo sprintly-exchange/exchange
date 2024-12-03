@@ -99,7 +99,6 @@ processingRoutes.get('/', function (req, res) {
 async function getProcessing(req:any,res:any){
     setCommonHeaders(res);
     const events = await filterResultsBasedOnUserRoleAndUserId(GlobalConfiguration.configurationProcessingMap,req);
-    console.log(events);
     return events.length > 0 ? res.status(200).send(events) : res.status(204).send(''); 
   };
 

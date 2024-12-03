@@ -2,10 +2,10 @@ import Transaction from "../../api/models/Transaction.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 
-export function countFlowNamePerMinute(events: Event[]): Record<string, number> {
+export function countFlowNamePerMinute(events: any): any {
   const counts: Record<string, number> = {};
 
-  events.forEach((entry:any) => {
+  events.forEach((entry:any):any => {
       const date = new Date(entry.processingTime);
       const minute = date.toISOString().substring(0, 16) + "Z"; // Format: "YYYY-MM-DDTHH:MM"
 
@@ -21,39 +21,43 @@ export function countFlowNamePerMinute(events: Event[]): Record<string, number> 
   
 
 
-export function transactionSummary(events: any): string {
-  const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
-
+export function transactionSummary(events:any) {
+    if (!events || typeof events.forEach !== 'function') {
+      console.error("Invalid 'events' provided:", events);
+      return { total: '0', failures: '0', successes: '0', inprocessing: '0' };
+    }
+  
+    const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
+  
     events.forEach((entry:any) => {
-        if (
-            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
-            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
-            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
-            entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
-        ) {
-            counts.INPROCESSING++;
-        } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS) {
-            counts.SUCCESS++;
-        } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED) {
-            counts.FAILED++;
-        }
+      if (
+        entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
+        entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
+        entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY ||
+        entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS
+      ) {
+        counts.INPROCESSING++;
+      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS) {
+        counts.SUCCESS++;
+      } else if (entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED) {
+        counts.FAILED++;
+      }
     });
-    
-
-
+  
     const summary = {
-        total: `${events.size ? events.size : 0}`,
-        failures: `${counts.FAILED}`,
-        successes: `${counts.SUCCESS}`,
-        inprocessing: `${counts.INPROCESSING}`,
+      total: `${events.size ? events.size : 0}`,
+      failures: `${counts.FAILED}`,
+      successes: `${counts.SUCCESS}`,
+      inprocessing: `${counts.INPROCESSING}`,
     };
-    console.log('XXXXXXXXXXXXX',summary);
-    
-  return JSON.stringify(summary);
-}
+  
+    console.log('Transaction Summary:', summary);
+    return summary;
+  }
+  
   
 
-  export function transactionSummaryWithTimeInMinutes(events: any): Record<string, Record<string, number>> {
+  export function transactionSummaryWithTimeInMinutes(events: any): any {
     const counts: Record<string, Record<string, number>> = {};
 
     // Step 1: Count existing events per minute and status
@@ -101,14 +105,25 @@ export function transactionSummary(events: any): string {
         currentMinute.setMinutes(currentMinute.getMinutes() + 1);
     }
 
-    return counts;
+    //sort by minute
+    const sortedCounts = Object.fromEntries(
+        Object.entries(counts)
+          .sort(([minuteKeyA], [minuteKeyB]) => {
+            // Compare keys as ISO 8601 strings, which sort lexicographically in time order
+            return minuteKeyA.localeCompare(minuteKeyB);
+          })
+      );
+      
+    
+
+    return sortedCounts;
 }
 
   
   
 
   
-  export function countFlowsPerMinute(events: Event[]): Record<string, Record<string, number>> {
+  export function countFlowsPerMinute(events: any): any {
     const counts: Record<string, Record<string, number>> = {};
 
     // Step 1: Count existing events per minute
@@ -147,7 +162,7 @@ export function transactionSummary(events: any): string {
             counts[minuteKey] = {};
         }
 
-        allFlows.forEach((flowName) => {
+        allFlows.forEach((flowName:any) => {
             if (!counts[minuteKey][flowName]) {
                 counts[minuteKey][flowName] = 0;
             }
@@ -156,11 +171,20 @@ export function transactionSummary(events: any): string {
         currentMinute.setMinutes(currentMinute.getMinutes() + 1);
     }
 
-    return counts;
+      //sort by minute
+      const sortedCounts = Object.fromEntries(
+        Object.entries(counts)
+          .sort(([minuteKeyA], [minuteKeyB]) => {
+            // Compare keys as ISO 8601 strings, which sort lexicographically in time order
+            return minuteKeyA.localeCompare(minuteKeyB);
+          })
+      );
+
+    return sortedCounts;
 }
   
   
-  export function countFlows(events: Event[]): Record<string, number> {
+  export function countFlows(events: any): any {
       const counts: Record<string, number> = {};
       events.forEach((entry:any) => {
           const flowName = entry.flowName;

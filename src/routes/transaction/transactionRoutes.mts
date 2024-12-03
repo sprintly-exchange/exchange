@@ -142,13 +142,11 @@ async function getSummary(req:any,res:any){
     setCommonHeaders(res);
      if(cacheManagerTransactionRoutes.has(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY)){
         const events:any = cacheManagerTransactionRoutes.get(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY);
-        const out:string = transactionSummary(events);
-        console.log('XXXXXXXXXXXXXXXXXXXXXX',out);
+        const out:any = transactionSummary(events);
         return out !== '' ? res.status(200).send(out) : res.status(204).send('');
     } else {
         const events:any = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-        const out:string = transactionSummary(events);
-        console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',out);
+        const out:any = transactionSummary(events);
         cacheManagerTransactionRoutes.set(GlobalConfiguration.appEnumerations.CACHE_API_TRANSACTIONROUTES_GET_SUMMARY,out,GlobalConfiguration.configurationDeliveryMap.get(GlobalConfiguration.appEnumerations.CACHE_API_GLOBAL_EXPIERY_MILLISECONDS));
 
         return out !== ''  ? res.status(200).send(out) : res.status(204).send('');
