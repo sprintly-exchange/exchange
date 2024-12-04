@@ -6,6 +6,7 @@ import {ConfigurationFileStorage } from '../configurationProcessor/Configuration
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 import bcrypt from 'bcryptjs';
+import { getOrganizationByName, getUserByName } from './serverCommon.mjs';
 
 //Global enums
 
@@ -25,16 +26,17 @@ const defaultRoleOrganizationAdmin = {
   role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN
 };
 
-//add default organizaton
-const defaultOrg = {
-    id : `${uuidv4()}`,
-    name : GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME,
-    address: 'Default Address',
-    email: 'mycompany@no-reply.com',
-    phone:'+99 999999999', 
-    isDefaultUiDisplayFalse : true,
-    isDefault:true,
-    registrationDate: new Date().toISOString(),
+
+let defaultOrg = {
+
+  id : '',
+  name :'',
+  address: '',
+  email: '',
+  phone:'', 
+  isDefaultUiDisplayFalse : true,
+  isDefault:true,
+  registrationDate:'',
 };
 
 let defaultUser = {
@@ -52,37 +54,46 @@ async function generatePassword() {
   return password;
 }
 
-async function ensureDefaultUser() {
-  defaultUser = {
-    id: `${uuidv4()}`,
-    username : GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME,
-    password :  `${await generatePassword()}`,
-    organizationId: `${defaultOrg.id}`,
-    roleId : `${defaultRoleAdmin.id}`,
-    registrationDate: new Date().toISOString(),
-};
-  
-};
 
- const ensureDefaultOrganization = async () => {
+ const ensureDefaultOrganizationAndUser = async () => {
     // Check if the default organization exists
     let organizationExists = false;
     organizationExists = Array.from(GlobalConfiguration.organizationsMap.values()).some(org => org.name === GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME);
     if(organizationExists){
-      console.log('Default organitaion exists')
+      console.log('Default organitaion exists');
+      defaultOrg = getOrganizationByName(GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME);
     }else{
-        console.log('Adding default organization')
+        console.log('Adding default organization');
+        defaultOrg = {
+          id : `${uuidv4()}`,
+          name : GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME,
+          address: 'Default Address',
+          email: 'mycompany@no-reply.com',
+          phone:'+99 999999999', 
+          isDefaultUiDisplayFalse : true,
+          isDefault:true,
+          registrationDate: new Date().toISOString(),
+      };
         GlobalConfiguration.organizationsMap.set(defaultOrg.id, defaultOrg) ;
     }
       
-    //console.log('Default user ', defaultUser);
     // Check if the default user exists
     let userExists = false;
     userExists = Array.from(GlobalConfiguration.organizationsUsersMap.values()).some(user =>  user.username === GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME);
+
     if(userExists){
-      console.log('Default admin user exists') 
+      console.log('Default admin user exists');
+      defaultUser = getUserByName(GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME);
     }else{
-      console.log('Adding default admin user.')
+      console.log('Adding default admin user.');
+      defaultUser = {
+          id: `${uuidv4()}`,
+          username : GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME,
+          password :  `${await generatePassword()}`,
+          organizationId: `${defaultOrg.id}`,
+          roleId : `${defaultRoleAdmin.id}`,
+          registrationDate: new Date().toISOString(),
+      };
       GlobalConfiguration.organizationsUsersMap.set(defaultUser.id,defaultUser);
     }
     return true;
@@ -177,8 +188,7 @@ export const initFunction = async () => {
 
 
         await GlobalConfiguration.configurationProcessor.loadConfigurations();
-        await ensureDefaultUser();
-        await ensureDefaultOrganization();
+        await ensureDefaultOrganizationAndUser
         await ensureDefaultRoles();
         await ensureSystemSettings();
 

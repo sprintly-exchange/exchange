@@ -76,6 +76,26 @@ export function getUserId(nameIn:string){
     return userId;
 };
 
+export function getUserByName(nameIn:string):any{
+    let user=null;
+    for (let user of GlobalConfiguration.organizationsUsersMap.values()) {
+        if (user.username === nameIn) {
+            user = GlobalConfiguration.organizationsUsersMap.get(user.id);
+        }
+    }
+    return user;
+};
+
+export function getOrganizationByName(nameIn:string):any{
+    let org=null;
+    for (let org of GlobalConfiguration.organizationsMap.values()) {
+        if (org.name === nameIn) {
+            org = GlobalConfiguration.organizationsMap.get(org.id);
+        }
+    }
+    return org;
+};
+
 export function getUserById(userId:any){
     return GlobalConfiguration.organizationsUsersMap.get(userId);
 };
