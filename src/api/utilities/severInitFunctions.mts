@@ -9,24 +9,18 @@ import bcrypt from 'bcryptjs';
 import { getOrganizationByName, getUserByName } from './serverCommon.mjs';
 import { Organization } from '../models/Organization.mjs';
 import { User } from '../models/User.mjs';
+import { OrganizationRole } from '../models/OrganizationRole.mjs';
 
 //Global enums
 
 
-const defaultRoleAdmin = {
-  id: `${uuidv4()}`,
-  role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN,
-};
-
-const defaultRoleOrganizationUser = {
+let defaultRoleAdmin:OrganizationRole|undefined;
+const defaultRoleOrganizationUser:OrganizationRole= {
   id: `${uuidv4()}`,
   role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER,
 };
 
-const defaultRoleOrganizationAdmin = {
-  id: `${uuidv4()}`,
-  role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN
-};
+let defaultRoleOrganizationAdmin:OrganizationRole|undefined;
 
 
 let defaultOrg:Organization|undefined=undefined ;
@@ -74,7 +68,7 @@ async function generatePassword() {
           username : GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME,
           password :  `${await generatePassword()}`,
           organizationId: `${defaultOrg?defaultOrg.id:undefined}`,
-          roleId : `${defaultRoleAdmin.id}`,
+          roleId : `${defaultRoleAdmin?defaultRoleAdmin.id:undefined}`,
           registrationDate: new Date().toISOString(),
       };
       GlobalConfiguration.organizationsUsersMap.set(defaultUser.id,defaultUser);
@@ -88,10 +82,13 @@ async function generatePassword() {
 
           // Check if the default admin user role exists
           if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-            const userExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN);
-            //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
-            if(!userExists){
+            const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN);
+            if(!roleExists){
               console.log('Adding application admin user role.')
+              defaultRoleAdmin = {
+                id: `${uuidv4()}`,
+                role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN,
+              }
               GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleAdmin.id,defaultRoleAdmin);
             }else{
               console.log('Default application admin user role exists.')
@@ -99,10 +96,14 @@ async function generatePassword() {
           } 
         
         if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-          const userExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
+          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
           //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
-          if(!userExists){
+          if(!roleExists){
             console.log('Adding organization admin role.')
+            defaultRoleOrganizationAdmin = {
+              id: `${uuidv4()}`,
+              role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN
+            };
             GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleOrganizationAdmin.id,defaultRoleOrganizationAdmin);
           }else{
             console.log('Default organization admin role exists.')
@@ -111,9 +112,9 @@ async function generatePassword() {
 
         // Check if the default organization user role exists
         if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-          const userExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
           //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
-          if(!userExists){
+          if(!roleExists){
             console.log('Adding organization user role.')
             GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleOrganizationUser.id,defaultRoleOrganizationUser);
           }else{
@@ -171,9 +172,9 @@ export const initFunction = async () => {
 
 
         await GlobalConfiguration.configurationProcessor.loadConfigurations();
-        await ensureDefaultOrganizationAndUser
         await ensureDefaultRoles();
         await ensureSystemSettings();
+        await ensureDefaultOrganizationAndUser();
 
         //Setting config saving interval
         const saveInterval = 10000; // 10 seconds
