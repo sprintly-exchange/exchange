@@ -7,6 +7,8 @@ import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 import bcrypt from 'bcryptjs';
 import { getOrganizationByName, getUserByName } from './serverCommon.mjs';
+import { Organization } from '../models/Organization.mjs';
+import { User } from '../models/User.mjs';
 
 //Global enums
 
@@ -27,27 +29,8 @@ const defaultRoleOrganizationAdmin = {
 };
 
 
-let defaultOrg = {
-
-  id : '',
-  name :'',
-  address: '',
-  email: '',
-  phone:'', 
-  isDefaultUiDisplayFalse : true,
-  isDefault:true,
-  registrationDate:'',
-};
-
-let defaultUser = {
-  id:'',
-  username:'',
-  password:'',
-  organizationId:'',
-  roleId:'',
-  registrationDate:''
-
-};
+let defaultOrg:Organization|undefined=undefined ;
+let defaultUser:User|undefined=undefined ;
 
 async function generatePassword() {
   const password = await bcrypt.hash('changeme', 10);
@@ -90,7 +73,7 @@ async function generatePassword() {
           id: `${uuidv4()}`,
           username : GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME,
           password :  `${await generatePassword()}`,
-          organizationId: `${defaultOrg.id}`,
+          organizationId: `${defaultOrg?defaultOrg.id:undefined}`,
           roleId : `${defaultRoleAdmin.id}`,
           registrationDate: new Date().toISOString(),
       };

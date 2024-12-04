@@ -1,6 +1,8 @@
 import { userInfo } from "os";
 import { getAuthDetails } from "./getOrganization&User.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import { Organization } from "../models/Organization.mjs";
+import { User } from "../models/User.mjs";
 
 export function setCommonHeaders(res:any){
     res.setHeader("Access-Control-Allow-Methods", "*");
@@ -76,24 +78,24 @@ export function getUserId(nameIn:string){
     return userId;
 };
 
-export function getUserByName(nameIn:string):any{
-    let user=null;
+export function getUserByName(nameIn:string):User|undefined{
+    let retUser:User|undefined = undefined;
     for (let user of GlobalConfiguration.organizationsUsersMap.values()) {
         if (user.username === nameIn) {
-            user = GlobalConfiguration.organizationsUsersMap.get(user.id);
+            retUser = GlobalConfiguration.organizationsUsersMap.get(user.id);
         }
     }
-    return user;
+    return retUser;
 };
 
-export function getOrganizationByName(nameIn:string):any{
-    let org=null;
+export function getOrganizationByName(nameIn:string):Organization|undefined{
+    let retOrg:Organization|undefined=undefined;
     for (let org of GlobalConfiguration.organizationsMap.values()) {
         if (org.name === nameIn) {
-            org = GlobalConfiguration.organizationsMap.get(org.id);
+            retOrg = GlobalConfiguration.organizationsMap.get(org.id);
         }
     }
-    return org;
+    return retOrg;
 };
 
 export function getUserById(userId:any){
