@@ -7,7 +7,7 @@ import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
 import os from 'os';
 import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
-import { TransactionProcessorA } from './TransactionProcessorA.js';
+import { TransactionProcessorA } from './TransactionProcessorA.mjs';
 
 export class TransactionProcessorFTP  extends TransactionProcessorA {
     ftpClientProcessor:any;

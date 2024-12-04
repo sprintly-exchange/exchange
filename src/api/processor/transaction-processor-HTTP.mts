@@ -1,7 +1,7 @@
 import { HTTPClient } from "../../client/http-client.mjs";
 import Transaction from "../models/Transaction.mjs";
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
-import { TransactionProcessorA } from "./TransactionProcessorA.js";
+import { TransactionProcessorA } from "./TransactionProcessorA.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
 export class TransactionProcessorHTTP extends TransactionProcessorA {

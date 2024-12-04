@@ -1,5 +1,5 @@
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
-import { TransactionProcessorI } from "./TransactionProcessorI";
+import { TransactionProcessorI } from "./TransactionProcessorI.mjs";
 import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 
