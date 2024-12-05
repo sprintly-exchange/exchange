@@ -3,6 +3,7 @@ import { getAuthDetails } from "./getOrganization&User.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 import { Organization } from "../models/Organization.mjs";
 import { User } from "../models/User.mjs";
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export function setCommonHeaders(res:any){
     res.setHeader("Access-Control-Allow-Methods", "*");

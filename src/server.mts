@@ -28,7 +28,7 @@ import { initFunction} from './api/utilities/severInitFunctions.mjs';
 import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
 import GlobalConfiguration from './GlobalConfiguration.mjs';
-import { CommonFunctions } from './api/utilities/serverCommon.mjs';
+import { CommonFunctions } from './api/models/CommonFunctions.mjs';
 
 const SERVER_PORT = process.env.SERVER_PORT || 4000;
 
