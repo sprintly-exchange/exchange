@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
+import { belongsToA } from './BelongsToA.mjs';
 
-export class Connection{
+export class Connection extends belongsToA{
     id;
     connectionName;
     host;
@@ -10,6 +11,7 @@ export class Connection{
     retryAttemps;
     authenticationType:any;
     constructor(connectionName:any,host:any,port:any,protocol:any,retryInterval:any,retryAttemps:any){
+      super();
       this.id = uuidv4();
       this.connectionName = connectionName;
       this.host = host;

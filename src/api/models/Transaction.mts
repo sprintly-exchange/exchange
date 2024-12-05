@@ -1,7 +1,8 @@
 import {v4 as uuidv4} from 'uuid';
+import { belongsToA } from './BelongsToA.mjs';
 
 // Classes related to store the tranaction configruation
-export class Transaction{
+export class Transaction extends belongsToA {
     id;
     flowName='';
     parentId='';
@@ -58,6 +59,7 @@ export class Transaction{
     
 
     constructor(processingTime:any,status:any,pickupId:any,pickupProtocol:any,pickupHost:any,pickupPort:any,pickupName:any,deliveryId:any,deliveryProtocol:any,deliveryHost:any,deliveryPort:any,deliveryName:any,processingId:any,parentId:any,childId:any,flowName:any,organizationId:any){
+      super();
       this.id = uuidv4();
       this.deliveryStatus = status;
       this.processingTime = processingTime;
@@ -83,6 +85,8 @@ export class Transaction{
     getId(){
       return this.id;
     }
+
+   
  }
 
 export default Transaction;

@@ -1,8 +1,10 @@
 
+import { before } from 'lodash';
 import {v4 as uuidv4} from 'uuid';
+import { belongsToA } from './BelongsToA.mjs';
 
 
-export class ConnectionFS{
+export class ConnectionFS extends belongsToA{
     path;
     connectionName;
     protocol;
@@ -11,6 +13,7 @@ export class ConnectionFS{
     id;
 
     constructor(connectionName:any,path:any,retryInterval:any,retryAttemps:any){
+      super();
       this.id = uuidv4();
       this.connectionName = connectionName;
       this.protocol = 'FS';
