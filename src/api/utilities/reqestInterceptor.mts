@@ -42,7 +42,7 @@ export const decodeToken = async (req:any, res:any, next:any) => {
       next();
     }
   } catch (error) {
-    console.error('JWT verification error:', error);
+    CommonFunctions.logWithTimestamp('JWT verification error:', error);
     return res.status(400).send('Invalid Token');
   }
 };

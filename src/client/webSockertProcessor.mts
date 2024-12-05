@@ -27,7 +27,7 @@ export class TransactionProcessorWEBSOCKET {
     };
 
     websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      CommonFunctions.logWithTimestamp('WebSocket error:', error);
     };
   }
 
@@ -46,7 +46,7 @@ export class TransactionProcessorWEBSOCKET {
     };
 
     websocket.onerror = (error:any) => {
-      console.error('WebSocket error:', error);
+      CommonFunctions.logWithTimestamp('WebSocket error:', error);
       // Set the delivery error in case of WebSocket error
       transactionProcessManagerInput.transaction.deliveryError = error.message;
     };

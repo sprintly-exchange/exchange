@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class FSClient {
   constructor(){
@@ -11,7 +12,7 @@ export class FSClient {
       const data = await fs.readFileSync(filePath, 'utf8');
       return await data;
     } catch (err) {
-      console.error('Error reading file:', err);
+      CommonFunctions.logWithTimestamp('Error reading file:', err);
       return null;
     }
   }
@@ -22,7 +23,7 @@ export class FSClient {
       console.debug('File successfully written.', filePath);
       return true;
     } catch (err) {
-      console.error('Error writing file:', err);
+      CommonFunctions.logWithTimestamp('Error writing file:', err);
       return false;
     }
   }
@@ -55,7 +56,7 @@ export class FSClient {
   
       return oldestFile;
     } catch (err) {
-      console.error('Error getting oldest file:', err);
+      CommonFunctions.logWithTimestamp('Error getting oldest file:', err);
       return null;
     }
   }
@@ -67,7 +68,7 @@ async  deleteFile(filePath:string) {
     await fs.promises.unlink(filePath);
     console.debug('File deleted successfully');
   } catch (err) {
-    console.error('Error deleting file:', err);
+    CommonFunctions.logWithTimestamp('Error deleting file:', err);
   }
 }
 

@@ -54,7 +54,7 @@ export class httpClientProcessorJWT {
       });
       return response.data;
     } catch (error:any) {
-      console.error('Error making HTTP request:', error.message);
+      CommonFunctions.logWithTimestamp('Error making HTTP request:', error.message);
       throw error;
     }
   }
@@ -68,7 +68,7 @@ export class httpClientProcessorJWT {
       });
       return authResponse.data.token;
     } catch (error:any) {
-      console.error('Error fetching auth token:', error.message);
+      CommonFunctions.logWithTimestamp('Error fetching auth token:', error.message);
       throw error;
     }
   }
@@ -83,7 +83,7 @@ export class httpClientProcessorJWT {
       };
       return await this.makeHttpRequest(url, method, headers, data);
     } catch (error:any) {
-      console.error('Error making authenticated request:', error.message);
+      CommonFunctions.logWithTimestamp('Error making authenticated request:', error.message);
       throw error;
     }
   }
@@ -97,7 +97,7 @@ export class httpClientProcessorJWT {
       const response = await this.makeAuthenticatedRequest(this.apiUrl, this.method, data);
       CommonFunctions.logWithTimestamp('Response:', response);
     } catch (error:any) {
-      console.error('Error in main function:', error.message);
+      CommonFunctions.logWithTimestamp('Error in main function:', error.message);
     }
   }
 }

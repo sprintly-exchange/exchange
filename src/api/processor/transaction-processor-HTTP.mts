@@ -45,7 +45,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
               }catch(error:any){
-                  //console.error("Unexpected error : ",error);
+                  //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.pickupError = error.message;
                   transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                   return false;
@@ -71,7 +71,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
             }catch(error:any){
-                //console.error("Unexpected error : ",error);
+                //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupError = error.message;
                 transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 return false;
@@ -122,7 +122,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                   await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction); 
               }catch(error:any){
-                  //console.error("Unexpected error : ",error);
+                  //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
                   transactionProcessManagerInput.transaction.deliveryProcessingError = error;
                   transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                   transactionProcessManagerInput.transaction.deliveryError = error.message;
@@ -149,7 +149,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
             }catch(error:any){
-                //console.error("Unexpected error : ",error);
+                //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.pickupProcessingError = error;
                 transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 transactionProcessManagerInput.transaction.deliveryError = error.message;
@@ -173,7 +173,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);         
               }catch(error:any){
-                //console.error("Unexpected error : ",error);
+                //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
                 transactionProcessManagerInput.transaction.deliveryProcessingError = error;
                 transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                 transactionProcessManagerInput.transaction.deliveryError = error.message;
@@ -200,7 +200,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
               await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
               await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
           }catch(error:any){
-              //console.error("Unexpected error : ",error);
+              //CommonFunctions.logWithTimestamp("Unexpected error : ",error);
               transactionProcessManagerInput.transaction.pickupProcessingError = error;
               transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
               transactionProcessManagerInput.transaction.deliveryError = error.message;

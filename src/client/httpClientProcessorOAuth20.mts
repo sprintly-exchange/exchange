@@ -63,7 +63,7 @@ export class HttpClientProcessorOAuth20 {
       });
       return response.data;
     } catch (error:any) {
-      console.error('Error making HTTP request:', error.message);
+      CommonFunctions.logWithTimestamp('Error making HTTP request:', error.message);
       throw error;
     }
   }
@@ -78,7 +78,7 @@ export class HttpClientProcessorOAuth20 {
       });
       return tokenResponse.data.access_token;
     } catch (error:any) {
-      console.error('Error fetching access token:', error.message);
+      CommonFunctions.logWithTimestamp('Error fetching access token:', error.message);
       throw error;
     }
   }
@@ -93,7 +93,7 @@ export class HttpClientProcessorOAuth20 {
       });
       return tokenResponse.data.access_token;
     } catch (error:any) {
-      console.error('Error refreshing token:', error.message);
+      CommonFunctions.logWithTimestamp('Error refreshing token:', error.message);
       throw error;
     }
   }
@@ -108,7 +108,7 @@ export class HttpClientProcessorOAuth20 {
       };
       return await this.makeHttpRequest(url, method, headers, data);
     } catch (error:any) {
-      console.error('Error making authenticated request:', error.message);
+      CommonFunctions.logWithTimestamp('Error making authenticated request:', error.message);
       throw error;
     }
   }
@@ -121,7 +121,7 @@ export class HttpClientProcessorOAuth20 {
       const response = await this.makeAuthenticatedRequest(this.apiUrl, this.method, data);
       CommonFunctions.logWithTimestamp('Response:', response);
     } catch (error:any) {
-      console.error('Error in main function:', error.message);
+      CommonFunctions.logWithTimestamp('Error in main function:', error.message);
     }
   }
 }

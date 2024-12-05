@@ -58,7 +58,7 @@ export class KfkaClientProcessor {
       });
       CommonFunctions.logWithTimestamp(`Produced message to topic: ${topic}`);
     } catch (error:any) {
-      console.error('Error producing message:', error.message);
+      CommonFunctions.logWithTimestamp('Error producing message:', error.message);
     } finally {
       await producer.disconnect();
       CommonFunctions.logWithTimestamp('Disconnected Kafka producer');
@@ -81,7 +81,7 @@ export class KfkaClientProcessor {
         },
       });
     } catch (error:any) {
-      console.error('Error consuming messages:', error.message);
+      CommonFunctions.logWithTimestamp('Error consuming messages:', error.message);
     } finally {
       await consumer.disconnect();
       CommonFunctions.logWithTimestamp('Disconnected Kafka consumer');

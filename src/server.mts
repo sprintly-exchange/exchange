@@ -154,11 +154,11 @@ function processRules() {
       if(configPickup && configDelivery && configProcessing && configurationFlowMapItem ){
         transactionProcessManager = new TransactionProcessManager(configPickup, configDelivery, configProcessing, configurationFlowMapItem);
       } else {
-        console.error('Setting up processing rule error');
-        !configPickup && console.error('configPickup:',configPickup);
-        !configDelivery && console.error('configDelivery:',configDelivery);
-        !configProcessing && console.error('configProcessing:',configProcessing);
-        !configurationFlowMapItem && console.error('configurationFlowMapItem :',configurationFlowMapItem);
+        CommonFunctions.logWithTimestamp('Setting up processing rule error');
+        !configPickup && CommonFunctions.logWithTimestamp('configPickup:',configPickup);
+        !configDelivery && CommonFunctions.logWithTimestamp('configDelivery:',configDelivery);
+        !configProcessing && CommonFunctions.logWithTimestamp('configProcessing:',configProcessing);
+        !configurationFlowMapItem && CommonFunctions.logWithTimestamp('configurationFlowMapItem :',configurationFlowMapItem);
         return;
       }
      

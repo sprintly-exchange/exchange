@@ -52,7 +52,7 @@ export class SftplientProcessor {
       await this.sftp.connect(sftpConfig);
       CommonFunctions.logWithTimestamp(`Connected to SFTP server at ${this.host}`);
     } catch (error:any) {
-      console.error('Error connecting to SFTP server:', error.message);
+      CommonFunctions.logWithTimestamp('Error connecting to SFTP server:', error.message);
       throw error;
     }
   }
@@ -63,7 +63,7 @@ export class SftplientProcessor {
       CommonFunctions.logWithTimestamp('Files in SFTP basePath:', fileList);
       return fileList;
     } catch (error:any) {
-      console.error('Error listing files:', error.message);
+      CommonFunctions.logWithTimestamp('Error listing files:', error.message);
       throw error;
     }
   }
@@ -73,7 +73,7 @@ export class SftplientProcessor {
       await this.sftp.put(localFilePath, remoteFilePath);
       CommonFunctions.logWithTimestamp(`Uploaded ${localFilePath} to ${remoteFilePath}`);
     } catch (error:any) {
-      console.error('Error uploading file:', error.message);
+      CommonFunctions.logWithTimestamp('Error uploading file:', error.message);
       throw error;
     }
   }
@@ -83,7 +83,7 @@ export class SftplientProcessor {
       await this.sftp.get(remoteFilePath, localFilePath);
       CommonFunctions.logWithTimestamp(`Downloaded ${remoteFilePath} to ${localFilePath}`);
     } catch (error:any) {
-      console.error('Error downloading file:', error.message);
+      CommonFunctions.logWithTimestamp('Error downloading file:', error.message);
       throw error;
     }
   }
@@ -93,7 +93,7 @@ export class SftplientProcessor {
       await this.sftp.end();
       CommonFunctions.logWithTimestamp('SFTP connection closed');
     } catch (error:any) {
-      console.error('Error closing SFTP connection:', error.message);
+      CommonFunctions.logWithTimestamp('Error closing SFTP connection:', error.message);
       throw error;
     }
   }
@@ -108,7 +108,7 @@ export class SftplientProcessor {
       const downloadedFilePath = '/path/to/downloaded/file.txt';
       await this.downloadFile(remoteFilePath, downloadedFilePath);
     } catch (error:any) {
-      console.error('Error in execute:', error.message);
+      CommonFunctions.logWithTimestamp('Error in execute:', error.message);
     } finally {
       await this.disconnect();
     }

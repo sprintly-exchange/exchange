@@ -19,7 +19,7 @@ export class MessageStoreGeneric {
                 this._messageStorage = new FileStorage('FS');
                 this._messageStorage.storageLocation = '/tmp';
                 CommonFunctions.logWithTimestamp("Setting storage type to FS");
-                console.error("Storage type not defined, current supported type is FS (file system)");
+                CommonFunctions.logWithTimestamp("Storage type not defined, current supported type is FS (file system)");
             }
         }
     }

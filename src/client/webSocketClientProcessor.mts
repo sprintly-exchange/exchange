@@ -62,7 +62,7 @@ export class WebSocketClientProcessor {
     });
 
     this.ws.on('error', (error:any) => {
-      console.error('WebSocket error:', error.message);
+      CommonFunctions.logWithTimestamp('WebSocket error:', error.message);
     });
   }
 
@@ -78,7 +78,7 @@ export class WebSocketClientProcessor {
     try {
       this.sendWebSocketData({ type: 'message', content: 'Hello WebSocket!' });
     } catch (error:any) {
-      console.error('Error in main function:', error.message);
+      CommonFunctions.logWithTimestamp('Error in main function:', error.message);
     }
   }
 }

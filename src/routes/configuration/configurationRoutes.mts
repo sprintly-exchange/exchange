@@ -166,7 +166,7 @@ async function updateSystemSettings(req:any, res:any) {
 
         res.status(200).json({ message: 'System settings updated successfully' });
     } catch (error) {
-        console.error('Error updating system settings:', error);
+        CommonFunctions.logWithTimestamp('Error updating system settings:', error);
         res.status(500).json(new ResponseMessage(uuidv4(),'Internal server error','Failed'));
     }
 }

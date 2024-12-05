@@ -213,7 +213,7 @@ userRoutes.put('/edit-user', async (req:any, res:any) => {
         GlobalConfiguration.organizationsUsersMap.set(id, user);
         res.status(200).send(new ResponseMessage(uuidv4(),'User updated successfully','Sucess'));
     } catch (error) {
-        console.error(error); // Log the error for debugging purposes
+        CommonFunctions.logWithTimestamp(error); // Log the error for debugging purposes
         res.status(500).send('Internal server error'); // Send a generic error message to the client
     }
 });
@@ -274,7 +274,7 @@ const deleteUser = async (req:any,res:any)  => {
         }
     } else {
         // Handle case where authDetails is undefined or missing userId
-        console.error('Authorization details are missing or invalid');
+        CommonFunctions.logWithTimestamp('Authorization details are missing or invalid');
     }
     
 }
@@ -423,7 +423,7 @@ const filterRoles = async  (req:any,res:any) =>  {
             }
             } else {
                 // Handle case where authDetails is undefined or missing userId
-                console.error('Authorization details are missing or invalid');
+                CommonFunctions.logWithTimestamp('Authorization details are missing or invalid');
             }
         
     }catch(error){

@@ -76,7 +76,7 @@ export class FtpClientProcessor {
       CommonFunctions.logWithTimestamp('Connected to FTP server');
       return true;
     } catch (err) {
-      console.error('Error connecting to FTP server:', err);
+      CommonFunctions.logWithTimestamp('Error connecting to FTP server:', err);
       return false
     }
   }
@@ -88,7 +88,7 @@ export class FtpClientProcessor {
       await this.ftp.uploadFrom(localFilePath, remoteFilePath);
       CommonFunctions.logWithTimestamp(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
     } catch (err) {
-      console.error('Error uploading file:', err);
+      CommonFunctions.logWithTimestamp('Error uploading file:', err);
       throw err;
     }
   }
@@ -100,7 +100,7 @@ export class FtpClientProcessor {
       await this.ftp.uploadFrom(localFilePath, remoteFilePath);
       CommonFunctions.logWithTimestamp(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
     } catch (err) {
-      console.error('Error uploading file:', err);
+      CommonFunctions.logWithTimestamp('Error uploading file:', err);
       throw err;
     }
   }
@@ -117,7 +117,7 @@ export class FtpClientProcessor {
       CommonFunctions.logWithTimestamp("Downloaded file from ftp server : ",fileContent);
       return fileContent;
     } catch (err) {
-      console.error('Error downloading file:', err);
+      CommonFunctions.logWithTimestamp('Error downloading file:', err);
       throw err;
     }
   }
@@ -128,7 +128,7 @@ export class FtpClientProcessor {
       //CommonFunctions.logWithTimestamp('Files in remote directory:', fileList);
       return fileList;
     } catch (err) {
-      console.error('Error listing files:', err);
+      CommonFunctions.logWithTimestamp('Error listing files:', err);
       throw err;
     }
   }
@@ -143,7 +143,7 @@ export class FtpClientProcessor {
       }
       CommonFunctions.logWithTimestamp('Downloaded all files.');
     } catch (err) {
-      console.error('Error downloading all files:', err);
+      CommonFunctions.logWithTimestamp('Error downloading all files:', err);
       throw err;
     }
   }
@@ -155,7 +155,7 @@ export class FtpClientProcessor {
       CommonFunctions.logWithTimestamp(`Read file content: ${localFilePath}`);
       return fileContent;
     } catch (err) {
-      console.error('Error reading file:', err);
+      CommonFunctions.logWithTimestamp('Error reading file:', err);
       throw err;
     }
   }
@@ -166,7 +166,7 @@ export class FtpClientProcessor {
       await this.ftp.remove(remoteFilePath);
       CommonFunctions.logWithTimestamp(`Deleted file: ${remoteFilePath}`);
     } catch (err) {
-      console.error('Error deleting file:', err);
+      CommonFunctions.logWithTimestamp('Error deleting file:', err);
       throw err;
     }
   }
@@ -176,7 +176,7 @@ export class FtpClientProcessor {
       await this.ftp.close();
       CommonFunctions.logWithTimestamp('Disconnected from FTP server');
     } catch (err) {
-      console.error('Error disconnecting from FTP server:', err);
+      CommonFunctions.logWithTimestamp('Error disconnecting from FTP server:', err);
       throw err;
     }
   }

@@ -116,7 +116,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
           }
       } else {
           // Handle the case where email or result is undefined
-          console.error('Google token verification failed or email is missing');
+          CommonFunctions.logWithTimestamp('Google token verification failed or email is missing');
       }
       
       return returnObj;
@@ -177,7 +177,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
           throw new Error('Token does not contain a valid payload with an email');
       }
     } catch (error:any) {
-      console.error('Error verifying token:', error.message);
+      CommonFunctions.logWithTimestamp('Error verifying token:', error.message);
   
     }
   };

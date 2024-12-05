@@ -115,7 +115,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                         transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
                     })
                     .catch((err) => {
-                        console.error(err);
+                        CommonFunctions.logWithTimestamp(err);
                         transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
                         transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
                         transactionProcessManagerInput.transaction.deliveryError = err.message;
@@ -151,7 +151,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
             tempFilePath = tempFilePath.replace(/\/\//g, '/');
             return tempFilePath;
         } catch (err) {
-            console.error("Error creating temporary file:", err);
+            CommonFunctions.logWithTimestamp("Error creating temporary file:", err);
             throw err;
         }
     }

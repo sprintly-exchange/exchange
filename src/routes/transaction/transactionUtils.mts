@@ -23,7 +23,7 @@ export function countFlowNamePerMinute(events: any): any {
 
 export function transactionSummary(events:any) {
     if (!events || typeof events.forEach !== 'function') {
-      console.error("Invalid 'events' provided:", events);
+      CommonFunctions.logWithTimestamp("Invalid 'events' provided:", events);
       return { total: '0', failures: '0', successes: '0', inprocessing: '0' };
     }
   

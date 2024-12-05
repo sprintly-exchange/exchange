@@ -130,12 +130,12 @@ export class TransactionProcessManager{
                         CommonFunctions.logWithTimestamp('Method executed successfully:', result);
                         //return result; // Return result if needed
                   } else {
-                        console.error('Generated object does not have a valid method to execute.');
+                        CommonFunctions.logWithTimestamp('Generated object does not have a valid method to execute.');
                   }
                   } catch (error:any) {
                   this.transaction.configurationProcessingError=error.toString();
                   this.commonTransactionUtils.addTransaction(this.transaction);
-                  console.error('Error executing processing transformation:', error);
+                  CommonFunctions.logWithTimestamp('Error executing processing transformation:', error);
                   // Handle error accordingly, maybe return a default value or rethrow
                   return false;
                   }
