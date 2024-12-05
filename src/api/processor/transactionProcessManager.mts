@@ -73,20 +73,20 @@ export class TransactionProcessManager{
             CommonFunctions.logWithTimestamp('Processing pickup : ', this.transaction.id);
             switch(this.configPickup.protocol){
                   //Pickup from file connector from localhost
-                  case 'FS': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_FS: {
                         await this.transactionProcessorFS.transactionProcessorPickup(this);
                         this.commonTransactionUtils.addTransaction(this.transaction);   
                         await GlobalConfiguration.configurationProcessingQueue.enqueue(this); 
                         break;   
                   } 
                    //Pikcup from http GET request
-                  case 'HTTP': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_HTTP: {
                         await this.transactionProcessorHTTP.transactionProcessorPickup(this)
                         this.commonTransactionUtils.addTransaction(this.transaction);  
                         await GlobalConfiguration.configurationProcessingQueue.enqueue(this);   
                         break; 
                   }           
-                  case 'FTP': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_FTP: {
                         //flow name is required as this is handled in seperate way
                         await this.transactionProcessorFTP.transactionProcessorPickup(this);
                         
@@ -154,19 +154,19 @@ export class TransactionProcessManager{
             CommonFunctions.logWithTimestamp('Processing delivery : ', this.transaction.id);
             switch(this.configDelivery.protocol){
                   //Delviery to localhost through file connector
-                  case 'FS': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_FS: {
                         await this.transactionProcessorFS.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
                   }
                   //Delivery to HTTP POST
-                  case 'HTTP': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_HTTP: {
                         CommonFunctions.logWithTimestamp('********** HTTP DELIVERY');
                         await this.transactionProcessorHTTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
                   } 
-                  case 'FTP': {
+                  case GlobalConfiguration.appEnumerations.COMMUNICATION_PROTOCOL_TYPE_FTP: {
                         //flow name is required as this is handled in seperate way
                         CommonFunctions.logWithTimestamp('********** FTP DELIVERY');
                         await this.transactionProcessorFTP.transactionProcessorDelivery(this);
