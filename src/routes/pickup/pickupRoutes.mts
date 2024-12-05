@@ -23,7 +23,7 @@ const pickupRoutes = Router();
  *         description: Pickup created
  */
 pickupRoutes.post('/', function (req, res) {  
-    console.debug(`Pickup request received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Pickup request received : ${JSON.stringify(req.body)}`);
     setCommonHeaders(res);
     if(req.body === '[]') 
       res.status(400).send('No data');
@@ -40,7 +40,7 @@ pickupRoutes.post('/', function (req, res) {
 });
 
 pickupRoutes.put('/', function (req, res) {  
-      console.debug(`Pickup update request received : ${JSON.stringify(req.body)}`);
+      CommonFunctions.logWithTimestamp(`Pickup update request received : ${JSON.stringify(req.body)}`);
       setCommonHeaders(res);
       if(req.body.id === undefined || req.body === '[]'){
             res.status(400).send('No data'); 
@@ -53,7 +53,7 @@ pickupRoutes.put('/', function (req, res) {
   });
 
   pickupRoutes.get('/', function (req, res) {   
-    console.debug(`All pickups requested`);
+    CommonFunctions.logWithTimestamp(`All pickups requested`);
     getPickups(req, res);
   });
   
@@ -107,7 +107,7 @@ pickupRoutes.put('/', function (req, res) {
 *           format: string
 */
 pickupRoutes.get('/:id', function (req, res) {   
-    console.debug(`Pickup id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Pickup id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.configurationPickupMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationPickupMap.get(req.params.id))) : res.status(204).send('{}') ;
 });
@@ -133,7 +133,7 @@ pickupRoutes.delete('/:id', function (req, res) {
 });
 
 async function deletePickup(req:any, res:any) {   
-  console.debug(`Pickup deletion id requested : ${req.params.id}`);
+  CommonFunctions.logWithTimestamp(`Pickup deletion id requested : ${req.params.id}`);
   setCommonHeaders(res);
   CommonFunctions.logWithTimestamp(`Attemting to delete pickup with id :  ${req.params.id}`);
 

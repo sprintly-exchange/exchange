@@ -32,7 +32,7 @@ const transactionRoutes = Router();
  */
 
 transactionRoutes.get('/', function (req, res) {   
-    console.debug(`All transactions requested`);
+    CommonFunctions.logWithTimestamp(`All transactions requested`);
     getTransactions(req,res);   
 });
 
@@ -67,7 +67,7 @@ transactionRoutes.delete('/:id', function (req, res) {
 
 
 async function deleteTransaction(req:any, res:any) {   
-    console.debug(`Transaction deletion id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Transaction deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     CommonFunctions.logWithTimestamp(`Attempting to delete transaction with id :  ${req.params.id}`);
     CommonFunctions.logWithTimestamp(`Current transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
@@ -90,7 +90,7 @@ async function deleteTransaction(req:any, res:any) {
  */
 
 transactionRoutes.get('/statistics/minute', function (req, res) {   
-    console.debug(`Statistics transactions /statistics/minute requested.`);
+    CommonFunctions.logWithTimestamp(`Statistics transactions /statistics/minute requested.`);
     statisticsPerMinute(req,res);
 });
 
@@ -115,7 +115,7 @@ async function statisticsPerMinute(req:any,res:any){
  */
 
 transactionRoutes.get('/statistics/summary', function (req, res) {   
-    console.debug(`Statistics transactions /statistics/summary requested.`);
+    CommonFunctions.logWithTimestamp(`Statistics transactions /statistics/summary requested.`);
     getSummary(req,res);
 });
 
@@ -142,7 +142,7 @@ async function getSummary(req:any,res:any){
  */
 
 transactionRoutes.get('/statistics/summary/statuses', function (req, res) {   
-    console.debug(`Statistics transactions /statistics/summary/statuses requested.`);
+    CommonFunctions.logWithTimestamp(`Statistics transactions /statistics/summary/statuses requested.`);
     getSummaryStatuses(req,res);
 });
 
@@ -167,7 +167,7 @@ async function getSummaryStatuses(req:any,res:any){
  */
 
 transactionRoutes.get('/statistics/flows/minute', function (req, res) {   
-    console.debug(`Statistics flows /statistics/flows/minute requested.`);
+    CommonFunctions.logWithTimestamp(`Statistics flows /statistics/flows/minute requested.`);
     getFlowsPerMinute(req,res);
 });
 
@@ -192,7 +192,7 @@ async function getFlowsPerMinute(req:any,res:any){
  */
 
 transactionRoutes.get('/statistics/flows/count', function (req, res) {   
-    console.debug(`Statistics count /statistics/flows/count requested.`);
+    CommonFunctions.logWithTimestamp(`Statistics count /statistics/flows/count requested.`);
     getFlowCounts(req,res);
     
 });
@@ -235,7 +235,7 @@ async function getFlowCounts(req:any,res:any){
  */
 
 transactionRoutes.get('/search', function (req, res) {   
-    console.debug(`Transaction search request requested between start : ${req.query.start} and end : ${req.query.end}`);
+    CommonFunctions.logWithTimestamp(`Transaction search request requested between start : ${req.query.start} and end : ${req.query.end}`);
     transationSearch(req,res);
 });
 
@@ -244,14 +244,14 @@ async function transationSearch(req:any,res:any){
     const end = Number(req.query.end);
     //CommonFunctions.logWithTimestamp('transactonsStatisticsMap length', transactonsStatisticsMap.size);
     const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
-    console.debug(`Transaction search request between start : ${new Date(start).toISOString()} and end : ${new Date(end).toISOString()}`);
+    CommonFunctions.logWithTimestamp(`Transaction search request between start : ${new Date(start).toISOString()} and end : ${new Date(end).toISOString()}`);
     setCommonHeaders(res);
     const eventsByDate = searchTranscationsBetweenDatesByEpochTime(start, end,events);
     return eventsByDate.length > 0 ? res.status(200).send(eventsByDate) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 
 }
 
 transactionRoutes.get('/searchByIds', function (req, res) {   
-    console.debug(`Transaction search request requested between messageId : ${req.query.messageId}, senderId : ${req.query.senderId} , receiverId : ${req.query.receiverId}`);
+    CommonFunctions.logWithTimestamp(`Transaction search request requested between messageId : ${req.query.messageId}, senderId : ${req.query.senderId} , receiverId : ${req.query.receiverId}`);
     transationSearchByIds(req,res);
 });
 

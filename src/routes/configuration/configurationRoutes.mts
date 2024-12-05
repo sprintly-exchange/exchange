@@ -42,7 +42,7 @@ const configurationRoutes = Router();
  *               $ref: '#/components/schemas/ResponseMessage'
  */
 configurationRoutes.post('app/', function (req:any, res:any) {   
-    console.debug(`Configuration received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Configuration received : ${JSON.stringify(req.body)}`);
     req.body.id === undefined ? req.body.id = uuidv4() :'';
     GlobalConfiguration.frontEndConfigurationMap.set(req.body.id, req.body);
     setCommonHeaders(res);
@@ -50,7 +50,7 @@ configurationRoutes.post('app/', function (req:any, res:any) {
 });
 
 configurationRoutes.post('/user', function (req:any, res:any) {   
-    console.debug(`User configuration received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`User configuration received : ${JSON.stringify(req.body)}`);
     saveUserConfig(req,res);
 });
 
@@ -94,14 +94,14 @@ async function saveUserConfig(req:any,res:any)
  *         description: No content
  */
 configurationRoutes.get('app/:id', function (req:any, res:any) {   
-    console.debug(`Configuration id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Configuration id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.frontEndConfigurationMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.frontEndConfigurationMap.get(req.params.id))) : res.status(204).send('{}');
 });
 
 
 configurationRoutes.get('/user', function (req:any, res:any) {   
-    console.debug(`User configuration requested`);
+    CommonFunctions.logWithTimestamp(`User configuration requested`);
     getUserConfig(req,res);
    });
 
@@ -118,7 +118,7 @@ async function getUserConfig(req:any,res:any) {
 }
 
 configurationRoutes.get('/system/settings', function (req:any, res:any) {   
-    console.debug(`System settings configuration requested`);
+    CommonFunctions.logWithTimestamp(`System settings configuration requested`);
     getSystemSettings(req,res);
 });
 
@@ -141,7 +141,7 @@ async function getSystemSettings(req:any,res:any) {
 }
 
 configurationRoutes.put('/system/settings', function (req:any, res:any) {   
-    console.debug(`System settings configuration requested`);
+    CommonFunctions.logWithTimestamp(`System settings configuration requested`);
     updateSystemSettings(req,res);
 });
 

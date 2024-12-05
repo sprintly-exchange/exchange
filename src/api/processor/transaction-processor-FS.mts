@@ -18,7 +18,7 @@ export class TransactionProcessorFS extends TransactionProcessorA{
     async transactionProcessorPickup(transactionProcessManagerInput:TransactionProcessManager){
         const fsClient = new FSClient();
         const fileName = await fsClient.getOldestFile(transactionProcessManagerInput.configPickup.path);
-        console.debug("File name from local disk recived is ", await fileName);
+        CommonFunctions.logWithTimestamp("File name from local disk recived is ", await fileName);
         //common params
         transactionProcessManagerInput.transaction.pickupTime = new Date().toISOString();
 
@@ -32,7 +32,7 @@ export class TransactionProcessorFS extends TransactionProcessorA{
               transactionProcessManagerInput.transaction.pickupStatus = GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
               await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
               if(transactionProcessManagerInput.configProcessing === undefined || transactionProcessManagerInput.configProcessing === ''){
-                    console.debug('No config processing defined, setting messageStore.setDeliveryOutboundMessage');
+                    CommonFunctions.logWithTimestamp('No config processing defined, setting messageStore.setDeliveryOutboundMessage');
                     return true;
               }else{
                     return true;

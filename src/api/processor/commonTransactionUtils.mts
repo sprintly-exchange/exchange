@@ -1,6 +1,6 @@
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 import Transaction from "../models/Transaction.mjs";
-
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export class CommonTransactionUtils {
 
@@ -9,11 +9,7 @@ export class CommonTransactionUtils {
       }
 
       async addTransaction(transaction:Transaction){
-            //CommonFunctions.logWithTimestamp('Transaction Pickup Status  XXX : ',transaction.pickupStatus);
-            //CommonFunctions.logWithTimestamp('Transaction Delivery Status XXX : ',transaction.deliveryStatus);
-            //console.debug(transaction);  
         if(transaction.pickupStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED && transaction.deliveryStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED ){
-            //CommonFunctions.logWithTimestamp('XXXXXX', 'both completed');
             transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS;
         }       
         else if(transaction.pickupStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED || transaction.deliveryStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED  ){
@@ -32,8 +28,8 @@ export class CommonTransactionUtils {
             delete redactedTransaction.currentMessage;
          }
          if ('id' in redactedTransaction && typeof redactedTransaction.id === 'string') {
-            console.debug(`Trasnaction added with id : ${redactedTransaction.id}`);
-            console.debug(`Number of total transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
+            CommonFunctions.logWithTimestamp(`Trasnaction added with id : ${redactedTransaction.id}`);
+            CommonFunctions.logWithTimestamp(`Number of total transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
             GlobalConfiguration.transactionsStatisticsMap.set(redactedTransaction.id, redactedTransaction);
             
         }

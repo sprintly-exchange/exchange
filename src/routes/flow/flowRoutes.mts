@@ -40,7 +40,7 @@ const flowRoutes = Router();
  *               $ref: '#/components/schemas/ResponseMessage'
  */
 flowRoutes.post('/', function (req, res) {   
-    console.debug(`Flow received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Flow received : ${JSON.stringify(req.body)}`);
         
     //Check If a record already exists with name
     if(mapEntrySearchByValue(GlobalConfiguration.configurationFlowMap,'flowName',req.body.flowName)){
@@ -56,7 +56,7 @@ flowRoutes.post('/', function (req, res) {
 });
 
 flowRoutes.put('/', function (req, res) {   
-    console.debug(`Flow received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Flow received : ${JSON.stringify(req.body)}`);
     GlobalConfiguration.configurationFlowMap.set(req.body.id, req.body);
     setCommonHeaders(res);
     res.status(201).send(JSON.stringify(new ResponseMessage(req.body.id,'','')));
@@ -80,7 +80,7 @@ flowRoutes.put('/', function (req, res) {
  *         description: No flows found
  */
 flowRoutes.get('/', function (req:any, res:any) { 
-    console.debug(`All flows requested.`);
+    CommonFunctions.logWithTimestamp(`All flows requested.`);
     getFlows(req, res);
 });
 
@@ -125,7 +125,7 @@ async function getFlows(req:any,res:any){
  *         description: Flow not found
  */
 flowRoutes.get('/:id', function (req:any, res:any) {   
-    console.debug(`Flow id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Flow id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.configurationFlowMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationFlowMap.get(req.params.id))) : res.status(204).send('{}'); 
 });
@@ -153,7 +153,7 @@ flowRoutes.delete('/:id', function (req:any, res:any) {
 });
 
 async function deleteFlow(req:any,res:any){
-    console.debug(`Flow deletion id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Flow deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     CommonFunctions.logWithTimestamp(`Attempting to delete flow with ID: ${req.params.id}`);
     CommonFunctions.logWithTimestamp(`Current flows: ${GlobalConfiguration.configurationFlowMap.size}`);
@@ -162,8 +162,8 @@ async function deleteFlow(req:any,res:any){
 };
 
 flowRoutes.put('/activation/:id', function (req:any, res:any) {   
-    console.debug(`Flow update requested : ${req.params.id}`);
-    console.debug(`status change: ${req.body.active}`);
+    CommonFunctions.logWithTimestamp(`Flow update requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`status change: ${req.body.active}`);
     const flow = GlobalConfiguration.configurationFlowMap.get(req.params.id);
     flow.activationStatus = req.body.active;
     GlobalConfiguration.configurationFlowMap.set(req.params.id,flow);

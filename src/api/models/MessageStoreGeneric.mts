@@ -45,7 +45,7 @@ export class MessageStoreGeneric {
 
     // Get methods
     async getMessage(id:string) {
-        console.debug("Reading file from id:", id);
+        CommonFunctions.logWithTimestamp("Reading file from id:", id);
         return await this._messageStorage.getMessage(id);
     }
 }

@@ -20,7 +20,7 @@ export class FSClient {
    async writeFile(filePath:string, data:any) {
     try {
       await fs.writeFileSync(filePath, data);
-      console.debug('File successfully written.', filePath);
+      CommonFunctions.logWithTimestamp('File successfully written.', filePath);
       return true;
     } catch (err) {
       CommonFunctions.logWithTimestamp('Error writing file:', err);
@@ -30,7 +30,7 @@ export class FSClient {
 
   async getOldestFile(directoryPath:string) {
     try {
-      console.debug(`Reading directory path : ${directoryPath}`);
+      CommonFunctions.logWithTimestamp(`Reading directory path : ${directoryPath}`);
       // Read the directory contents
       const files = await fs.promises.readdir(directoryPath);
       
@@ -48,7 +48,7 @@ export class FSClient {
       let oldestTime = Number.MAX_SAFE_INTEGER;
       fileStats.forEach(({ file, stats }) => {
         if (stats.isFile() && stats.birthtimeMs < oldestTime) {
-          console.debug(`Setting oldest file: ${file}`);
+          CommonFunctions.logWithTimestamp(`Setting oldest file: ${file}`);
           oldestFile = file;
           oldestTime = stats.birthtimeMs;
         }
@@ -66,7 +66,7 @@ async  deleteFile(filePath:string) {
   try {
     // Use fs.promises.unlink to delete the file
     await fs.promises.unlink(filePath);
-    console.debug('File deleted successfully');
+    CommonFunctions.logWithTimestamp('File deleted successfully');
   } catch (err) {
     CommonFunctions.logWithTimestamp('Error deleting file:', err);
   }

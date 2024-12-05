@@ -40,7 +40,7 @@ const deliveryRoutes = Router();
  *               $ref: '#/components/schemas/ResponseMessage'
  */
 deliveryRoutes.post('/', function (req, res) {   
-    console.debug(`Delivery received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Delivery received : ${JSON.stringify(req.body)}`);
     setCommonHeaders(res);
     if (req.body === '[]') {
         res.status(400).send('No data'); 
@@ -84,7 +84,7 @@ deliveryRoutes.post('/', function (req, res) {
  *               $ref: '#/components/schemas/ResponseMessage'
  */
 deliveryRoutes.put('/', function (req, res) {   
-    console.debug(`Delivery update request received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Delivery update request received : ${JSON.stringify(req.body)}`);
     setCommonHeaders(res);
     if (req.body.id === undefined || req.body === '[]') {
         res.status(400).send('No data'); 
@@ -112,7 +112,7 @@ deliveryRoutes.put('/', function (req, res) {
  *         description: No deliveries found
  */
 deliveryRoutes.get('/', function (req, res) {   
-    console.debug(`All deliveries requested`);
+    CommonFunctions.logWithTimestamp(`All deliveries requested`);
     getDeliveries(req, res);
   });
   
@@ -166,7 +166,7 @@ deliveryRoutes.get('/', function (req, res) {
  *         description: Delivery not found
  */
 deliveryRoutes.get('/:id', function (req, res) {   
-    console.debug(`Delivery id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Delivery id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.configurationDeliveryMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationDeliveryMap.get(req.params.id))) : res.status(406).send('{}'); 
 });
@@ -194,7 +194,7 @@ deliveryRoutes.delete('/:id', function (req, res) {
 });
 
 async function deleteDelivery(req:any,res:any) {
-    console.debug(`Delivery deletion id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Delivery deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     CommonFunctions.logWithTimestamp(`Attempting to delete delivery with ID: ${req.params.id}`);
 

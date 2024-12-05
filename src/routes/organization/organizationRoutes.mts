@@ -91,7 +91,7 @@ organizationRoutes.post('/register-organization', async (req:any, res:any) => {
  *         description: No organizations found
  */
 organizationRoutes.get('/', (req, res) => {
-  console.debug(`All organizations requested.`);
+  CommonFunctions.logWithTimestamp(`All organizations requested.`);
   getOrganizations(req,res);
 });
 

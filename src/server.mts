@@ -80,7 +80,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.options('*', function (req, res) {   
-      console.debug(`Options request..`);
+      CommonFunctions.logWithTimestamp(`Options request..`);
       setCommonHeaders(res);
       res.status(200).send('');
 });
@@ -105,7 +105,7 @@ app.use('/api/users',userRoutes);
 app.use('/api/openapis',OpenApis);
 
 app.get('/api/dummy', function (req, res) {   
-      console.debug(`Dummy API request for debugging requested.`);
+      CommonFunctions.logWithTimestamp(`Dummy API request for debugging requested.`);
       CommonFunctions.logWithTimestamp('Request headers' ,req.headers);
       setCommonHeaders(res);
       res.status(200).send('');    
@@ -146,7 +146,7 @@ function processRules() {
   GlobalConfiguration.configurationFlowMap.forEach((configurationFlowMapItem) => {
     CommonFunctions.logWithTimestamp(`Flow "${configurationFlowMapItem.flowName}" status -> ${configurationFlowMapItem.activationStatus}`);
     if (configurationFlowMapItem.activationStatus) {
-      console.debug('Processing flow : ', configurationFlowMapItem.flowName);
+      CommonFunctions.logWithTimestamp('Processing flow : ', configurationFlowMapItem.flowName);
       let transactionProcessManager:TransactionProcessManager;
       const configPickup = configurationPickupMapSet.find((object) => object.id === configurationFlowMapItem.pickupId);
       const configDelivery = configurationDeliveryMapSet.find((object) => object.id === configurationFlowMapItem.deliveryId);
@@ -167,17 +167,17 @@ function processRules() {
         ? Number(configPickup.retryInterval) * 1000
         : 60 * 1000;
 
-      //console.debug('retryInterval - ', retryInterval);
+      //CommonFunctions.logWithTimestamp('retryInterval - ', retryInterval);
 
       // Retrieve any existing timeout info
       const existingTimeout = timeoutMap.get(configurationFlowMapItem.flowName);
-      //console.debug('existingTimeout - ', existingTimeout);
+      //CommonFunctions.logWithTimestamp('existingTimeout - ', existingTimeout);
       // Check if a timeout needs to be set or updated
       if (!existingTimeout || Number(existingTimeout.interval) !== retryInterval) {
         // Clear previous timeout if it's set and interval has changed
         if (existingTimeout) {
           clearTimeout(existingTimeout.id);
-          console.debug(`Cleared existing timeout for ${configurationFlowMapItem.flowName} due to interval change.`);
+          CommonFunctions.logWithTimestamp(`Cleared existing timeout for ${configurationFlowMapItem.flowName} due to interval change.`);
         }
 
         // Set a new timeout for this configurationFlowMapItem
@@ -189,12 +189,12 @@ function processRules() {
         // Store the timeout ID and interval
         timeoutMap.set(configurationFlowMapItem.flowName, { id: timeoutId, interval: retryInterval });
       } else {
-        console.debug(`Timeout for ${configurationFlowMapItem.flowName} with interval ${retryInterval / 1000}s is already set. Skipping duplicate.`);
+        CommonFunctions.logWithTimestamp(`Timeout for ${configurationFlowMapItem.flowName} with interval ${retryInterval / 1000}s is already set. Skipping duplicate.`);
       }
     }
   });
 
-  console.info(`Processing rules ended ${date.toLocaleTimeString()}`);
+  CommonFunctions.logWithTimestamp(`Processing rules ended`);
 }
 
 
@@ -382,7 +382,7 @@ async function removeOldTransactions(removeOldTransactionsArchiveDays:number) {
 
 // Expres server
 var server = app.listen(`${SERVER_PORT}`, function () {
-   console.debug(`Express App running at http://127.0.0.1:${SERVER_PORT}/`);
+   CommonFunctions.logWithTimestamp(`Express App running at http://127.0.0.1:${SERVER_PORT}/`);
 });
 
 

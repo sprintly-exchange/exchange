@@ -37,7 +37,7 @@ const processingRoutes = Router();
  */
 
 processingRoutes.post('/', function (req, res) {   
-    console.debug(`Processing received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Processing received : ${JSON.stringify(req.body)}`);
     setCommonHeaders(res);
     if(req.body === '[]') 
       res.status(400).send('No data');
@@ -55,7 +55,7 @@ processingRoutes.post('/', function (req, res) {
 });
 
 processingRoutes.put('/', function (req, res) {  
-    console.debug(`Processing update request received : ${JSON.stringify(req.body)}`);
+    CommonFunctions.logWithTimestamp(`Processing update request received : ${JSON.stringify(req.body)}`);
     setCommonHeaders(res);
     if(req.body.id === undefined || req.body === '[]'){
           res.status(400).send('No data'); 
@@ -87,13 +87,13 @@ processingRoutes.put('/', function (req, res) {
  */
 
 processingRoutes.get('/:id', function (req, res) {   
-    console.debug(`Processing id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Processing id requested : ${req.params.id}`);
     setCommonHeaders(res);
     GlobalConfiguration.configurationProcessingMap.has(req.params.id) ? res.status(200).send(JSON.stringify(GlobalConfiguration.configurationProcessingMap.get(req.params.id))) : res.status(204).send('{}');
 });
 
 processingRoutes.get('/', function (req, res) {   
-    console.debug(`All processing requested`);
+    CommonFunctions.logWithTimestamp(`All processing requested`);
     getProcessing(req,res);
 });
 
@@ -108,7 +108,7 @@ async function getProcessing(req:any,res:any){
   });
 
  async function deleteProcessing(req:any,res:any) {
-    console.debug(`Processing deletion id requested : ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Processing deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
     CommonFunctions.logWithTimestamp(`Attemting to delete processing with id :  ${req.params.id}`);
     

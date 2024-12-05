@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const systemStatusRoutes = Router();
 
@@ -35,7 +36,7 @@ const systemStatusRoutes = Router();
  */
 
 systemStatusRoutes.get('/queue/statistics', function (req, res) {   
-    console.debug(`Queue statistics requested`);
+    CommonFunctions.logWithTimestamp(`Queue statistics requested`);
     setCommonHeaders(res);
 
     const queueStat = {

@@ -18,13 +18,13 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
           `${transactionProcessManagerInput.configPickup.host}${transactionProcessManagerInput.configPickup.basePath}` 
         :
           `${transactionProcessManagerInput.configPickup.host}:${transactionProcessManagerInput.configPickup.port}${transactionProcessManagerInput.configPickup.basePath}`;
-        console.debug(`Trying to fetch from ${baseURL}`);
+        CommonFunctions.logWithTimestamp(`Trying to fetch from ${baseURL}`);
         const headers: Record<string, string> = {};
         //add all headers if defined
       Object.keys(transactionProcessManagerInput.configPickup.headers).length > 0 ? Object.assign(headers,transactionProcessManagerInput.configPickup.headers):'';
-      console.debug('HTTP Request Type : ',`${transactionProcessManagerInput.configPickup.method}-${transactionProcessManagerInput.configPickup.authenticationType}`.toUpperCase());
-      console.debug('HTTP Request URL : ',baseURL);
-      console.debug('HTTP request headers : ',headers);
+      CommonFunctions.logWithTimestamp('HTTP Request Type : ',`${transactionProcessManagerInput.configPickup.method}-${transactionProcessManagerInput.configPickup.authenticationType}`.toUpperCase());
+      CommonFunctions.logWithTimestamp('HTTP Request URL : ',baseURL);
+      CommonFunctions.logWithTimestamp('HTTP request headers : ',headers);
 
       //common params
       transactionProcessManagerInput.transaction.pickupTime = new Date().toISOString();
@@ -80,7 +80,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
             break;
           }     
           default:{
-              console.debug('No config found for http pickup processing.');
+              CommonFunctions.logWithTimestamp('No config found for http pickup processing.');
               return false;
           }
       }
@@ -96,13 +96,13 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
 
     async transactionProcessorDelivery(transactionProcessManagerInput:TransactionProcessManager){
         const baseURL = `${transactionProcessManagerInput.configDelivery.host}:${transactionProcessManagerInput.configDelivery.port}${transactionProcessManagerInput.configDelivery.basePath}`;
-        console.debug(`Trying to send  to ${baseURL}`);
+        CommonFunctions.logWithTimestamp(`Trying to send  to ${baseURL}`);
         const headers: Record<string, string> = {};
         //add all headers if defined
       Object.keys(transactionProcessManagerInput.configDelivery.headers).length > 0 ? Object.assign(headers,transactionProcessManagerInput.configDelivery.headers):'';
-      console.debug('HTTP Request Type : ',`${transactionProcessManagerInput.configDelivery.method}-${transactionProcessManagerInput.configDelivery.authenticationType}`.toUpperCase());
-      console.debug('HTTP Request URL : ',baseURL);
-      console.debug('HTTP request headers : ',headers);
+      CommonFunctions.logWithTimestamp('HTTP Request Type : ',`${transactionProcessManagerInput.configDelivery.method}-${transactionProcessManagerInput.configDelivery.authenticationType}`.toUpperCase());
+      CommonFunctions.logWithTimestamp('HTTP Request URL : ',baseURL);
+      CommonFunctions.logWithTimestamp('HTTP request headers : ',headers);
 
       //common params
       transactionProcessManagerInput.transaction.deliveryTime = new Date().toISOString();
@@ -210,7 +210,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
           break;
         }     
         default:{
-            console.debug('No config found for http pickup processing.');
+            CommonFunctions.logWithTimestamp('No config found for http pickup processing.');
             return false;
         }
       }

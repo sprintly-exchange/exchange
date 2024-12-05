@@ -35,9 +35,9 @@ export class FileStorage extends Storage {
      }
  
      async storeMessage(payload:any) {
-       console.debug('Setting file storage location - this.storageLocation',this.storageLocation);
+       CommonFunctions.logWithTimestamp('Setting file storage location - this.storageLocation',this.storageLocation);
        const baseDir = await path.join(this.storageLocation, 'storage'); // Base directory for storage
-       console.debug('baseDir',baseDir);
+       CommonFunctions.logWithTimestamp('baseDir',baseDir);
        const dateHour = this.getCurrentDateHour();
        const folderPath = path.join(baseDir, dateHour);
      

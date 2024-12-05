@@ -104,7 +104,7 @@ userRoutes.post('/register-user', async (req:any, res:any) => {
  *         description: No users found
  */
 userRoutes.get('/', (req, res) => {
-    console.debug(`All users requested.`);
+    CommonFunctions.logWithTimestamp(`All users requested.`);
     try{
         filterUsers(req, res);
     }catch(error) {
@@ -391,7 +391,7 @@ userRoutes.get('/username/:username', (req:any, res:any) => {
 });
 
 userRoutes.get('/roles', (req, res) => {
-    console.debug(`All roles requested.`);
+    CommonFunctions.logWithTimestamp(`All roles requested.`);
    filterRoles(req,res);
     
 });

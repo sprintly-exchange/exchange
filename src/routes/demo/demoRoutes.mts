@@ -61,7 +61,7 @@ async function toggle(req:any, res:any) {
     const authDetails = await getAuthDetails(req.headers['authorization']);
     if (authDetails) {
         const { userId, organizationId } = authDetails;
-        console.debug('Toggle demo mode request.');
+        CommonFunctions.logWithTimestamp('Toggle demo mode request.');
         setCommonHeaders(res);
 
         // Await the toggleDemoMode function since it's async
@@ -103,10 +103,10 @@ async function status(req:any, res:any) {
         const demoStatus = {
             status: GlobalConfiguration.demoModeEnabledMap.get(organizationId) ? GlobalConfiguration.demoModeEnabledMap.get(organizationId).status : false,
         }; 
-        console.debug('Demo mode status requested.');
+        CommonFunctions.logWithTimestamp('Demo mode status requested.');
         setCommonHeaders(res);
         res.status(200).json(demoStatus);  // Express automatically converts object to JSON
-        console.debug(`Demo mode status: ${demoStatus.status}`);
+        CommonFunctions.logWithTimestamp(`Demo mode status: ${demoStatus.status}`);
     
     } else {
         throw new Error('Authorization details are missing');
