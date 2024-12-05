@@ -14,17 +14,15 @@ import { OrganizationRole } from '../models/OrganizationRole.mjs';
 //Global enums
 
 
+
+
 let defaultRoleAdmin:OrganizationRole|undefined;
-const defaultRoleOrganizationUser:OrganizationRole= {
-  id: `${uuidv4()}`,
-  role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER,
-};
-
 let defaultRoleOrganizationAdmin:OrganizationRole|undefined;
-
+let defaultRoleOrganizationUser:OrganizationRole|undefined;
 
 let defaultOrg:Organization|undefined=undefined ;
 let defaultUser:User|undefined=undefined ;
+
 
 async function generatePassword() {
   const password = await bcrypt.hash('changeme', 10);
@@ -81,22 +79,22 @@ async function generatePassword() {
         // Check if the default organization admin exists
 
           // Check if the default admin user role exists
-          if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-            const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN);
+          if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
+            const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN);
             if(!roleExists){
               console.log('Adding application admin user role.')
               defaultRoleAdmin = {
                 id: `${uuidv4()}`,
                 role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN,
               }
-              GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleAdmin.id,defaultRoleAdmin);
+              GlobalConfiguration.organizationsRolesMap.set(defaultRoleAdmin.id,defaultRoleAdmin);
             }else{
               console.log('Default application admin user role exists.')
             }
           } 
         
-        if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
+        if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
+          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
           //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
           if(!roleExists){
             console.log('Adding organization admin role.')
@@ -104,19 +102,23 @@ async function generatePassword() {
               id: `${uuidv4()}`,
               role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN
             };
-            GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleOrganizationAdmin.id,defaultRoleOrganizationAdmin);
+            GlobalConfiguration.organizationsRolesMap.set(defaultRoleOrganizationAdmin.id,defaultRoleOrganizationAdmin);
           }else{
             console.log('Default organization admin role exists.')
           }
         } 
 
         // Check if the default organization user role exists
-        if (GlobalConfiguration.organizationsRolesMapNew instanceof Map) {
-          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+        if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
+          const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
           //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
           if(!roleExists){
             console.log('Adding organization user role.')
-            GlobalConfiguration.organizationsRolesMapNew.set(defaultRoleOrganizationUser.id,defaultRoleOrganizationUser);
+            defaultRoleOrganizationUser = {
+              id: `${uuidv4()}`,
+              role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER,
+            };
+            GlobalConfiguration.organizationsRolesMap.set(defaultRoleOrganizationUser.id,defaultRoleOrganizationUser);
           }else{
             console.log('Default organization user role exists.')
           }

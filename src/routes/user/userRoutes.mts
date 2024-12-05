@@ -407,13 +407,13 @@ const filterRoles = async  (req:any,res:any) =>  {
             const currUser=getUserById(userId);
             //super admin user for the applications
             if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN) ) {
-                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values());
+                events = Array.from(GlobalConfiguration.organizationsRolesMap.values());
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
             } else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN)){
-                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=> role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+                events = Array.from(GlobalConfiguration.organizationsRolesMap.values()).filter((role)=> role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN || role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
             }  else if(currUser.roleId === getRoleId( GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER)){
-                events = Array.from(GlobalConfiguration.organizationsRolesMapNew.values()).filter((role)=>  role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
+                events = Array.from(GlobalConfiguration.organizationsRolesMap.values()).filter((role)=>  role.role ===  GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
                 events.length > 0 ? res.status(200).send(events) : res.status(204).send([]); 
             }
             

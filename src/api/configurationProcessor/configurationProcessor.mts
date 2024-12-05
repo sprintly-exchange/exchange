@@ -5,7 +5,7 @@ export class ConfigurationProcessor {
     const userConfigurations = {
         organizationsMap: this.mapToJson(GlobalConfiguration.organizationsMap),
         organizationsUsersMap: this.mapToJson(GlobalConfiguration.organizationsUsersMap),
-        organizationsRolesMapNew: this.mapToJson(GlobalConfiguration.organizationsRolesMapNew),
+        organizationsRolesMap: this.mapToJson(GlobalConfiguration.organizationsRolesMap),
         forntEndConfigurationMap: this.mapToJson(GlobalConfiguration.frontEndConfigurationMap),
       };
 
@@ -59,7 +59,7 @@ export class ConfigurationProcessor {
             const userConfigurations = JSON.parse(await GlobalConfiguration.storageConfiguration.loadStaticFile('User_Configurations.json'));
             GlobalConfiguration.organizationsMap = this.jsonToMap(userConfigurations.organizationsMap);
             GlobalConfiguration.organizationsUsersMap = this.jsonToMap(userConfigurations.organizationsUsersMap);
-            GlobalConfiguration.organizationsRolesMapNew = this.jsonToMap(userConfigurations.organizationsRolesMapNew);
+            GlobalConfiguration.organizationsRolesMap = this.jsonToMap(userConfigurations.organizationsRolesMap);
             GlobalConfiguration.frontEndConfigurationMap = this.jsonToMap(userConfigurations.forntEndConfigurationMap);
         } catch (error:any) {
             console.log('userConfigurations not found for loading.');

@@ -32,7 +32,7 @@ export function mapEntrySearchByValue(map:any, searchKey:any, searchValue:any) {
 export function getRoleId(role:string){
     let roleId = undefined;
 
-    for (let [key, value] of GlobalConfiguration.organizationsRolesMapNew.entries()) {
+    for (let [key, value] of GlobalConfiguration.organizationsRolesMap.entries()) {
         if (value.role === role) {
             roleId = value.id;
             break;
@@ -46,7 +46,7 @@ export function getRoleId(role:string){
 export function getRoleById(roleId:string){
     let role = undefined;
     //console.log('roleId',roleId);
-    for (let [key, value] of GlobalConfiguration.organizationsRolesMapNew.entries()) {
+    for (let [key, value] of GlobalConfiguration.organizationsRolesMap.entries()) {
         //console.log('value',value);
         if (value.id === roleId) {
             role = value.role;
