@@ -1,6 +1,6 @@
 import Transaction from "../../api/models/Transaction.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
-
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 export function countFlowNamePerMinute(events: any): any {
   const counts: Record<string, number> = {};
@@ -51,7 +51,7 @@ export function transactionSummary(events:any) {
       inprocessing: `${counts.INPROCESSING}`,
     };
   
-    console.log('Transaction Summary:', summary);
+    CommonFunctions.logWithTimestamp('Transaction Summary:', summary);
     return summary;
   }
   
@@ -211,7 +211,7 @@ export function transactionSummary(events:any) {
   export function searcTransationSearchByIds(messageId:string, senderId:string, receiverId:string, events:any) {
     return events.filter((transaction:Transaction) => {
       // Log for debugging purposes
-      console.log('Searching for:', messageId, senderId, receiverId);
+      CommonFunctions.logWithTimestamp('Searching for:', messageId, senderId, receiverId);
   
       // Check if the transaction's fields include the search values (wildcard search)
       const messageIdMatch = messageId ? (transaction.messageId && typeof transaction.messageId === 'string' && transaction.messageId.includes(messageId)) : true;

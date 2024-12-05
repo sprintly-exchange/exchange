@@ -1,8 +1,5 @@
 
 import {v4 as uuidv4} from 'uuid';
-import { FileStorage } from '../models/FileStorage.mjs';
-import Queue from '../system/Queue.mjs';
-import {ConfigurationFileStorage } from '../configurationProcessor/ConfigurationFileStorage.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 import bcrypt from 'bcryptjs';
@@ -10,6 +7,7 @@ import { getOrganizationByName, getUserByName } from './serverCommon.mjs';
 import { Organization } from '../models/Organization.mjs';
 import { User } from '../models/User.mjs';
 import { OrganizationRole } from '../models/OrganizationRole.mjs';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 let defaultRoleAdmin:OrganizationRole|undefined;
 let defaultRoleOrganizationAdmin:OrganizationRole|undefined;
@@ -30,10 +28,10 @@ async function generatePassword() {
     let organizationExists = false;
     organizationExists = Array.from(GlobalConfiguration.organizationsMap.values()).some(org => org.name === GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME);
     if(organizationExists){
-      console.log('Default organitaion exists');
+      CommonFunctions.logWithTimestamp('Default organitaion exists');
       defaultOrg = getOrganizationByName(GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME);
     }else{
-        console.log('Adding default organization');
+        CommonFunctions.logWithTimestamp('Adding default organization');
         defaultOrg = {
           id : `${uuidv4()}`,
           name : GlobalConfiguration.appEnumerations.APP_DEFAULT_ORGANIZATION_NAME,
@@ -52,10 +50,10 @@ async function generatePassword() {
     userExists = Array.from(GlobalConfiguration.organizationsUsersMap.values()).some(user =>  user.username === GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME);
 
     if(userExists){
-      console.log('Default admin user exists');
+      CommonFunctions.logWithTimestamp('Default admin user exists');
       defaultUser = getUserByName(GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME);
     }else{
-      console.log('Adding default admin user.');
+      CommonFunctions.logWithTimestamp('Adding default admin user.');
       defaultUser = {
           id: `${uuidv4()}`,
           username : GlobalConfiguration.appEnumerations.APP_DEFAULT_ADMIN_NAME,
@@ -77,28 +75,28 @@ async function generatePassword() {
           if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
             const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN);
             if(!roleExists){
-              console.log('Adding application admin user role.')
+              CommonFunctions.logWithTimestamp('Adding application admin user role.')
               defaultRoleAdmin = {
                 id: `${uuidv4()}`,
                 role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ADMIN,
               }
               GlobalConfiguration.organizationsRolesMap.set(defaultRoleAdmin.id,defaultRoleAdmin);
             }else{
-              console.log('Default application admin user role exists.')
+              CommonFunctions.logWithTimestamp('Default application admin user role exists.')
             }
           } 
         
         if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
           const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
           if(!roleExists){
-            console.log('Adding organization admin role.')
+            CommonFunctions.logWithTimestamp('Adding organization admin role.')
             defaultRoleOrganizationAdmin = {
               id: `${uuidv4()}`,
               role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN
             };
             GlobalConfiguration.organizationsRolesMap.set(defaultRoleOrganizationAdmin.id,defaultRoleOrganizationAdmin);
           }else{
-            console.log('Default organization admin role exists.')
+            CommonFunctions.logWithTimestamp('Default organization admin role exists.')
           }
         } 
 
@@ -106,19 +104,19 @@ async function generatePassword() {
         if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
           const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
           if(!roleExists){
-            console.log('Adding organization user role.')
+            CommonFunctions.logWithTimestamp('Adding organization user role.')
             defaultRoleOrganizationUser = {
               id: `${uuidv4()}`,
               role : GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER,
             };
             GlobalConfiguration.organizationsRolesMap.set(defaultRoleOrganizationUser.id,defaultRoleOrganizationUser);
           }else{
-            console.log('Default organization user role exists.')
+            CommonFunctions.logWithTimestamp('Default organization user role exists.')
           }
         } 
         
       }catch(error) {
-        console.log(error);
+        CommonFunctions.logWithTimestamp(error);
       } 
   };
 
@@ -161,7 +159,7 @@ async function generatePassword() {
 export const initFunction = async () => {
      //Configruation save funtionality
        
-        console.log('global.storageConfiguration',GlobalConfiguration.storageConfiguration);
+        CommonFunctions.logWithTimestamp('global.storageConfiguration',GlobalConfiguration.storageConfiguration);
         
         GlobalConfiguration.storage._storageLocation= process.env.FILE_STORAGE_DIR;
 
@@ -175,7 +173,7 @@ export const initFunction = async () => {
         const saveInterval = 10000; // 10 seconds
         setInterval(() => {
           GlobalConfiguration.configurationProcessor.saveConfigurations();
-          console.log('Configurations saved at', new Date());
+          CommonFunctions.logWithTimestamp('Configurations saved at', new Date());
         }, saveInterval);
 };
 

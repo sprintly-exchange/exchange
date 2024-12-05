@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 export class ConfigurationFileStorage {
   _storageLocation;
@@ -27,8 +28,8 @@ export class ConfigurationFileStorage {
     try {
       return fs.readFileSync(path.join(this._storageLocation, `${this.prefix}_${filename}`), 'utf-8');
     } catch (error) {
-      console.log(error);
-      console.log("No files found to initialize : ", path.join(this._storageLocation, `${this.prefix}_${filename}`));
+      CommonFunctions.logWithTimestamp(error);
+      CommonFunctions.logWithTimestamp("No files found to initialize : ", path.join(this._storageLocation, `${this.prefix}_${filename}`));
     }
   }
 
@@ -36,8 +37,8 @@ export class ConfigurationFileStorage {
     try {
       return fs.readFileSync(path.join(this._storageLocation, `${this.prefix}_${filename}`), 'utf-8');
     } catch (error) {
-      console.log(error);
-      console.log("No files found to initialize : ", path.join(this._storageLocation, `${this.prefix}_${filename}`));
+      CommonFunctions.logWithTimestamp(error);
+      CommonFunctions.logWithTimestamp("No files found to initialize : ", path.join(this._storageLocation, `${this.prefix}_${filename}`));
       return "";
     
     }

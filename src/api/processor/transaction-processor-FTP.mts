@@ -4,10 +4,9 @@ import { TransactionProcessManager } from './transactionProcessManager.mjs';
 import { fileSync } from 'tmp';
 import { promises as fs } from 'fs';
 import { CommonTransactionUtils } from './commonTransactionUtils.mjs';
-import os from 'os';
-import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 import { TransactionProcessorA } from './TransactionProcessorA.mjs';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 export class TransactionProcessorFTP  extends TransactionProcessorA {
     ftpClientProcessor:any;
@@ -26,7 +25,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
             } catch (err) {
                 attempt++;
                 if (attempt >= maxRetries) throw err;
-                console.log(`Retrying operation (${attempt}/${maxRetries}) after delay of ${delay}ms...`);
+                CommonFunctions.logWithTimestamp(`Retrying operation (${attempt}/${maxRetries}) after delay of ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2; // Exponential backoff
             }
@@ -43,7 +42,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
             const connected = await this.retryOperation(() => ftpProcessor.connect());
             if (connected) {
                 const fileList = await this.retryOperation(() => ftpProcessor.listFiles());
-                console.log('fileList', fileList);
+                CommonFunctions.logWithTimestamp('fileList', fileList);
                 let count = 0;
 
                 for (const file of fileList) {
@@ -84,7 +83,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             }
         } catch (error:any) {
-            console.log('Error processing from ftp', error);
+            CommonFunctions.logWithTimestamp('Error processing from ftp', error);
             transactionProcessManagerInput.transaction.pickupError = error.message;
             transactionProcessManagerInput.transaction.pickupStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
@@ -108,7 +107,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
             if (connected) {
                 await this.createTempFileFromString(transactionProcessManagerInput.transaction.currentMessage)
                     .then(async (tempFilePath) => {
-                        console.log('`${transactionProcessManagerInput.transaction.messageName}`', `${transactionProcessManagerInput.transaction.messageName}`);
+                        CommonFunctions.logWithTimestamp('`${transactionProcessManagerInput.transaction.messageName}`', `${transactionProcessManagerInput.transaction.messageName}`);
                         await this.retryOperation(() => ftpProcessor.uploadFileCustom(tempFilePath, `${transactionProcessManagerInput.transaction.messageName}`));
 
                         await this.storeMessage(transactionProcessManagerInput.transaction, transactionProcessManagerInput.messageStore, GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
@@ -125,7 +124,7 @@ export class TransactionProcessorFTP  extends TransactionProcessorA {
                 this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);
             }
         } catch (error:any) {
-            console.log('Error sending file to ftp', error);
+            CommonFunctions.logWithTimestamp('Error sending file to ftp', error);
             transactionProcessManagerInput.transaction.deliveryError = error.message;
             transactionProcessManagerInput.transaction.deliveryStatus =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
             this.commonTransactionUtils.addTransaction(transactionProcessManagerInput.transaction);

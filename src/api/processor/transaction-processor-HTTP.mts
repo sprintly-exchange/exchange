@@ -3,6 +3,7 @@ import Transaction from "../models/Transaction.mjs";
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
 import { TransactionProcessorA } from "./TransactionProcessorA.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export class TransactionProcessorHTTP extends TransactionProcessorA {
 
@@ -38,8 +39,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   }
                   const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
 
-                  console.log('responseFromHttpCall : ', await responseFromHttpCall);
-                  console.log('statusCode : ', await statusCode);
+                  CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+                  CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
@@ -64,8 +65,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                       throw new Error("HTTP request failed");
                   }
                   const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
-                  console.log('responseFromHttpCall : ', await responseFromHttpCall);
-                  console.log('statusCode : ', await statusCode);
+                  CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+                  CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE);
                   await this.setCommonPickupProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
@@ -115,8 +116,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                       throw new Error("HTTP request failed");
                   }
                   const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
-                  console.log('responseFromHttpCall : ', await responseFromHttpCall);
-                  console.log('statusCode : ', await statusCode);
+                  CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+                  CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
                   transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                   await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                   await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction); 
@@ -142,8 +143,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                       throw new Error("HTTP request failed");
                   }
                 const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
-                console.log('responseFromHttpCall : ', await responseFromHttpCall);
-                console.log('statusCode : ', await statusCode);
+                CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+                CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
@@ -166,8 +167,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                 }
                 const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
 
-                console.log('responseFromHttpCall : ', await responseFromHttpCall);
-                console.log('statusCode : ', await statusCode);
+                CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+                CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
                 transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
                 await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
                 await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);         
@@ -193,8 +194,8 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
                   throw new Error("HTTP request failed");
               }
               const [responseFromHttpCall, statusCode] = response; // Safe to destructure if response is an array
-              console.log('responseFromHttpCall : ', await responseFromHttpCall);
-              console.log('statusCode : ', await statusCode);
+              CommonFunctions.logWithTimestamp('responseFromHttpCall : ', await responseFromHttpCall);
+              CommonFunctions.logWithTimestamp('statusCode : ', await statusCode);
               transactionProcessManagerInput.transaction.currentMessage = responseFromHttpCall;
               await this.storeMessage(transactionProcessManagerInput.transaction,transactionProcessManagerInput.messageStore,GlobalConfiguration.appEnumerations.STORAGE_DELIVERY_OUTBOUND_MESSAGE);
               await this.setCommonDeliveryProcessingParameters(responseFromHttpCall,statusCode,baseURL,transactionProcessManagerInput.transaction);
@@ -217,7 +218,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
     }
 
     async setDeliveryStatusFromResponseCode(transaction:Transaction,statusCode:string){
-      console.log('Number(statusCode)',Number(statusCode));
+      CommonFunctions.logWithTimestamp('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
         transaction.deliveryStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
@@ -229,7 +230,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
     }
 
     async setPickupStatusFromResponseCode(transaction:Transaction,statusCode:string){
-      console.log('Number(statusCode)',Number(statusCode));
+      CommonFunctions.logWithTimestamp('Number(statusCode)',Number(statusCode));
       const checkStatus = Number(statusCode);
       if( (200 <= checkStatus) && (checkStatus <= 299) ){
         transaction.pickupStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED;
@@ -238,7 +239,7 @@ export class TransactionProcessorHTTP extends TransactionProcessorA {
       } else {
         transaction.pickupStatus=  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED;
       }
-      console.log('transaction.pickupStatus : ', transaction.pickupStatus);
+      CommonFunctions.logWithTimestamp('transaction.pickupStatus : ', transaction.pickupStatus);
     }
 
     async setCommonPickupProcessingParameters(responseFromHttpCall:any,statusCode:any,baseURL:string,transaction:Transaction){

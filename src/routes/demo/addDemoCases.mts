@@ -3,6 +3,7 @@ import { ConnectionHTTP } from "../../api/models/ConnectionHTTP.mjs";
 import { Flow } from "../../api/models/Flow.mjs";
 import {v4 as uuidv4} from 'uuid';
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 //variables used to run the demo mode
 let Pickup_Weather_Data:any=undefined;
@@ -254,7 +255,7 @@ export function addDemoCases(organizationId:string){
 }
 
 export function removeDemoCases(organizationId:string){
-    console.log("Removing all flows for org id : ",organizationId);
+    CommonFunctions.logWithTimestamp("Removing all flows for org id : ",organizationId);
     try{
       const flowsToDelete = [...GlobalConfiguration.configurationFlowMap.values()].filter((record) => record.organizationId === organizationId);
       // Step 2: Delete the filtered records using their id

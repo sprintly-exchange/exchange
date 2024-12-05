@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import { setProcessConfigurationProcessingQueueInterval, setProcessDeliveryProcessingQueueInterval, setProcessPickupProcessingQueueInterval, setProcessRulesInterval, setRemoveOldTransactionsInterval } from '../../server.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const configurationRoutes = Router();
 
@@ -159,7 +160,7 @@ async function updateSystemSettings(req:any, res:any) {
                 key ===  GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL ? setProcessDeliveryProcessingQueueInterval(): '';
                 key ===  GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL || key ===  GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS ? setRemoveOldTransactionsInterval(): '';
             } else {
-                console.log(`Key ${key} not found in global serverConfigurationMap.`);
+                CommonFunctions.logWithTimestamp(`Key ${key} not found in global serverConfigurationMap.`);
             }
         }
 

@@ -1,4 +1,5 @@
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export class ConfigurationProcessor {
   async saveConfigurations() {
@@ -62,7 +63,7 @@ export class ConfigurationProcessor {
             GlobalConfiguration.organizationsRolesMap = this.jsonToMap(userConfigurations.organizationsRolesMap);
             GlobalConfiguration.frontEndConfigurationMap = this.jsonToMap(userConfigurations.forntEndConfigurationMap);
         } catch (error:any) {
-            console.log('userConfigurations not found for loading.');
+            CommonFunctions.logWithTimestamp('userConfigurations not found for loading.');
         }
 
       try {
@@ -85,21 +86,21 @@ export class ConfigurationProcessor {
           GlobalConfiguration.serverConfigurationMap = this.jsonToMap(serverConfigurationMap.serverConfigurationMap);
           // Iterate over the Map and print all key-value pairs
           //Loaded server configuration settings
-          console.log('Loaded server configruation settings.');
+          CommonFunctions.logWithTimestamp('Loaded server configruation settings.');
           GlobalConfiguration.serverConfigurationMap.forEach((value, key) => {
-          console.log(`Key: ${key}, Value: ${value}`);
+          CommonFunctions.logWithTimestamp(`Key: ${key}, Value: ${value}`);
 });
 
       } catch (error:any) {
-          console.log(error);
-          console.log('dataConfigurations not found for loading.');
+          CommonFunctions.logWithTimestamp(error);
+          CommonFunctions.logWithTimestamp('dataConfigurations not found for loading.');
       }
     
       try {
           const dataTransactions = JSON.parse(await GlobalConfiguration.storageConfiguration.loadStaticFile('Transactions.json'));
           GlobalConfiguration.transactionsStatisticsMap = this.jsonToMap(dataTransactions.transactonsStatisticsMap);
       } catch (error:any) {
-          console.log('dataTransactions not found for loading.');
+          CommonFunctions.logWithTimestamp('dataTransactions not found for loading.');
       }
   }
 

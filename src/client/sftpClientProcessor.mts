@@ -1,6 +1,7 @@
 import Client from 'ssh2-sftp-client';
 import fs from 'fs';
 import { sftpTemplate } from './protocolTemplates.mjs';
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class SftplientProcessor {
   connectionName;
@@ -49,7 +50,7 @@ export class SftplientProcessor {
 
     try {
       await this.sftp.connect(sftpConfig);
-      console.log(`Connected to SFTP server at ${this.host}`);
+      CommonFunctions.logWithTimestamp(`Connected to SFTP server at ${this.host}`);
     } catch (error:any) {
       console.error('Error connecting to SFTP server:', error.message);
       throw error;
@@ -59,7 +60,7 @@ export class SftplientProcessor {
   async listFiles() {
     try {
       const fileList = await this.sftp.list(this.basePath);
-      console.log('Files in SFTP basePath:', fileList);
+      CommonFunctions.logWithTimestamp('Files in SFTP basePath:', fileList);
       return fileList;
     } catch (error:any) {
       console.error('Error listing files:', error.message);
@@ -70,7 +71,7 @@ export class SftplientProcessor {
   async uploadFile(localFilePath:string, remoteFilePath:string) {
     try {
       await this.sftp.put(localFilePath, remoteFilePath);
-      console.log(`Uploaded ${localFilePath} to ${remoteFilePath}`);
+      CommonFunctions.logWithTimestamp(`Uploaded ${localFilePath} to ${remoteFilePath}`);
     } catch (error:any) {
       console.error('Error uploading file:', error.message);
       throw error;
@@ -80,7 +81,7 @@ export class SftplientProcessor {
   async downloadFile(remoteFilePath:string, localFilePath:string) {
     try {
       await this.sftp.get(remoteFilePath, localFilePath);
-      console.log(`Downloaded ${remoteFilePath} to ${localFilePath}`);
+      CommonFunctions.logWithTimestamp(`Downloaded ${remoteFilePath} to ${localFilePath}`);
     } catch (error:any) {
       console.error('Error downloading file:', error.message);
       throw error;
@@ -90,7 +91,7 @@ export class SftplientProcessor {
   async disconnect() {
     try {
       await this.sftp.end();
-      console.log('SFTP connection closed');
+      CommonFunctions.logWithTimestamp('SFTP connection closed');
     } catch (error:any) {
       console.error('Error closing SFTP connection:', error.message);
       throw error;

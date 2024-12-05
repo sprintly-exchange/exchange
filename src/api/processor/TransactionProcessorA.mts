@@ -2,6 +2,7 @@ import { TransactionProcessManager } from "./transactionProcessManager.mjs";
 import { TransactionProcessorI } from "./TransactionProcessorI.mjs";
 import Transaction from '../models/Transaction.mjs';
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export abstract class TransactionProcessorA implements TransactionProcessorI {
     constructor(){
@@ -11,7 +12,7 @@ export abstract class TransactionProcessorA implements TransactionProcessorI {
     abstract transactionProcessorPickup(transactionProcessManagerInput: TransactionProcessManager): Promise<boolean>;
 
     async storeMessage(transaction:Transaction,messageStore:any,leg:string) {
-        console.log('Trying to store message HTTP : ',transaction.currentMessage);
+        CommonFunctions.logWithTimestamp('Trying to store message HTTP : ',transaction.currentMessage);
         switch(leg){
           case GlobalConfiguration.appEnumerations.STORAGE_PICKUP_INBOUND_MESSAGE: {
             [transaction.pickupInboundMessagePath,transaction.pickupInboundMessageSize] = await messageStore.storeMessage(transaction.currentMessage);

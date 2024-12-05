@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class TransactionProcessorWEBSOCKET {
   constructor() {}
@@ -36,7 +37,7 @@ export class TransactionProcessorWEBSOCKET {
 
     websocket.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
-      console.log('Received message:', receivedMessage);
+      CommonFunctions.logWithTimestamp('Received message:', receivedMessage);
       // Perform the desired action with the received message
 
       // After processing the message, update the delivery status and time

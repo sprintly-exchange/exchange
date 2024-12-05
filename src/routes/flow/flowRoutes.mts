@@ -3,6 +3,7 @@ import { filterResultsBasedOnUserRoleAndUserId, getOrganizatonNameById, setCommo
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const flowRoutes = Router();
 
@@ -154,10 +155,10 @@ flowRoutes.delete('/:id', function (req:any, res:any) {
 async function deleteFlow(req:any,res:any){
     console.debug(`Flow deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    console.log(`Attempting to delete flow with ID: ${req.params.id}`);
-    console.log(`Current flows: ${GlobalConfiguration.configurationFlowMap.size}`);
+    CommonFunctions.logWithTimestamp(`Attempting to delete flow with ID: ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Current flows: ${GlobalConfiguration.configurationFlowMap.size}`);
     await userHasDeleteRights(req,GlobalConfiguration.configurationFlowMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
-    console.log(`Current flows after deletion: ${GlobalConfiguration.configurationFlowMap.size}`);
+    CommonFunctions.logWithTimestamp(`Current flows after deletion: ${GlobalConfiguration.configurationFlowMap.size}`);
 };
 
 flowRoutes.put('/activation/:id', function (req:any, res:any) {   

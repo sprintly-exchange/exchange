@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const userRoutes = Router();
 
@@ -69,7 +70,7 @@ userRoutes.post('/register-user', async (req:any, res:any) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         GlobalConfiguration.organizationsUsersMap.set(id, { id, username, password: hashedPassword, email, mobileNumber, organizationId, roleId,registrationDate });
         res.status(201).send(new ResponseMessage(uuidv4(),'User registered successfully','Success'));
-        //console.log('organizationsUsersMap.', organizationsUsersMap);
+        //CommonFunctions.logWithTimestamp('organizationsUsersMap.', organizationsUsersMap);
     } catch (error:any) {
         res.status(400).send(error.message);
     }
@@ -107,7 +108,7 @@ userRoutes.get('/', (req, res) => {
     try{
         filterUsers(req, res);
     }catch(error) {
-        console.log(error);
+        CommonFunctions.logWithTimestamp(error);
         res.status(400).send('Unable to read the users.');
     }
 });
@@ -119,7 +120,7 @@ const filterUsers = async  (req:any,res:any) =>  {
 
         if (authDetails) {
             const { userId, organizationId } = authDetails;
-            //console.log('from auth ', { userId, organizationId });
+            //CommonFunctions.logWithTimestamp('from auth ', { userId, organizationId });
             setCommonHeaders(res);
             const currUser = GlobalConfiguration.organizationsUsersMap.get(userId);
             //super admin user for the applications
@@ -138,7 +139,7 @@ const filterUsers = async  (req:any,res:any) =>  {
         }
         
     }catch(error){
-        console.log(error);
+        CommonFunctions.logWithTimestamp(error);
         res.status(400).send('');
 
     }
@@ -197,9 +198,9 @@ userRoutes.put('/edit-user', async (req:any, res:any) => {
 
 
         // Update password only if a new password is provided and it's different from the existing one
-        //console.log('password : ',password);
-        //console.log('user.password : ',user.password)
-        //console.log(user.password === password);
+        //CommonFunctions.logWithTimestamp('password : ',password);
+        //CommonFunctions.logWithTimestamp('user.password : ',user.password)
+        //CommonFunctions.logWithTimestamp(user.password === password);
 
         if (password) {
             const isSamePassword = await bcrypt.compare(password, user.password);

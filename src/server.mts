@@ -28,7 +28,7 @@ import { initFunction} from './api/utilities/severInitFunctions.mjs';
 import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
 import GlobalConfiguration from './GlobalConfiguration.mjs';
-
+import { CommonFunctions } from './api/utilities/serverCommon.mjs';
 
 const SERVER_PORT = process.env.SERVER_PORT || 4000;
 
@@ -106,7 +106,7 @@ app.use('/api/openapis',OpenApis);
 
 app.get('/api/dummy', function (req, res) {   
       console.debug(`Dummy API request for debugging requested.`);
-      console.log('Request headers' ,req.headers);
+      CommonFunctions.logWithTimestamp('Request headers' ,req.headers);
       setCommonHeaders(res);
       res.status(200).send('');    
 });
@@ -119,7 +119,7 @@ export function setProcessRulesInterval() {
   let processRulesTimeInterval = (GlobalConfiguration.serverConfigurationMap && GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL)) 
     ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL) 
     : 1000; // Default to 1000 if not defined
-  console.log( GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL,processRulesTimeInterval);
+    CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.PROCESS_RULES_TIME_INTERVAL,processRulesTimeInterval);
   // Clear the previous interval if it exists
   if (processRulesInterval) {
     clearInterval(processRulesInterval);
@@ -144,7 +144,7 @@ function processRules() {
   console.info(`Processing rules started ${date.toLocaleTimeString()}`);
 
   GlobalConfiguration.configurationFlowMap.forEach((configurationFlowMapItem) => {
-    console.log(`Flow "${configurationFlowMapItem.flowName}" status -> ${configurationFlowMapItem.activationStatus}`);
+    CommonFunctions.logWithTimestamp(`Flow "${configurationFlowMapItem.flowName}" status -> ${configurationFlowMapItem.activationStatus}`);
     if (configurationFlowMapItem.activationStatus) {
       console.debug('Processing flow : ', configurationFlowMapItem.flowName);
       let transactionProcessManager:TransactionProcessManager;
@@ -211,7 +211,7 @@ export function setProcessPickupProcessingQueueInterval() {
     ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log( GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL,processPickupProcessingQueueTimeInterval);
+  CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.PROCESS_PICKUP_PROCESSING_QUEUE_TIME_INTERVAL,processPickupProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processPickupProcessingQueueInterval) {
     clearInterval(processPickupProcessingQueueInterval);
@@ -230,13 +230,13 @@ async function processPickupProcessingQueue() {
   const queueEntry = GlobalConfiguration.pickupProcessingQueue.dequeue();
 
   if (queueEntry === undefined || queueEntry == null) {
-    console.log('Nothing to process from the pickup queue.');
+    CommonFunctions.logWithTimestamp('Nothing to process from the pickup queue.');
     return;
   }
 
-  console.log(`START-PROCESSING ****************`);
+  CommonFunctions.logWithTimestamp(`START-PROCESSING ****************`);
   await queueEntry.processPickup();
-  console.log(`END-PROCESSING ****************`);
+  CommonFunctions.logWithTimestamp(`END-PROCESSING ****************`);
 }
 
 // Whenever the configuration changes, call setProcessPickupProcessingQueueInterval() again
@@ -251,7 +251,7 @@ export function setProcessDeliveryProcessingQueueInterval() {
     ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log( GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL,processDeliveryProcessingQueueTimeInterval);
+  CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.PROCESS_DELIVERY_PROCESSING_QUEUE_TIME_INTERVAL,processDeliveryProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processDeliveryProcessingQueueInterval) {
     clearInterval(processDeliveryProcessingQueueInterval);
@@ -269,13 +269,13 @@ async function processDeliveryProcessingQueue() {
   const queueEntry = GlobalConfiguration.deliveryProcessingQueue.dequeue();
 
   if (queueEntry === undefined || queueEntry == null) {
-    console.log('Nothing to process from delivery queue.');
+    CommonFunctions.logWithTimestamp('Nothing to process from delivery queue.');
     return;
   }
 
-  console.log(`START-DELIVERY ****************`);
+  CommonFunctions.logWithTimestamp(`START-DELIVERY ****************`);
   await queueEntry.processDelivery();
-  console.log(`END-DELIVERY ****************`);
+  CommonFunctions.logWithTimestamp(`END-DELIVERY ****************`);
 }
 
 // Whenever the configuration changes, call setProcessDeliveryProcessingQueueInterval() again
@@ -291,7 +291,7 @@ export function setProcessConfigurationProcessingQueueInterval() {
     ? GlobalConfiguration.serverConfigurationMap.get( GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL)
     : 1000; // Default to 1000 if not defined
 
-  console.log( GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL,processConfigurationProcessingQueueTimeInterval);
+  CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.PROCESS_CONFIGURATION_PROCESSING_QUEUE_TIME_INTERVAL,processConfigurationProcessingQueueTimeInterval);
   // Clear the previous interval if it exists
   if (processConfigurationProcessingQueueInterval) {
     clearInterval(processConfigurationProcessingQueueInterval);
@@ -309,13 +309,13 @@ async function processConfigurationProcessingQueue() {
   const queueEntry = GlobalConfiguration.configurationProcessingQueue.dequeue();
 
   if(queueEntry === undefined || queueEntry == null){
-    console.log('Nothing to process from configuration queue.');
+    CommonFunctions.logWithTimestamp('Nothing to process from configuration queue.');
     return;
   }
 
-  console.log(`START-CONFIGURATION-PROCESSOR ****************`);
+  CommonFunctions.logWithTimestamp(`START-CONFIGURATION-PROCESSOR ****************`);
   await queueEntry.configurationProcessing();
-  console.log(`END-CONFIGURATION-PROCESSOR ****************`);
+  CommonFunctions.logWithTimestamp(`END-CONFIGURATION-PROCESSOR ****************`);
 }
 
 // Whenever the configuration changes, call setProcessConfigurationProcessingQueueInterval() again
@@ -345,8 +345,8 @@ export function setRemoveOldTransactionsInterval() {
     clearInterval(removeOldTransactionsInterval);
   }
 
-  console.log( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL,removeOldTransactionsTimeInterval);
-  console.log( GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS,removeOldTransactionsArchiveDays);
+  CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_TIME_INTERVAL,removeOldTransactionsTimeInterval);
+  CommonFunctions.logWithTimestamp(GlobalConfiguration.appEnumerations.REMOVE_OLD_TRANSACTIONS_ARCHIVE_DAYS,removeOldTransactionsArchiveDays);
 
   // Set the new interval dynamically based on the configuration
   removeOldTransactionsInterval = setInterval(() => {
@@ -361,7 +361,7 @@ setRemoveOldTransactionsInterval();
 async function removeOldTransactions(removeOldTransactionsArchiveDays:number) {
   const thresholdDate = new Date(Date.now() - removeOldTransactionsArchiveDays * 24 * 60 * 60 * 1000); // Calculate threshold based on archive days
 
-  console.log(`START-TRANSACTION-PURGE ****************`);
+  CommonFunctions.logWithTimestamp(`START-TRANSACTION-PURGE ****************`);
   
   // Iterate over a copy of the Map entries to avoid modification during iteration
   for (const [id, { processingTime }] of Array.from(GlobalConfiguration.transactionsStatisticsMap.entries())) {
@@ -369,11 +369,11 @@ async function removeOldTransactions(removeOldTransactionsArchiveDays:number) {
 
     if (processingDate < thresholdDate) {
       GlobalConfiguration.transactionsStatisticsMap.delete(id);
-      console.log(`Old transaction removed with ID: ${id}`);
+      CommonFunctions.logWithTimestamp(`Old transaction removed with ID: ${id}`);
     }
   }
 
-  console.log(`END-TRANSACTION-PURGE ****************`);
+  CommonFunctions.logWithTimestamp(`END-TRANSACTION-PURGE ****************`);
 }
 
 // Whenever the configuration changes, call setRemoveOldTransactionsInterval() again

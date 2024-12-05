@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { getAuthDetails } from './getOrganization&User.mjs';
 import { v4 as uuidv4 } from 'uuid';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 // Middleware to decode JWT token and inject userId and organizationId into request body
 export const decodeToken = async (req:any, res:any, next:any) => {
@@ -14,7 +15,7 @@ export const decodeToken = async (req:any, res:any, next:any) => {
     '/api/openapis',
   ];
 
-  console.log('Request Path : ', req.path);
+  CommonFunctions.logWithTimestamp('Request Path : ', req.path);
   // Check if the request path is exempted or method is OPTIONS
   if (exemptPaths.some(path => req.path.startsWith(path)) || req.method === 'OPTIONS') {
     return next();
@@ -35,7 +36,7 @@ export const decodeToken = async (req:any, res:any, next:any) => {
           id: req.body.id || uuidv4(),
         };
 
-        //console.log( 'req.body', req.body);
+        //CommonFunctions.logWithTimestamp('req.body', req.body);
       }
 
       next();

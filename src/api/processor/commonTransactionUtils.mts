@@ -9,11 +9,11 @@ export class CommonTransactionUtils {
       }
 
       async addTransaction(transaction:Transaction){
-            //console.log('Transaction Pickup Status  XXX : ',transaction.pickupStatus);
-            //console.log('Transaction Delivery Status XXX : ',transaction.deliveryStatus);
+            //CommonFunctions.logWithTimestamp('Transaction Pickup Status  XXX : ',transaction.pickupStatus);
+            //CommonFunctions.logWithTimestamp('Transaction Delivery Status XXX : ',transaction.deliveryStatus);
             //console.debug(transaction);  
         if(transaction.pickupStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED && transaction.deliveryStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED ){
-            //console.log('XXXXXX', 'both completed');
+            //CommonFunctions.logWithTimestamp('XXXXXX', 'both completed');
             transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS;
         }       
         else if(transaction.pickupStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED || transaction.deliveryStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_FAILED  ){

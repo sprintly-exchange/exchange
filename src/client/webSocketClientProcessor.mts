@@ -1,7 +1,8 @@
 
 
 import WebSocket from 'ws';
-import { websocketRecordType } from './protocolTemplates.mjs'; // Adjust path as per your structure
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
+
 
 export class WebSocketClientProcessor {
   connectionName;
@@ -48,16 +49,16 @@ export class WebSocketClientProcessor {
 
   initializeWebSocket() {
     this.ws.on('open', () => {
-      console.log('WebSocket connected');
+      CommonFunctions.logWithTimestamp('WebSocket connected');
       this.ws.send(JSON.stringify({ type: 'init', message: 'WebSocket initialized' }));
     });
 
     this.ws.on('message', (data) => {
-      console.log('Received message:', data);
+      CommonFunctions.logWithTimestamp('Received message:', data);
     });
 
     this.ws.on('close', () => {
-      console.log('WebSocket disconnected');
+      CommonFunctions.logWithTimestamp('WebSocket disconnected');
     });
 
     this.ws.on('error', (error:any) => {

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class httpClientProcessorJWT {
   connectionName;
@@ -94,7 +95,7 @@ export class httpClientProcessorJWT {
         // Data to be sent in the request body
       };
       const response = await this.makeAuthenticatedRequest(this.apiUrl, this.method, data);
-      console.log('Response:', response);
+      CommonFunctions.logWithTimestamp('Response:', response);
     } catch (error:any) {
       console.error('Error in main function:', error.message);
     }

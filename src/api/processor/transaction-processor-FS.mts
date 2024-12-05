@@ -4,6 +4,7 @@ import { TransactionProcessManager } from './transactionProcessManager.mjs';
 import Transaction from '../models/Transaction.mjs';
 import { TransactionProcessorA } from './TransactionProcessorA.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 export class TransactionProcessorFS extends TransactionProcessorA{
     constructor(){
@@ -38,7 +39,7 @@ export class TransactionProcessorFS extends TransactionProcessorA{
                     //apply processing rules
               }
         }else{
-               console.log('Writing Transaction : ', transactionProcessManagerInput.transaction.id);
+               CommonFunctions.logWithTimestamp('Writing Transaction : ', transactionProcessManagerInput.transaction.id);
                
               return false;
         }     

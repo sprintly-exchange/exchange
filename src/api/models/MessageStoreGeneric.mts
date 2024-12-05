@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { FileStorage } from './FileStorage.mjs';
+import { CommonFunctions } from './CommonFunctions.mjs';
 
 export class MessageStoreGeneric {
     _id:string;
@@ -11,13 +12,13 @@ export class MessageStoreGeneric {
             case 'FS': {
                 this._messageStorage = new FileStorage('FS');
                 this._messageStorage.storageLocation = '/tmp';
-                console.log("Setting storage type to FS");
+                CommonFunctions.logWithTimestamp("Setting storage type to FS");
                 break;
             }
             default: {
                 this._messageStorage = new FileStorage('FS');
                 this._messageStorage.storageLocation = '/tmp';
-                console.log("Setting storage type to FS");
+                CommonFunctions.logWithTimestamp("Setting storage type to FS");
                 console.error("Storage type not defined, current supported type is FS (file system)");
             }
         }
@@ -37,8 +38,8 @@ export class MessageStoreGeneric {
         
         const messageSize = Buffer.byteLength(value, 'utf-8');
         const messagePath = await this._messageStorage.storeMessage(value);
-        console.log("Setting message path", messagePath);
-        console.log("Setting message size", messageSize);
+        CommonFunctions.logWithTimestamp("Setting message path", messagePath);
+        CommonFunctions.logWithTimestamp("Setting message size", messageSize);
         return [messagePath, messageSize];
     }
 

@@ -3,6 +3,7 @@ import { userHasDeleteRights,filterResultsBasedOnUserRoleAndUserId, setCommonHea
 import {v4 as uuidv4} from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const pickupRoutes = Router();
 
@@ -134,7 +135,7 @@ pickupRoutes.delete('/:id', function (req, res) {
 async function deletePickup(req:any, res:any) {   
   console.debug(`Pickup deletion id requested : ${req.params.id}`);
   setCommonHeaders(res);
-  console.log(`Attemting to delete pickup with id :  ${req.params.id}`);
+  CommonFunctions.logWithTimestamp(`Attemting to delete pickup with id :  ${req.params.id}`);
 
 
   let flowFound=false;

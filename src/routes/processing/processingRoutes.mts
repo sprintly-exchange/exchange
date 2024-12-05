@@ -3,6 +3,7 @@ import { filterResultsBasedOnUserRoleAndUserId, mapEntrySearchByValue, setCommon
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const processingRoutes = Router();
 
@@ -109,7 +110,7 @@ async function getProcessing(req:any,res:any){
  async function deleteProcessing(req:any,res:any) {
     console.debug(`Processing deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    console.log(`Attemting to delete processing with id :  ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Attemting to delete processing with id :  ${req.params.id}`);
     
     let flowFound=false;
     let flowId='';

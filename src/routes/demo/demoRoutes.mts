@@ -5,6 +5,7 @@ import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import { addDemoCases, removeDemoCases } from './addDemoCases.mjs';
 import { getAuthDetails } from "../../api/utilities/getOrganization&User.mjs";
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const demoRoutes = Router();
 
@@ -21,7 +22,7 @@ const toggleDemoMode = async (req:any) => {
             // If demo mode is currently disabled, enable it
             addDemoCases(organizationId);
             GlobalConfiguration.demoModeEnabledMap.set(organizationId, { 'status': true });
-            console.log('Demo mode status enabled for organization:', organizationId);
+            CommonFunctions.logWithTimestamp('Demo mode status enabled for organization:', organizationId);
             return true;
         }
 
@@ -32,13 +33,13 @@ const toggleDemoMode = async (req:any) => {
             // If demo mode is currently enabled, disable it
             removeDemoCases(organizationId);
             GlobalConfiguration.demoModeEnabledMap.set(organizationId, { 'status': false });
-            console.log('Demo mode status disabled for organization:', organizationId);
+            CommonFunctions.logWithTimestamp('Demo mode status disabled for organization:', organizationId);
             return false;
         } else {
         // If demo mode is currently disabled, enable it
         addDemoCases(organizationId);
         GlobalConfiguration.demoModeEnabledMap.set(organizationId, { 'status': true });
-        console.log('Demo mode status enabled for organization:', organizationId);
+        CommonFunctions.logWithTimestamp('Demo mode status enabled for organization:', organizationId);
         return true;
         }
     

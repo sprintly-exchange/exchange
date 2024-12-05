@@ -26,7 +26,7 @@ export class HTTPClient {
 
             return [JSON.stringify(data), response.status];
         } catch (error:any) {
-            //console.log('error', error);
+            //CommonFunctions.logWithTimestamp('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
             }
@@ -52,7 +52,7 @@ export class HTTPClient {
             return [JSON.stringify(data), response.status];
         } catch (error:any) {
             //disabled the logging to remove uncessary http logs when there is an error
-            //console.log('error', error);
+            //CommonFunctions.logWithTimestamp('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
             }
@@ -77,7 +77,7 @@ export class HTTPClient {
 
             return [JSON.stringify(data), response.status];
         } catch (error:any) {
-            //console.log('error', error);
+            //CommonFunctions.logWithTimestamp('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
             }
@@ -102,7 +102,7 @@ export class HTTPClient {
 
             return [JSON.stringify(data), response.status];
         } catch (error:any) {
-            //console.log('error', error);
+            //CommonFunctions.logWithTimestamp('error', error);
             if (error.response) {
                 return [undefined, error.response.status];
             }

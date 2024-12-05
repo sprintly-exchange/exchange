@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const organizationRoutes = Router();
 
@@ -211,7 +212,7 @@ async function deleteOrganisaton(req:any,res:any){
  
 
   if (GlobalConfiguration.organizationsMap.has(id)) {
-    console.log('organizationsMap.get(id).isDefaultUiDisplayFalse',GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse);
+    CommonFunctions.logWithTimestamp('organizationsMap.get(id).isDefaultUiDisplayFalse',GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse);
     if(GlobalConfiguration.organizationsMap.get(id).isDefaultUiDisplayFalse !== true){
       //organizationsMap.delete(id);
       await userHasDeleteRights(req,GlobalConfiguration.organizationsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));

@@ -1,4 +1,5 @@
 import { Kafka, logLevel } from 'kafkajs';
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class KfkaClientProcessor {
   connectionName;
@@ -55,12 +56,12 @@ export class KfkaClientProcessor {
           { value: JSON.stringify(message) },
         ],
       });
-      console.log(`Produced message to topic: ${topic}`);
+      CommonFunctions.logWithTimestamp(`Produced message to topic: ${topic}`);
     } catch (error:any) {
       console.error('Error producing message:', error.message);
     } finally {
       await producer.disconnect();
-      console.log('Disconnected Kafka producer');
+      CommonFunctions.logWithTimestamp('Disconnected Kafka producer');
     }
   }
 
@@ -72,7 +73,7 @@ export class KfkaClientProcessor {
       await consumer.subscribe({ topic, fromBeginning: true });
       await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
-          console.log({
+          CommonFunctions.logWithTimestamp({
             partition,
             offset: message.offset,
             value: message?.value?.toString(),
@@ -83,7 +84,7 @@ export class KfkaClientProcessor {
       console.error('Error consuming messages:', error.message);
     } finally {
       await consumer.disconnect();
-      console.log('Disconnected Kafka consumer');
+      CommonFunctions.logWithTimestamp('Disconnected Kafka consumer');
     }
   }
 

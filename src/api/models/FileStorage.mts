@@ -2,6 +2,7 @@ import { Storage } from './Storage.mjs';
 import fs from 'fs';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import { CommonFunctions } from './CommonFunctions.mjs';
 
 export class FileStorage extends Storage {
     _storageLocation:any;
@@ -42,13 +43,13 @@ export class FileStorage extends Storage {
      
        await this.createDirectory(folderPath);
      
-       console.log(`Directory created: ${await folderPath}`);
+       CommonFunctions.logWithTimestamp(`Directory created: ${await folderPath}`);
      
        //Store file
        const filePath = await path.join(folderPath,  uuidv4());
        await fs.writeFileSync(filePath, payload);
      
-       console.log(`File created: ${await filePath}`);
+       CommonFunctions.logWithTimestamp(`File created: ${await filePath}`);
        return  `${await filePath}`;
      }
 

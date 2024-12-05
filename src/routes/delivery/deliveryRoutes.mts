@@ -3,6 +3,7 @@ import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders, userHasDeleteR
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const deliveryRoutes = Router();
 
@@ -195,14 +196,14 @@ deliveryRoutes.delete('/:id', function (req, res) {
 async function deleteDelivery(req:any,res:any) {
     console.debug(`Delivery deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    console.log(`Attempting to delete delivery with ID: ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Attempting to delete delivery with ID: ${req.params.id}`);
 
     let flowFound = false;
     let flowId = '';
     let flowName = '';
     GlobalConfiguration.configurationFlowMap.forEach(function (flow) {
-        console.log('flow.deliveryId', flow.deliveryId);
-        console.log('req.params.id', req.params.id);
+        CommonFunctions.logWithTimestamp('flow.deliveryId', flow.deliveryId);
+        CommonFunctions.logWithTimestamp('req.params.id', req.params.id);
         if (flow.deliveryId === `${req.params.id}`) {
             flowFound = true;
             flowId = flow.id;
@@ -210,7 +211,7 @@ async function deleteDelivery(req:any,res:any) {
         }          
     });
 
-    console.log('flowFound:', flowFound);
+    CommonFunctions.logWithTimestamp('flowFound:', flowFound);
 
     if (!flowFound) {
         await userHasDeleteRights(req,GlobalConfiguration.configurationDeliveryMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
@@ -219,7 +220,7 @@ async function deleteDelivery(req:any,res:any) {
         res.status(400).send(new ResponseMessage(uuidv4(),`Delivery :  ${GlobalConfiguration.configurationDeliveryMap.get(req.params.id).connectionName} used in flow :  ${flowName}`,'Failed')) ;
     }
 
-    console.log(`Current deliveries after deletion: ${GlobalConfiguration.configurationDeliveryMap.size}`);
+    CommonFunctions.logWithTimestamp(`Current deliveries after deletion: ${GlobalConfiguration.configurationDeliveryMap.size}`);
 }
 
 export default deliveryRoutes;

@@ -1,6 +1,7 @@
 import * as ftp from 'basic-ftp';
 import { promises as fs } from 'fs'; // Import fs.promises
 import os from "os";
+import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
 export class FtpClientProcessor {
   host;
@@ -72,7 +73,7 @@ export class FtpClientProcessor {
         password: this.password,
         secure: this.secure
       });
-      console.log('Connected to FTP server');
+      CommonFunctions.logWithTimestamp('Connected to FTP server');
       return true;
     } catch (err) {
       console.error('Error connecting to FTP server:', err);
@@ -85,7 +86,7 @@ export class FtpClientProcessor {
       const localFilePath = `${this.localPath}/${localFileName}`;
       const remoteFilePath = `${this.remotePath}/${localFileName}`;
       await this.ftp.uploadFrom(localFilePath, remoteFilePath);
-      console.log(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
+      CommonFunctions.logWithTimestamp(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
     } catch (err) {
       console.error('Error uploading file:', err);
       throw err;
@@ -97,7 +98,7 @@ export class FtpClientProcessor {
       const localFilePath = `${localFileName}`;
       const remoteFilePath = `${this.remotePath}/${remoteFileName}`;
       await this.ftp.uploadFrom(localFilePath, remoteFilePath);
-      console.log(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
+      CommonFunctions.logWithTimestamp(`Uploaded file: ${localFilePath} to ${remoteFilePath}`);
     } catch (err) {
       console.error('Error uploading file:', err);
       throw err;
@@ -113,7 +114,7 @@ export class FtpClientProcessor {
       
       // Read the downloaded file content as a string
       const fileContent = await fs.readFile(localFilePath, 'utf8');
-      console.log("Downloaded file from ftp server : ",fileContent);
+      CommonFunctions.logWithTimestamp("Downloaded file from ftp server : ",fileContent);
       return fileContent;
     } catch (err) {
       console.error('Error downloading file:', err);
@@ -124,7 +125,7 @@ export class FtpClientProcessor {
   async listFiles() {
     try {
       const fileList = await this.ftp.list(this.remotePath);
-      //console.log('Files in remote directory:', fileList);
+      //CommonFunctions.logWithTimestamp('Files in remote directory:', fileList);
       return fileList;
     } catch (err) {
       console.error('Error listing files:', err);
@@ -140,7 +141,7 @@ export class FtpClientProcessor {
           await this.downloadFile(file.name);
         }
       }
-      console.log('Downloaded all files.');
+      CommonFunctions.logWithTimestamp('Downloaded all files.');
     } catch (err) {
       console.error('Error downloading all files:', err);
       throw err;
@@ -151,7 +152,7 @@ export class FtpClientProcessor {
     try {
       const localFilePath = `${this.localPath}/${localFileName}`;
       const fileContent = await fs.readFile(localFilePath, 'utf8');
-      console.log(`Read file content: ${localFilePath}`);
+      CommonFunctions.logWithTimestamp(`Read file content: ${localFilePath}`);
       return fileContent;
     } catch (err) {
       console.error('Error reading file:', err);
@@ -163,7 +164,7 @@ export class FtpClientProcessor {
     try {
       const remoteFilePath = `${this.remotePath}/${remoteFileName}`;
       await this.ftp.remove(remoteFilePath);
-      console.log(`Deleted file: ${remoteFilePath}`);
+      CommonFunctions.logWithTimestamp(`Deleted file: ${remoteFilePath}`);
     } catch (err) {
       console.error('Error deleting file:', err);
       throw err;
@@ -173,7 +174,7 @@ export class FtpClientProcessor {
   async disconnect() {
     try {
       await this.ftp.close();
-      console.log('Disconnected from FTP server');
+      CommonFunctions.logWithTimestamp('Disconnected from FTP server');
     } catch (err) {
       console.error('Error disconnecting from FTP server:', err);
       throw err;

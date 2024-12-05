@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const loginRoutes = Router();
 
@@ -71,9 +72,9 @@ loginRoutes.post('/login', async (req:any, res:any) => {
       if (foundUser) {
         // Update the lastLoggedInTime of the found user
         foundUser.lastLoggedInTime = new Date(); // Or set to your desired time
-        console.log(`Updated lastLogged for user: ${foundUser.username}`);
+        CommonFunctions.logWithTimestamp(`Updated lastLogged for user: ${foundUser.username}`);
     } else {
-        console.log('User not found.');
+        CommonFunctions.logWithTimestamp('User not found.');
     }
 
       // Check if password matches
@@ -94,7 +95,7 @@ loginRoutes.post('/login', async (req:any, res:any) => {
         { expiresIn: '1h' });
       res.send({ "status": "success", "token": token });
   } catch (error:any) {
-    console.log(error);
+    CommonFunctions.logWithTimestamp(error);
       res.status(400).send(error.message);
   }
 });

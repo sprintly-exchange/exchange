@@ -7,6 +7,7 @@ import { getOrgId, getRoleId, getUserById, getUserId, organizationExists, userEx
 import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
 
 const {TokenExpiredError} = pkg;
 const returnObj =  {userId: '',organizationId: ''}
@@ -36,7 +37,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
 
       if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded && 'organizationId' in decoded) {
           const { userId, organizationId } = decoded as JwtPayload;
-          console.log(`User ID: ${userId}, Organization ID: ${organizationId}`);
+          CommonFunctions.logWithTimestamp(`User ID: ${userId}, Organization ID: ${organizationId}`);
           returnObj.userId = userId;
           returnObj.organizationId = organizationId;
           return returnObj;
@@ -46,7 +47,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
     }catch (error) {
       if (error instanceof TokenExpiredError) {
         // Handle the expired token case
-        console.log('Token expired:', error.expiredAt);
+        CommonFunctions.logWithTimestamp('Token expired:', error.expiredAt);
         throw new Error('Access Denied: Token has expired, please reauthenticate!');
         // Alternatively, implement token refresh logic here if applicable
         // Example:
@@ -54,7 +55,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
         // return await getAuthDetails(`Bearer ${newToken}`);
       } else {
         // For other types of errors (like invalid token), fall back to Google authentication
-        console.log('Checking for Google user authentication.');
+        CommonFunctions.logWithTimestamp('Checking for Google user authentication.');
         return await checkGoogleAuth(token);
       }
     }
@@ -84,7 +85,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
             };
             GlobalConfiguration.organizationsMap.set(org.id,org);
             returnObj.organizationId = org.id;
-            console.log('rganization added : ',new Date().toISOString(), org);
+            CommonFunctions.logWithTimestamp('rganization added : ',new Date().toISOString(), org);
           } else {
             returnObj.organizationId = getOrgId(email);
           }
@@ -106,7 +107,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
             };
             GlobalConfiguration.organizationsUsersMap.set(user.id,user);
             returnObj.userId = user.id;
-            console.log('User added : ',new Date().toISOString(), user);
+            CommonFunctions.logWithTimestamp('User added : ',new Date().toISOString(), user);
             GlobalConfiguration.googleUserCreationStatus[email] = false;
           } else {
             returnObj.userId = getUserId(email);
@@ -120,7 +121,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
       
       return returnObj;
     }catch(error:any){
-      console.log(error);
+      CommonFunctions.logWithTimestamp(error);
       return  returnObj;
   
     }
@@ -134,24 +135,24 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
       // Fetch Google's public keys
       const response = await axios.get('https://www.googleapis.com/oauth2/v3/certs');
       const keys = response.data.keys;
-      //console.log('Fetched keys:', JSON.stringify(keys, null, 2));
+      //CommonFunctions.logWithTimestamp('Fetched keys:', JSON.stringify(keys, null, 2));
   
       // Decode the token header to get the key ID (kid)
       const decodedHeader = jwt.decode(token, { complete: true });
       if (!decodedHeader) {
         throw new Error('Invalid token');
       }
-      //console.log('Decoded header:', JSON.stringify(decodedHeader, null, 2));
+      //CommonFunctions.logWithTimestamp('Decoded header:', JSON.stringify(decodedHeader, null, 2));
   
       const kid = decodedHeader.header.kid;
-      //console.log('Key ID (kid):', kid);
+      //CommonFunctions.logWithTimestamp('Key ID (kid):', kid);
   
       // Find the public key that matches the key ID
       const key = keys.find((k:any) => k.kid === kid);
       if (!key) {
         throw new Error('Key not found');
       }
-      //console.log('Matched key:', JSON.stringify(key, null, 2));
+      //CommonFunctions.logWithTimestamp('Matched key:', JSON.stringify(key, null, 2));
   
       // Ensure the key has the x5c property or convert JWK to PEM
       let pubKey;
@@ -164,7 +165,7 @@ export const getAuthDetails = async (authorizationHeader:string): Promise<AuthDe
       } else {
         throw new Error('Invalid key format: x5c and RSA properties are missing or empty');
       }
-      //console.log('Public key:', pubKey);
+      //CommonFunctions.logWithTimestamp('Public key:', pubKey);
   
       // Verify the token
       const decoded = jwt.verify(token, pubKey);

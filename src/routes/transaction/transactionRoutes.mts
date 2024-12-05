@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { userHasDeleteRights, filterResultsBasedOnUserRole } from '../../api/utilities/serverCommon.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
 const transactionRoutes = Router();
 /**
@@ -68,10 +69,10 @@ transactionRoutes.delete('/:id', function (req, res) {
 async function deleteTransaction(req:any, res:any) {   
     console.debug(`Transaction deletion id requested : ${req.params.id}`);
     setCommonHeaders(res);
-    console.log(`Attempting to delete transaction with id :  ${req.params.id}`);
-    console.log(`Current transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
+    CommonFunctions.logWithTimestamp(`Attempting to delete transaction with id :  ${req.params.id}`);
+    CommonFunctions.logWithTimestamp(`Current transactions : ${GlobalConfiguration.transactionsStatisticsMap.size}`);
     await userHasDeleteRights(req,GlobalConfiguration.transactionsStatisticsMap,req.params.id) ? res.status(200).send('') : res.status(400).send(new ResponseMessage(uuidv4(),'Not allowed','Failed'));
-    console.log(`Current transactions after deletion: ${GlobalConfiguration.transactionsStatisticsMap.size}`);
+    CommonFunctions.logWithTimestamp(`Current transactions after deletion: ${GlobalConfiguration.transactionsStatisticsMap.size}`);
 };
 
 /**
@@ -241,7 +242,7 @@ transactionRoutes.get('/search', function (req, res) {
 async function transationSearch(req:any,res:any){
     const start = Number(req.query.start);
     const end = Number(req.query.end);
-    //console.log('transactonsStatisticsMap length', transactonsStatisticsMap.size);
+    //CommonFunctions.logWithTimestamp('transactonsStatisticsMap length', transactonsStatisticsMap.size);
     const events = await filterResultsBasedOnUserRole(GlobalConfiguration.transactionsStatisticsMap,req);
     console.debug(`Transaction search request between start : ${new Date(start).toISOString()} and end : ${new Date(end).toISOString()}`);
     setCommonHeaders(res);
@@ -260,7 +261,7 @@ async function transationSearchByIds(req:any,res:any){
     const eventsByIds = searcTransationSearchByIds(req.query.messageId,req.query.senderId,req.query.receiverId,events)
     return eventsByIds.length > 0 ? res.status(200).send(eventsByIds) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 
     
-    console.log('events',events.length);return eventsByIds.length > 0 ? res.status(200).send(eventsByIds) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 
+    CommonFunctions.logWithTimestamp('events',events.length);return eventsByIds.length > 0 ? res.status(200).send(eventsByIds) : res.status(204).send(new ResponseMessage(uuidv4(),`Transactions not found.`,'Failed')); 
 }
 
 export default transactionRoutes;

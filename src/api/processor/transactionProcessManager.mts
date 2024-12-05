@@ -7,7 +7,7 @@ import { Transaction } from '../models/Transaction.mjs';
 import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
-
+import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 //processing transactions
 export class TransactionProcessManager{
@@ -70,7 +70,7 @@ export class TransactionProcessManager{
       async processPickup(){
             this.transactionProcessManagerStage = this._STAGE_PICKUP;
             this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP;
-            console.log('Processing pickup : ', this.transaction.id);
+            CommonFunctions.logWithTimestamp('Processing pickup : ', this.transaction.id);
             switch(this.configPickup.protocol){
                   //Pickup from file connector from localhost
                   case 'FS': {
@@ -103,31 +103,31 @@ export class TransactionProcessManager{
       async configurationProcessing() {
             this.transactionProcessManagerStage = this._STAGE_PROCESSING;
             this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_CONFIGURATIONS;
-            console.log('Processing configuration : ', this.transaction.id);
+            CommonFunctions.logWithTimestamp('Processing configuration : ', this.transaction.id);
 
-            //console.log(this.configProcessing);
+            //CommonFunctions.logWithTimestamp(this.configProcessing);
             if(this.configProcessing && this.configProcessing.code){
                   // Decode the base64 encoded code to a string
                   //const decodedCode = atob(this.configProcessing.code);
                   const decodedCode = Buffer.from(this.configProcessing.code, 'base64').toString('utf-8');
-                  //console.log('Decoded Code:', decodedCode); // Debugging statement to see the decoded code
+                  //CommonFunctions.logWithTimestamp('Decoded Code:', decodedCode); // Debugging statement to see the decoded code
             
                   try {
                   // Use Function constructor to create a new function from the decoded code
                   const generatedObject = new Function(`return ${decodedCode}`)();
-                  //console.log('Generated Object:', generatedObject);
-                  //console.log('Method from Object:', generatedObject.method);
+                  //CommonFunctions.logWithTimestamp('Generated Object:', generatedObject);
+                  //CommonFunctions.logWithTimestamp('Method from Object:', generatedObject.method);
             
                   // Check if generatedObject is defined and has a method to execute
                   if (generatedObject && typeof generatedObject.method === 'function') {
-                        console.log('Method is a function and will be executed.');
+                        CommonFunctions.logWithTimestamp('Method is a function and will be executed.');
             
                         this.commonTransactionUtils.addTransaction(this.transaction);
                         await GlobalConfiguration.deliveryProcessingQueue.enqueue(this);
             
                         // Execute the method
                         const result = await generatedObject.method(this);
-                        console.log('Method executed successfully:', result);
+                        CommonFunctions.logWithTimestamp('Method executed successfully:', result);
                         //return result; // Return result if needed
                   } else {
                         console.error('Generated object does not have a valid method to execute.');
@@ -151,7 +151,7 @@ export class TransactionProcessManager{
       async processDelivery(){
             this.transactionProcessManagerStage = this._STAGE_DELIVERY;
             this.transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_DELIVERY;
-            console.log('Processing delivery : ', this.transaction.id);
+            CommonFunctions.logWithTimestamp('Processing delivery : ', this.transaction.id);
             switch(this.configDelivery.protocol){
                   //Delviery to localhost through file connector
                   case 'FS': {
@@ -161,14 +161,14 @@ export class TransactionProcessManager{
                   }
                   //Delivery to HTTP POST
                   case 'HTTP': {
-                        console.log('********** HTTP DELIVERY');
+                        CommonFunctions.logWithTimestamp('********** HTTP DELIVERY');
                         await this.transactionProcessorHTTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
                   } 
                   case 'FTP': {
                         //flow name is required as this is handled in seperate way
-                        console.log('********** FTP DELIVERY');
+                        CommonFunctions.logWithTimestamp('********** FTP DELIVERY');
                         await this.transactionProcessorFTP.transactionProcessorDelivery(this);
                         this.commonTransactionUtils.addTransaction(this.transaction); 
                         break;
