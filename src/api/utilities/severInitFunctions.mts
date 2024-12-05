@@ -11,11 +11,6 @@ import { Organization } from '../models/Organization.mjs';
 import { User } from '../models/User.mjs';
 import { OrganizationRole } from '../models/OrganizationRole.mjs';
 
-//Global enums
-
-
-
-
 let defaultRoleAdmin:OrganizationRole|undefined;
 let defaultRoleOrganizationAdmin:OrganizationRole|undefined;
 let defaultRoleOrganizationUser:OrganizationRole|undefined;
@@ -95,7 +90,6 @@ async function generatePassword() {
         
         if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
           const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_ADMIN);
-          //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
           if(!roleExists){
             console.log('Adding organization admin role.')
             defaultRoleOrganizationAdmin = {
@@ -111,7 +105,6 @@ async function generatePassword() {
         // Check if the default organization user role exists
         if (GlobalConfiguration.organizationsRolesMap instanceof Map) {
           const roleExists = Array.from(GlobalConfiguration.organizationsRolesMap.values()).some(org => org.role === GlobalConfiguration.appEnumerations.APP_DEFAULT_ROLE_ORGANIZATION_USER);
-          //console.log('Array.from(organizationsRolesMapNew.values()).some(org => org.role - user :',userExists);
           if(!roleExists){
             console.log('Adding organization user role.')
             defaultRoleOrganizationUser = {
