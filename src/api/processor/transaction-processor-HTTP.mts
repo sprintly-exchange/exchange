@@ -1,4 +1,4 @@
-import { HTTPClient } from "../../client/http-client.mjs";
+import { HTTPClient } from "../../client/HTTPClient.mjs";
 import Transaction from "../models/Transaction.mjs";
 import { TransactionProcessManager } from "./transactionProcessManager.mjs";
 import { TransactionProcessorA } from "./TransactionProcessorA.mjs";

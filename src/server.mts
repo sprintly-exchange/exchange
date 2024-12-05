@@ -40,35 +40,9 @@ app.use(bodyParser.json() );
 app.use(bodyParser.urlencoded({  extended: true }));
 
 
-// Or configure specific options
 // app.use(cors({ origin: 'http://example.com' }));
 app.use(cors()); // Enable CORS for all routes
 
-
-//customer loger
-//const logger = new CustomLogger();
-
-// Middleware to create and attach a custom logger to each request
-/*
-app.use((req, res, next) => {
-  const logFileName = `${req.id}.log`;
-  req.log = logger.createLogger(logFileName);
-  req.log.info(`Incoming request: ${req.method} ${req.url}`);
-  next();
-});
-*/
-
-// Middleware to log the response
-/*
-app.use((req, res, next) => {
-  const oldSend = res.send;
-  res.send = function (data) {
-    req.log.info(`Outgoing response: ${res.statusCode} ${data}`);
-    oldSend.apply(res, arguments);
-  };
-  next();
-});
-*/
 
 // Use the decodeToken middleware
 app.use(decodeToken);
@@ -77,7 +51,6 @@ initFunction();
 //swagger UI
 // Serve Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
 
 app.options('*', function (req, res) {   
       CommonFunctions.logWithTimestamp(`Options request..`);

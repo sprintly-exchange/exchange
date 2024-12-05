@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import { FSClient } from '../../client/fs-client.mjs';
+import { FSClient } from '../../client/FSClient.mjs';
 import { TransactionProcessManager } from './transactionProcessManager.mjs';
 import Transaction from '../models/Transaction.mjs';
 import { TransactionProcessorA } from './TransactionProcessorA.mjs';

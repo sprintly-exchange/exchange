@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CommonFunctions } from '../api/models/CommonFunctions.mjs';
 
-export class httpClientProcessorJWT {
+export class HttpClientProcessorJWT {
   connectionName;
   host;
   port;
