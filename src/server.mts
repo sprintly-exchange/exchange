@@ -29,6 +29,7 @@ import OpenApis from './routes/openapi/openApis.mjs';
 import cors from 'cors';
 import GlobalConfiguration from './GlobalConfiguration.mjs';
 import { CommonFunctions } from './api/models/CommonFunctions.mjs';
+import invoiceRoutes from './routes/invoices/invoiceRoutes.mjs';
 
 const SERVER_PORT = process.env.SERVER_PORT || 4000;
 
@@ -76,6 +77,8 @@ app.use('/api/iam',loginRoutes);
 app.use('/api/organizations',organizationRoutes);
 app.use('/api/users',userRoutes);
 app.use('/api/openapis',OpenApis);
+app.use('/api/invoice',invoiceRoutes);
+
 
 app.get('/api/dummy', function (req, res) {   
       CommonFunctions.logWithTimestamp(`Dummy API request for debugging requested.`);
