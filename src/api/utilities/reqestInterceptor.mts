@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { getAuthDetails } from './getOrganization&User.mjs';
 import { v4 as uuidv4 } from 'uuid';
 import { CommonFunctions } from '../models/CommonFunctions.mjs';
+import { ResponseMessage } from '../models/ResponseMessage.mjs';
 
 // Middleware to decode JWT token and inject userId and organizationId into request body
 export const decodeToken = async (req:any, res:any, next:any) => {
@@ -21,10 +22,15 @@ export const decodeToken = async (req:any, res:any, next:any) => {
     return next();
   }
 
+  let authDetails;
+
   try {
-    const authDetails = await getAuthDetails(req.headers['authorization']);
+     authDetails = await getAuthDetails(req.headers['authorization']);
+
     if (authDetails) {
       const { userId, organizationId } = authDetails;
+
+      
    
       // Inject userId and organizationId into request body if they exist
       if (req.method === 'POST' || req.method === 'PUT') {
@@ -43,7 +49,12 @@ export const decodeToken = async (req:any, res:any, next:any) => {
     }
   } catch (error) {
     CommonFunctions.logWithTimestamp('JWT verification error:', error);
-    return res.status(400).send('Invalid Token');
+    if(authDetails === undefined){
+      res.status(401).send(new ResponseMessage(uuidv4(),'AUthnetication error, try logging again','Falied'));
+    }else{
+      return res.status(401).send('Invalid Token');
+    }
+    
   }
 };
 
