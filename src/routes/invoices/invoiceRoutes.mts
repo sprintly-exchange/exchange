@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';  // Import Multer for handling file uploads
 import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
-import { setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
+import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 
@@ -138,17 +138,22 @@ invoiceRoutes.get('/:id', function (req, res) {
 
 // GET route to retrieve all invoices
 invoiceRoutes.get('/', function (req, res) {
+    getInvoices(req,res);
+});
+
+async  function getInvoices(req:any,res:any){
     CommonFunctions.logWithTimestamp('All invoices requested');
     setCommonHeaders(res);
 
     // Get all invoices from the map
-    const invoices = Array.from(GlobalConfiguration.configurationInvoiceMap.values());
-    if (invoices.length > 0) {
-        res.status(200).send(invoices);
+    const events = await filterResultsBasedOnUserRoleAndUserId(GlobalConfiguration.configurationInvoiceMap, req);
+    
+    if (events.length > 0) {
+        res.status(200).send(events);
     } else {
         res.status(204).send('No invoices found');
     }
-});
+}
 
 /**
  * @swagger
