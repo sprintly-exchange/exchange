@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { CommonFunctions } from '../models/CommonFunctions.mjs';
+import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 
 export class ConfigurationFileStorage {
   _storageLocation;
@@ -13,7 +14,7 @@ export class ConfigurationFileStorage {
       this._storageLocation = process.env.CONFIG_STORAGE_DIR;
     } 
     else {
-      this._storageLocation = "/tmp";
+      this._storageLocation = GlobalConfiguration.appEnumerations.FILE_STORAGE_DEFAULT_DIR;
     }
     this.prefix = prefix;
     this.maxFileSize = 1024 * 1024 * 10

@@ -12,7 +12,7 @@ const invoiceRoutes = Router();
 // Set up storage for Multer (optional, you can specify destination and filename for uploaded files)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '');  // Set the folder where files should be saved
+    cb(null,GlobalConfiguration.appEnumerations.FILE_STORAGE_UPLOAD_FILES_DEFAULT_DIR);  // Set the folder where files should be saved
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);  // Name the file uniquely (e.g., timestamp + original name)
