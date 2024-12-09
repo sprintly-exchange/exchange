@@ -65,19 +65,19 @@ app.use(cors({
 
 // Use the imported routes
 app.use('/api/demo', demoRoutes);
-app.use('/api/pickup/',pickupRoutes);
-app.use('/api/delivery/',deliveryRoutes);
-app.use('/api/flow/',flowRoutes);
-app.use('/api/transactions/',transactionRoutes);
-app.use('/api/processing/',processingRoutes);
-app.use('/api/messagestore/',messageStoreRoutes);
-app.use('/api/configuration/',configurationRoutes);
-app.use('/api/system/',systemStatusRoutes);
-app.use('/api/iam/',loginRoutes);
-app.use('/api/organizations/',organizationRoutes);
-app.use('/api/users/',userRoutes);
+app.use('/api/pickup',pickupRoutes);
+app.use('/api/delivery',deliveryRoutes);
+app.use('/api/flow',flowRoutes);
+app.use('/api/transactions',transactionRoutes);
+app.use('/api/processing',processingRoutes);
+app.use('/api/messagestore',messageStoreRoutes);
+app.use('/api/configuration',configurationRoutes);
+app.use('/api/system',systemStatusRoutes);
+app.use('/api/iam',loginRoutes);
+app.use('/api/organizations',organizationRoutes);
+app.use('/api/users',userRoutes);
 app.use('/api/openapis',OpenApis);
-app.use('/api/invoice/',invoiceRoutes);
+app.use('/api/invoice',invoiceRoutes);
 
 
 app.get('/api/dummy', function (req, res) {   
