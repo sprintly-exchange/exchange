@@ -14,12 +14,14 @@ export class ConfigurationFileStorage {
       this._storageLocation = process.env.CONFIG_STORAGE_DIR;
     } 
     else {
-      this._storageLocation = GlobalConfiguration.appEnumerations.FILE_STORAGE_DEFAULT_DIR;
+      this._storageLocation = '/tmp';
     }
     this.prefix = prefix;
     this.maxFileSize = 1024 * 1024 * 10
     this.currentFileNumber = 0;
   }
+
+
 
   async saveStaticFile(filename:string, data:any) {
     fs.writeFileSync( path.join(this._storageLocation, `${this.prefix}_${filename}`), data);

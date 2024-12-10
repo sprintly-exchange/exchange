@@ -5,6 +5,7 @@ import { ResponseMessage } from '../../api/models/ResponseMessage.mjs';
 import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders } from '../../api/utilities/serverCommon.mjs';
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
+import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
 
 // Initialize router
 const invoiceRoutes = Router();
@@ -54,43 +55,51 @@ const upload = multer({ storage: storage });
  */
 
 // POST route to handle invoice upload
-invoiceRoutes.post('/', upload.single('file'), (req, res) => {
-    try {
-        CommonFunctions.logWithTimestamp('Invoice upload received');
-        setCommonHeaders(res);
+invoiceRoutes.post('/', upload.single('file'), (req:any, res:any) => {
+        postInvoices(req,res);
+    });
 
-        // Log received data for debugging purposes
-        console.log('Received body:', req.body);
-        console.log('Received file:', req.file);
 
-        // Check if a file was uploaded
-        if (!req.file) {
-            res.status(400).send('No file uploaded');
-            return; // Ensure the handler ends here
+    async function postInvoices(req:any,res:any){
+        try {
+            CommonFunctions.logWithTimestamp('Invoice upload received');
+            setCommonHeaders(res);
+    
+            // Log received data for debugging purposes
+            //console.log('Received body:', req.body);
+            console.log('Received file:', req.file);
+            const authDetails:any = await getAuthDetails(req.headers['authorization']);
+            console.log(authDetails);
+            // Check if a file was uploaded
+            if (!req.file) {
+                res.status(400).send('No file uploaded');
+                return; // Ensure the handler ends here
+            }
+    
+            // Generate a unique ID for the invoice
+            const invoiceId = uuidv4();
+            const invoiceData = {
+                id: invoiceId,
+                fileName: req.file.originalname, // Use the uploaded file's original name
+                status: 'Pending', // Set the initial status to Pending
+                uploadedAt: new Date().toISOString(), // Store the upload timestamp
+                organizationId: `${authDetails.organizationId}`,
+            };
+    
+            console.log('invoiceData',invoiceData);
+            // Store the invoice in memory (or in a database, in real applications)
+            GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
+    
+            // Send a success response
+            res.status(201).send(
+                JSON.stringify(new ResponseMessage(invoiceId, 'Invoice uploaded successfully', ''))
+            );
+        } catch (error) {
+            // Handle unexpected errors
+            console.error('Error handling invoice upload:', error);
+            res.status(500).send('Internal server error');
         }
-
-        // Generate a unique ID for the invoice
-        const invoiceId = uuidv4();
-        const invoiceData = {
-            id: invoiceId,
-            fileName: req.file.originalname, // Use the uploaded file's original name
-            status: 'Pending', // Set the initial status to Pending
-            uploadedAt: new Date().toISOString(), // Store the upload timestamp
-        };
-
-        // Store the invoice in memory (or in a database, in real applications)
-        GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
-
-        // Send a success response
-        res.status(201).send(
-            JSON.stringify(new ResponseMessage(invoiceId, 'Invoice uploaded successfully', ''))
-        );
-    } catch (error) {
-        // Handle unexpected errors
-        console.error('Error handling invoice upload:', error);
-        res.status(500).send('Internal server error');
-    }
-});
+    };
 
 
 /**
