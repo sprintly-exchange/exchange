@@ -28,8 +28,9 @@ export function transactionSummary(events:any) {
     }
   
     const counts = { SUCCESS: 0, FAILED: 0, INPROCESSING: 0 };
-  
+    let count=0;
     events.forEach((entry:any) => {
+      count++;
       if (
         entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_INPROCESSING ||
         entry.status === GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_PROCESSING_PICKUP ||
@@ -45,7 +46,7 @@ export function transactionSummary(events:any) {
     });
   
     const summary = {
-      total: `${events.size ? events.size : 0}`,
+      total: `${count}`,
       failures: `${counts.FAILED}`,
       successes: `${counts.SUCCESS}`,
       inprocessing: `${counts.INPROCESSING}`,
