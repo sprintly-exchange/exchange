@@ -2,12 +2,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileStorage } from './FileStorage.mjs';
 import { CommonFunctions } from '../models/CommonFunctions.mjs';
 import { StorageType } from './StorageType';
+import { TransactionMessageStorageA } from './TransactionMessageStorageA.mjs';
 
-export class TransactionMessageStorage {
+export class TransactionMessageStorage extends TransactionMessageStorageA {
     _id:string;
     _messageStorage;
 
     constructor(storageType:StorageType) {
+        super();
         this._id = uuidv4();
         switch (storageType) {
             case 'FS': {
@@ -33,7 +35,7 @@ export class TransactionMessageStorage {
     }
 
     // Set methods
-    async storeMessage(value:any) {
+    async storeMessage(value:any): Promise<[string, number]>{
         if (value === undefined) 
             return ['', 0];
         
@@ -45,7 +47,7 @@ export class TransactionMessageStorage {
     }
 
     // Get methods
-    async getMessage(id:string) {
+    async getMessage(id:string):Promise<string|undefined> {
         CommonFunctions.logWithTimestamp("Reading file from id:", id);
         return await this._messageStorage.getMessage(id);
     }
