@@ -1,7 +1,7 @@
 import Queue from "./api/system/Queue.mjs";
 import { FileStorage } from "./api/models/FileStorage.mjs";
 import { ConfigurationProcessor } from "./api/configurationProcessor/configurationProcessor.mjs";
-import ConfigurationFileStorage from "./api/configurationProcessor/ConfigurationFileStorage.mjs";
+import ConfigurationFileStorageFS from "./api/configurationProcessor/ConfigurationFileStorageFS.mjs";
 
 class GlobalConfiguration {
     public static configurationPickupMap: Map<string, any> = new Map();
@@ -24,7 +24,7 @@ class GlobalConfiguration {
 
     public static configurationProcessor: ConfigurationProcessor = new ConfigurationProcessor(); // Fixed typo
 
-    public static storageConfiguration: ConfigurationFileStorage = new ConfigurationFileStorage('FS');
+    public static storageConfiguration: ConfigurationFileStorageFS = new ConfigurationFileStorageFS('FS');
 
     public static googleUserCreationStatus: Record<string, any> = {}; // More specific typing
 

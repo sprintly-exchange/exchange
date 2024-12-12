@@ -1,20 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import { CommonFunctions } from '../models/CommonFunctions.mjs';
-import GlobalConfiguration from '../../GlobalConfiguration.mjs';
+import ConfigurationFileStorageA from './ConfigurationFileStorageA.mjs';
 
-export class ConfigurationFileStorage {
+export class ConfigurationFileStorageFS  extends ConfigurationFileStorageA {
   _storageLocation;
   prefix;
   maxFileSize;
   currentFileNumber;
 
   constructor(prefix:string) { // Default max file size is 1MB
+    super();
     if(process.env.CONFIG_STORAGE_DIR){
       this._storageLocation = process.env.CONFIG_STORAGE_DIR;
     } 
     else {
       this._storageLocation = '/tmp';
+      CommonFunctions.logWarningWithTimestamp('Configruation file storage set to /tmp');
     }
     this.prefix = prefix;
     this.maxFileSize = 1024 * 1024 * 10
@@ -48,4 +50,4 @@ export class ConfigurationFileStorage {
   }
 }
 
-export default ConfigurationFileStorage;
+export default ConfigurationFileStorageFS;
