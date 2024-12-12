@@ -20,7 +20,7 @@ export abstract class belongsToA implements belongsToI{
       addOrganistionId(organizationId:string):boolean{
         const pos = this.organizationIds.indexOf(organizationId);
         if(pos){
-          return false;
+          return true;
         }else {
           this.organizationIds.push(organizationId);
           return true;
