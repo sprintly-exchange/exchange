@@ -1,0 +1,1 @@
+export type StorageType = 'FS' | 'CLOUD' | 'FTP' | 'DATABASE';

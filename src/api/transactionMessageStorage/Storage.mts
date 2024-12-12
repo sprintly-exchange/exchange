@@ -1,14 +1,15 @@
 import {v4 as uuidv4} from 'uuid';
+import { StorageType } from './StorageType';
 
 export class Storage{
-    _storageType:any;
+    _storageType:StorageType;
      get storageType() {
        return this._storageType;
      }
      set storageType(value) {
        this._storageType = value;
      }
-    constructor(storageType:any){
-      this.storageType = storageType;
+    constructor(storageType:StorageType){
+      this._storageType = storageType;
     }
    }

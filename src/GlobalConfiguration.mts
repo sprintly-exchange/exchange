@@ -1,5 +1,5 @@
 import Queue from "./api/system/Queue.mjs";
-import { FileStorage } from "./api/models/FileStorage.mjs";
+import { FileStorage } from "./api/transactionMessageStorage/FileStorage.mjs";
 import { ConfigurationProcessor } from "./api/configurationProcessor/configurationProcessor.mjs";
 import ConfigurationFileStorageFS from "./api/configurationProcessor/ConfigurationFileStorageFS.mjs";
 

@@ -4,7 +4,7 @@ import { TransactionProcessorFTP } from "./transaction-processor-FTP.mjs";
 import xmldom from "xmldom";
 
 import { Transaction } from '../models/Transaction.mjs';
-import { MessageStoreGeneric } from "../models/MessageStoreGeneric.mjs";
+import { TransactionMessageStorage } from "../transactionMessageStorage/TransactionMessageStorage.mjs";
 import { CommonTransactionUtils } from "./commonTransactionUtils.mjs";
 import GlobalConfiguration from "../../GlobalConfiguration.mjs";
 import { CommonFunctions } from "../models/CommonFunctions.mjs";
@@ -40,7 +40,7 @@ export class TransactionProcessManager{
             this.configProcessing =  configProcessing;
             this.configurationFlow = configurationFlow;
             this.flowName = configurationFlow.flowName;
-            this.messageStore = new MessageStoreGeneric("FS");
+            this.messageStore = new TransactionMessageStorage("FS");
             this.commonTransactionUtils = new CommonTransactionUtils();
            
             this.transaction = new Transaction(

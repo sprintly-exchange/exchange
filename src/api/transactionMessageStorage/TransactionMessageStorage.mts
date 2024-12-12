@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { FileStorage } from './FileStorage.mjs';
-import { CommonFunctions } from './CommonFunctions.mjs';
+import { CommonFunctions } from '../models/CommonFunctions.mjs';
+import { StorageType } from './StorageType';
 
-export class MessageStoreGeneric {
+export class TransactionMessageStorage {
     _id:string;
     _messageStorage;
 
-    constructor(storageType:any) {
+    constructor(storageType:StorageType) {
         this._id = uuidv4();
         switch (storageType) {
             case 'FS': {
