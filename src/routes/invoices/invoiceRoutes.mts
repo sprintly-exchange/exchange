@@ -92,6 +92,7 @@ invoiceRoutes.post('/', upload.single('file'), (req:any, res:any) => {
             // Store the invoice in memory (or in a database, in real applications)
             GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
 
+            // Add a transaction for the uploaded invoice
            let transaction = new Transaction(
                 new Date().toISOString(),
                 GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_UPLOADED,
@@ -108,10 +109,14 @@ invoiceRoutes.post('/', upload.single('file'), (req:any, res:any) => {
                 0,
                 0,
                 0,
-                'Manual',
+                GlobalConfiguration.appEnumerations.TRANSACTION_FLOW_FILE_UPLOAD_NAME,
                 `${authDetails.organizationId}`,
             );
 
+            // Set the transaction message type and ID
+            transaction.messageType = GlobalConfiguration.appEnumerations.TRANSACTION_MESSAGE_TYPE_INVOICE;
+            transaction.messageId = invoiceId;
+            // Add the transaction to the common transaction utils
             const commonTransactionUtils = new CommonTransactionUtils
             commonTransactionUtils.addTransaction(transaction);
               

@@ -53,6 +53,7 @@ export class Transaction extends belongsToA {
     messageId='';
     senderId='';
     receiverId='';
+    messageType='';
 
     deliveryProcessingError='';
     pickupProcessingError='';
