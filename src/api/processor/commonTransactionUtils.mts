@@ -4,11 +4,12 @@ import { CommonFunctions } from "../models/CommonFunctions.mjs";
 
 export class CommonTransactionUtils {
 
+
       constructor(){
             //
       }
 
-      async addTransaction(transaction:Transaction){
+       async addTransaction(transaction:Transaction){
         if(transaction.pickupStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED && transaction.deliveryStatus ===  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_COMPLETED ){
             transaction.status =  GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_SUCCESS;
         }       

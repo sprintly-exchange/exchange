@@ -6,6 +6,8 @@ import { filterResultsBasedOnUserRoleAndUserId, setCommonHeaders } from '../../a
 import GlobalConfiguration from '../../GlobalConfiguration.mjs';
 import { CommonFunctions } from '../../api/models/CommonFunctions.mjs';
 import { getAuthDetails } from '../../api/utilities/getOrganization&User.mjs';
+import Transaction from '../../api/models/Transaction.mjs';
+import { CommonTransactionUtils } from '../../api/processor/commonTransactionUtils.mjs';
 
 // Initialize router
 const invoiceRoutes = Router();
@@ -89,6 +91,30 @@ invoiceRoutes.post('/', upload.single('file'), (req:any, res:any) => {
             console.log('invoiceData',invoiceData);
             // Store the invoice in memory (or in a database, in real applications)
             GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
+
+           let transaction = new Transaction(
+                new Date().toISOString(),
+                GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_UPLOADED,
+                '',
+                'Manual',
+                'localhost',
+                0,
+                'Manual',
+                '',
+                'MANUAL',
+                'localhost',
+                0,
+                'Manual',
+                0,
+                0,
+                0,
+                'Manual',
+                `${authDetails.organizationId}`,
+            );
+
+            const commonTransactionUtils = new CommonTransactionUtils
+            commonTransactionUtils.addTransaction(transaction);
+              
     
             // Send a success response
             res.status(201).send(
