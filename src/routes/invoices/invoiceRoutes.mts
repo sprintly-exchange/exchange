@@ -58,79 +58,133 @@ const upload = multer({ storage: storage });
 
 // POST route to handle invoice upload
 invoiceRoutes.post('/', upload.single('file'), (req:any, res:any) => {
-        postInvoices(req,res);
-    });
+    postInvoices(req, res);
+});
 
+async function postInvoices(req:any, res:any) {
+    try {
+        CommonFunctions.logWithTimestamp('Invoice upload received');
+        setCommonHeaders(res);
 
-    async function postInvoices(req:any,res:any){
-        try {
-            CommonFunctions.logWithTimestamp('Invoice upload received');
-            setCommonHeaders(res);
-    
-            // Log received data for debugging purposes
-            //console.log('Received body:', req.body);
-            console.log('Received file:', req.file);
-            const authDetails:any = await getAuthDetails(req.headers['authorization']);
-            console.log(authDetails);
-            // Check if a file was uploaded
-            if (!req.file) {
-                res.status(400).send('No file uploaded');
-                return; // Ensure the handler ends here
-            }
-    
-            // Generate a unique ID for the invoice
-            const invoiceId = uuidv4();
-            const invoiceData = {
-                id: invoiceId,
-                fileName: req.file.originalname, // Use the uploaded file's original name
-                status: 'Pending', // Set the initial status to Pending
-                uploadedAt: new Date().toISOString(), // Store the upload timestamp
-                organizationId: `${authDetails.organizationId}`,
-            };
-    
-            console.log('invoiceData',invoiceData);
-            // Store the invoice in memory (or in a database, in real applications)
-            GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
+        console.log('Received file:', req.body);
+        const authDetails:any = await getAuthDetails(req.headers['authorization']);
+        console.log(authDetails);
 
-            // Add a transaction for the uploaded invoice
-           let transaction = new Transaction(
-                new Date().toISOString(),
-                GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_UPLOADED,
-                '',
-                'Manual',
-                'localhost',
-                0,
-                'Manual',
-                '',
-                'MANUAL',
-                'localhost',
-                0,
-                'Manual',
-                0,
-                0,
-                0,
-                GlobalConfiguration.appEnumerations.TRANSACTION_FLOW_FILE_UPLOAD_NAME,
-                `${authDetails.organizationId}`,
-            );
-
-            // Set the transaction message type and ID
-            transaction.messageType = GlobalConfiguration.appEnumerations.TRANSACTION_MESSAGE_TYPE_INVOICE;
-            transaction.messageId = invoiceId;
-            // Add the transaction to the common transaction utils
-            const commonTransactionUtils = new CommonTransactionUtils
-            commonTransactionUtils.addTransaction(transaction);
-              
-    
-            // Send a success response
-            res.status(201).send(
-                JSON.stringify(new ResponseMessage(invoiceId, 'Invoice uploaded successfully', ''))
-            );
-        } catch (error) {
-            // Handle unexpected errors
-            console.error('Error handling invoice upload:', error);
-            res.status(500).send('Internal server error');
+        if (!req.body) {
+            res.status(400).send('No invoice uploaded');
+            return;
         }
-    };
+
+        const invoiceId = uuidv4();
+        const invoiceData = {
+            id: invoiceId,
+            status: 'Pending',
+            uploadedAt: new Date().toISOString(),
+            organizationId: `${authDetails.organizationId}`,
+        };
+
+        console.log('invoiceData', invoiceData);
+        GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
+
+        let transaction = new Transaction(
+            new Date().toISOString(),
+            GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_UPLOADED,
+            '',
+            'Manual',
+            'localhost',
+            0,
+            'Manual',
+            '',
+            'MANUAL',
+            'localhost',
+            0,
+            'Manual',
+            0,
+            0,
+            0,
+            GlobalConfiguration.appEnumerations.TRANSACTION_FLOW_FILE_UPLOAD_NAME,
+            `${authDetails.organizationId}`
+        );
+
+        transaction.messageType = GlobalConfiguration.appEnumerations.TRANSACTION_MESSAGE_TYPE_INVOICE;
+        transaction.messageId = invoiceId;
+        const commonTransactionUtils = new CommonTransactionUtils();
+        commonTransactionUtils.addTransaction(transaction);
+
+        res.status(201).send(
+            JSON.stringify(new ResponseMessage(invoiceId, 'Invoice uploaded successfully', ''))
+        );
+    } catch (error) {
+        console.error('Error handling invoice upload:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+invoiceRoutes.post('/json', (req:any, res:any) => {
+    
+    postInvoicesJson(req, res);
+});
+
+async function postInvoicesJson(req:any, res:any) {
+    try {
+        CommonFunctions.logWithTimestamp('Invoice JSON upload received');
+        setCommonHeaders(res);
+
+        const authDetails:any = await getAuthDetails(req.headers['authorization']);
+        console.log(authDetails);
+
+
+
+        if (!req.body) {
+            res.status(400).send('Missing required fields');
+            return;
+        }
+
+        const invoiceId =  req.body.id || uuidv4();
+        const invoiceData = {
+            id: invoiceId,
+            content: req.body,
+            status: 'Pending',
+            uploadedAt: new Date().toISOString(),
+            organizationId: `${authDetails.organizationId}`,
+        };
+
+        console.log('invoiceData', invoiceData);
+        GlobalConfiguration.configurationInvoiceMap.set(invoiceId, invoiceData);
+
+        let transaction = new Transaction(
+            new Date().toISOString(),
+            GlobalConfiguration.appEnumerations.TRANSACTION_STATUS_UPLOADED,
+            '',
+            'Manual',
+            'localhost',
+            0,
+            'Manual',
+            '',
+            'MANUAL',
+            'localhost',
+            0,
+            'Manual',
+            0,
+            0,
+            0,
+            GlobalConfiguration.appEnumerations.TRANSACTION_FLOW_FILE_UPLOAD_NAME,
+            `${authDetails.organizationId}`
+        );
+
+        transaction.messageType = GlobalConfiguration.appEnumerations.TRANSACTION_MESSAGE_TYPE_INVOICE;
+        transaction.messageId = invoiceId;
+        const commonTransactionUtils = new CommonTransactionUtils();
+        commonTransactionUtils.addTransaction(transaction);
+
+        res.status(201).send(
+            JSON.stringify(new ResponseMessage(invoiceId, 'Invoice uploaded successfully', ''))
+        );
+    } catch (error) {
+        console.error('Error handling invoice JSON upload:', error);
+        res.status(500).send('Internal server error');
+    }
+}
 
 
 /**
